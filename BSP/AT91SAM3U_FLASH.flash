@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<flash_device>
+  <exe>$TOOLKIT_DIR$\config\flashloader\ATMEL\AT91SAM3u4-EK\internalflash-sam3u4.out</exe>
+  <flash_base>0x80000</flash_base>
+  <page>256</page>
+  <block>16 0x2000</block>
+  <macro>$TOOLKIT_DIR$\config\flashloader\ATMEL\resources\FlashAT91SAM3Ux.mac</macro>
+  <args_doc>[--flash] specifies the flash loader program internal flash.
+[--eefcbank 1] A devimal number which specifies the EEFC bank. By default is bank 0.
+[--boot] is given, it will boot from flash after it is programmed. 
+</args_doc>
+</flash_device>
+

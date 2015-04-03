@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<flash_board>
+  <pass>
+    <loader>$PROJ_DIR$\..\BSP\AT91SAM3U_FLASH0.flash</loader>
+    <range>CODE 0x80000 0xa0000</range>
+    <rel_offset>0x0</rel_offset>
+    <args>--flash
+--boot</args>
+  </pass>
+</flash_board>
+
+
