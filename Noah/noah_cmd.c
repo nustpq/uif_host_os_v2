@@ -74,7 +74,7 @@ void  Init_CMD_Read (CMDREAD   *pCMD_Read,
                      OS_EVENT  *pOS_EVENT)
 {
     
-    pCMD_Read->state_mac    = CMD_STAT_SYNC1 ;
+    pCMD_Read->state_mac    = STAT_SYNC1 ;
     pCMD_Read->pRecvPtr     = NULL;
     pCMD_Read->PcCmdCounter = 0 ;
     pCMD_Read->PcCmdDataLen = 0 ;  
@@ -96,111 +96,102 @@ void  Init_CMD_Read (CMDREAD   *pCMD_Read,
 *********************************************************************************************************
 */
 void  Noah_CMD_Read (CMDREAD    *pCMD_Read,
-                     CPU_INT08U  ch)
+                     CPU_INT08U  data_byte)
 { 
     
     CPU_INT08U   err;    
-    OS_MEM_DATA  MemInfo ;
-    NOAH_CMD    *pNoahCmd = NULL ; 
     
     CPU_INT08U   state_mac       = pCMD_Read->state_mac ;
-    CPU_INT08U  *pRecvPtr        = pCMD_Read->pRecvPtr;
-    CPU_INT16U   PcCmdCounter    = pCMD_Read->PcCmdCounter;
-    CPU_INT16U   PcCmdDataLen    = pCMD_Read->PcCmdDataLen;
+    pNEW_CMD     pRecvPtr        = (pNEW_CMD)pCMD_Read->pRecvPtr;
+    CPU_INT32U   PcCmdCounter    = pCMD_Read->PcCmdCounter;
+    CPU_INT32U   PcCmdDataLen    = pCMD_Read->PcCmdDataLen;
+   
     
     switch( state_mac ) {   
         
-        case CMD_STAT_SYNC1 :        
-            if(ch == CMD_DATA_SYNC1)  {
-                state_mac = CMD_STAT_SYNC2 ;
+        case STAT_SYNC1 :        
+            if(data_byte == CMD_DATA_SYNC1)  {
+                state_mac = STAT_LENGTH ;
+                PcCmdCounter = 0;
+                PcCmdDataLen = 0;
             }
         break;
         
-        case CMD_STAT_SYNC2 :
-            if(ch == CMD_DATA_SYNC2)  {             
-                err =   OSMemQuery( pMEM_Part_MsgUART,&MemInfo );	                
-                if( MemInfo.OSNFree > 1 && OS_ERR_NONE == err )  {
+        case STAT_LENGTH :   //3 bytes
+             PcCmdDataLen = (PcCmdDataLen << 8) + data_byte ;
+             if( ++PcCmdCounter == 3 ) { 
+                if(PcCmdDataLen > NEW_CMD_DATA_MLEN ) { //error
+                    state_mac    = STAT_SYNC1 ;
+                } else { 
+                    state_mac    = STAT_SYNC2 ;
+                }
+             }          
+        break ;        
+        
+        case STAT_SYNC2 :
+            if(data_byte == CMD_DATA_SYNC2)  {             
+                state_mac = STAT_FLAG;
+            } else {              
+                state_mac = STAT_SYNC1;                
+            }
+        break ;        
+        
+        case STAT_FLAG :    
+            if( 1 <= data_byte && data_byte <= 31 ) {
+                while(1) {
                     pRecvPtr = (void *)OSMemGet(pMEM_Part_MsgUART,&err);
                     if( NULL != pRecvPtr && OS_ERR_NONE == err )  {
-                        state_mac     =  CMD_STAT_FLAG;
-                        PcCmdCounter  = 0 ;                        
+                        break;
                     }
-                } 
-                
-            } else {
+                    OSTimeDly(5); //wait for free MemoryPart
+                }            
+                pRecvPtr->head_sync_1 = CMD_DATA_SYNC1;
+                pRecvPtr->head_sync_2 = CMD_DATA_SYNC2;
+                pRecvPtr->data_len[0] = (PcCmdDataLen>>16) & 0xFF;
+                pRecvPtr->data_len[1] = (PcCmdDataLen>>8) & 0xFF;
+                pRecvPtr->data_len[2] = (PcCmdDataLen)& 0xFF;     
+                pRecvPtr->pkt_sn      = data_byte; 
+                state_mac     =  STAT_CMD;
+                PcCmdCounter  =  0 ;
+            } else{
+                state_mac = STAT_SYNC1; 
+            }         
+        break ;
+        
+        case STAT_CMD :                 
+            pRecvPtr->cmd[PcCmdCounter++] = data_byte; 
+            if(PcCmdCounter == 2 ) {
+                state_mac = STAT_DATA;
+                PcCmdCounter = 0;
+            }        
+        break ;
+        
+        case STAT_DATA :            
+            pRecvPtr->data[PcCmdCounter++] = data_byte;  
+            if( PcCmdCounter == PcCmdDataLen ) {             
+               state_mac = STAT_SYNC1; 
+               PcCmdCounter = 0 ;  
+               PcCmdDataLen = 0 ;                
+//               err  = OSQPost( pCMD_Read->pEvent, pRecvPtr); // EVENT_MsgQ_PCUART2Noah  //Send valid CMD inf to Uart2task0 Messege Queue                    
+//               if( OS_ERR_NONE == err )  {              
+//                   pRecvPtr  = NULL;                 
+//               } else {  
+//                   OSMemPut( pMEM_Part_MsgUART, pRecvPtr );              
+//               }
+////                Time_Stamp();
+////                APP_TRACE_INFO(("\r\n::::: Noah_CMD_Read post data "));
               
-                state_mac = CMD_STAT_SYNC1;                
-            }
-        break ;
-        
-        case CMD_STAT_FLAG :            
-            *( pRecvPtr + PcCmdCounter++ ) = ch; //save in buf
-       
-            switch( GET_FRAME_TYPE(ch) )  {
-                    case FRAM_TYPE_DATA :
-                    case FRAM_TYPE_GDD_IIC :
-                        state_mac =  CMD_STAT_LENGTH ;
-                        break ;                
-                    case FRAM_TYPE_ACK :
-                    case FRAM_TYPE_NAK :
-                    case FRAM_TYPE_EST :
-                    case FRAM_TYPE_ESTA :
-                        *( pRecvPtr + PcCmdCounter++ ) = 0; //set datalen = 0
-                        state_mac =  CMD_STAT_CHECKSUM ;
-                        break;                    
-                    default :
-                        break ;                        
-            }
-         
-        break ;
-        
-        case CMD_STAT_LENGTH :            
-            *( pRecvPtr + PcCmdCounter++ ) = ch;      
-             PcCmdDataLen = ch ; // global
-             state_mac    = CMD_STAT_DATA ;
-          
-        break ;
-        
-        case CMD_STAT_DATA :
-            *( pRecvPtr + PcCmdCounter++ ) = ch;
-            if( PcCmdCounter >= MAXBUFLEN ) { //check verflow             
-               state_mac = CMD_STAT_SYNC1; 
-               OSMemPut( pMEM_Part_MsgUART, pRecvPtr ); 
-            } else if(PcCmdCounter >= PcCmdDataLen + 2) { // data over, the check sum will be followed              
-                state_mac =  CMD_STAT_CHECKSUM ;
-            }
-        break ;
-        
-        case CMD_STAT_CHECKSUM :   
-            pNoahCmd = (NOAH_CMD *)pRecvPtr;             
-            pNoahCmd->checkSum = ch ;   //get check sum data            
+               
+            err = EMB_Data_Parse( pRecvPtr );
             
-            if( PcCmdCounter >= MAXBUFLEN ) { //check verflow            
-                state_mac = CMD_STAT_SYNC1; 
-                OSMemPut( pMEM_Part_MsgUART, pRecvPtr );
-                
-            }  else {         
-                state_mac    = CMD_STAT_SYNC1 ; //reset state machine  
-                PcCmdCounter = 0 ;  
-                PcCmdDataLen = 0 ;
-                
-                err  = OSQPost( pCMD_Read->pEvent, pRecvPtr); // EVENT_MsgQ_PCUART2Noah  //Send valid CMD inf to Uart2task0 Messege Queue
-                if( OS_ERR_NONE == err )  {              
-                   pRecvPtr  = NULL;                 
-                } else {  
-                   OSMemPut( pMEM_Part_MsgUART, pRecvPtr );              
-                }
-//                Time_Stamp();
-//                APP_TRACE_INFO(("\r\n::::: Noah_CMD_Read post data "));
-              
+            OSMemPut( pMEM_Part_MsgUART, pRecvPtr );  //release mem
+            
+            
             }
-        break ;
-        
-        case CMD_STAT_FRAM :   
-        break;
+        break ;        
         
         default :
-            state_mac     = CMD_STAT_SYNC1;
+            state_mac     = STAT_SYNC1;
             PcCmdCounter  = 0 ;
         break ;
     }
@@ -346,6 +337,63 @@ CPU_INT08U  pcSendDateToBuf (OS_EVENT    *pOS_EVENT,
 }
 
 
+CPU_INT08U  pcSendDateToBuffer ( OS_EVENT    *pOS_EVENT,                               
+                                 RAW_READ    *p_raw_read,
+                                 CPU_INT08U   pkt_index,
+                                 CPU_INT16U   cmd_id                                 
+                               )
+{
+    
+    CPU_INT08U  *pMemPtr;
+    pNEW_CMD     pSendPtr;    
+    CPU_INT08U   err;
+    CPU_INT32U   data_length;
+    
+    err         = 0;  
+    pSendPtr    = NULL;
+    pMemPtr     = NULL;  
+        
+    while(1) {
+        pMemPtr = (void *)OSMemGet(pMEM_Part_MsgUART,&err);
+        if( (NULL != pMemPtr) && (OS_ERR_NONE == err) )  {
+            break;
+        }
+        while(1){
+               APP_TRACE_INFO(("\r\n::::: error"));
+        };
+        OSTimeDly(5); //wait for free MemoryPart
+    }
+    pSendPtr = (pNEW_CMD)pMemPtr;
+ 
+    if( cmd_id != 0 ) { 
+        err = EMB_Data_Build( cmd_id, pSendPtr->data, p_raw_read, &data_length );  
+        
+    } else { //report package
+        pSendPtr->data[0] = *(unsigned char *)p_raw_read;
+        data_length = 1;
+        
+    }
+    
+    if( OS_ERR_NONE == err )  {    
+        pSendPtr->head_sync_1 = CMD_DATA_SYNC1;     
+        pSendPtr->head_sync_2 = CMD_DATA_SYNC2;
+        pSendPtr->data_len[0] = (data_length>>16)&0xFF; 
+        pSendPtr->data_len[1] = (data_length>>8)&0xFF;
+        pSendPtr->data_len[2] = (data_length)&0xFF;
+        pSendPtr->pkt_sn      = pkt_index;
+        pSendPtr->cmd[0]      = (cmd_id>>8)&0xFF;
+        pSendPtr->cmd[1]      = (cmd_id)&0xFF;  
+           
+        err = OSQPost( pOS_EVENT, pMemPtr );         
+        if( OS_ERR_NONE != err )  {   
+            OSMemPut( pMEM_Part_MsgUART, pMemPtr ); 
+        }
+    }
+          
+    return  err;
+    
+}
+
 /*
 *********************************************************************************************************
 *                                           EMB_Data_Check()
@@ -360,7 +408,7 @@ CPU_INT08U  pcSendDateToBuf (OS_EVENT    *pOS_EVENT,
 * Note(s)     : None.
 *********************************************************************************************************
 */
-CPU_INT08U  EMB_Data_Check (NOAH_CMD   *pNoahCmd, 
+CPU_INT08U  EMB_Data_Check (pNEW_CMD    pNewCmd, 
                             EMB_BUF    *pEBuf,
                             CPU_INT08U  delay)
 {
@@ -368,23 +416,27 @@ CPU_INT08U  EMB_Data_Check (NOAH_CMD   *pNoahCmd,
     CPU_INT08U   err;
     CPU_INT16U   data_cmd_len;
     CPU_INT08U  *p_data_cmd;
-   
+    CPU_INT16U   cmd; //for new protocol
+    
     //Time_Stamp();                      
-    //APP_TRACE_INFO(("\r\n::::: EMB_Data_Check "));
-           
-            
+    //APP_TRACE_INFO(("\r\n::::: EMB_Data_Check "));           
+                
+    cmd = (pNewCmd->cmd[0]<<8) + (pNewCmd->cmd[1]); //right now, not used
+    APP_TRACE_INFO(("\r\n::::: cmd = %d",cmd));
+    
     err          = NO_ERR;
-    p_data_cmd   = pNoahCmd->Data ;
-    data_cmd_len = pNoahCmd->DataLen ;   
+    p_data_cmd   = pNewCmd->data;  //  pNoahCmd->Data ;
+    data_cmd_len = (pNewCmd->data_len[0]<<16) + (pNewCmd->data_len[1]<<8) + pNewCmd->data_len[2]; // pNoahCmd->DataLen ;   
+    pEBuf->pkt_sn= pNewCmd->pkt_sn;
     
     p_data_cmd  += delay;
     data_cmd_len-= delay;
     
     if( pEBuf->state ) { //new data pack        
      
-        if( *p_data_cmd++ == EMB_DATA_FRAME ) { //sync data          
-            pEBuf->index   = *p_data_cmd++ ;
-            pEBuf->index  += ((*p_data_cmd++)<<8) ; 
+       // if( *p_data_cmd++ == EMB_DATA_FRAME ) { //sync data          
+            //pEBuf->index   = *p_data_cmd++ ;
+            //pEBuf->index  += ((*p_data_cmd++)<<8) ; 
             pEBuf->length  = pEBuf->index; //reserve length
             if( pEBuf->length > EMB_BUF_SIZE ) {
                 APP_TRACE_INFO(("EMB data length exceed the Max %d B\r\n",EMB_BUF_SIZE));
@@ -398,10 +450,10 @@ CPU_INT08U  EMB_Data_Check (NOAH_CMD   *pNoahCmd,
             memcpy( pEBuf->pdata, p_data_cmd, data_cmd_len-3 );
             pEBuf->pdata += data_cmd_len-3 ;
             
-        } else {          
-            err = EMB_FORMAT_ERR; 
+       // } else {          
+       //     err = EMB_FORMAT_ERR; 
             
-        }
+       // }
       
     } else { //next data pack
 
@@ -471,7 +523,7 @@ CPU_INT08U  Noah_CMD_Parse_Ruler (NOAH_CMD    *pNoahCmd,
             index += 1;        
         case RULER_CMD_RAED_RULER_INFO :  
             index += 1;
-            err = EMB_Data_Check( pNoahCmd, pEBuf_Data, index );       
+            //err = EMB_Data_Check( pNoahCmd, pEBuf_Data, index );       
             if( err != OS_ERR_NONE ) {
                 Init_EMB_BUF( pEBuf_Data ); 
             } else {
@@ -529,13 +581,13 @@ CPU_INT08U  Noah_CMD_Parse_Ruler (NOAH_CMD    *pNoahCmd,
 void  Send_DACK (CPU_INT08U  error_id)
 {
    
-    CPU_INT08U   DAckBuf[2]; 
-    
-    DAckBuf[0] = CMD_D_ACK ;
-    DAckBuf[1] = error_id ;
-    APP_TRACE_DBG(("%2x ",error_id));
-    pcSendDateToBuf( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, DAckBuf, 2, 0, NULL, 0 ) ; //send data: command error status  
-   
+//    CPU_INT08U   DAckBuf[2]; 
+//    
+//    DAckBuf[0] = CMD_D_ACK ;
+//    DAckBuf[1] = error_id ;
+//    APP_TRACE_DBG(("%2x ",error_id));
+//    pcSendDateToBuf( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, DAckBuf, 2, 0, NULL, 0 ) ; //send data: command error status  
+//   
     
 }
 
@@ -554,13 +606,35 @@ void  Send_DACK (CPU_INT08U  error_id)
 void  Send_GACK (CPU_INT08U  error_id)
 {
   
-    CPU_INT08U   GAckBuf[2]; 
-    
-    GAckBuf[0] = CMD_G_ACK ;
-    GAckBuf[1] = error_id ;
-    APP_TRACE_DBG(("%2x ",error_id));
-    pcSendDateToBuf( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, GAckBuf, 2, 0, NULL, 0 ) ; 
+//    CPU_INT08U   GAckBuf[2]; 
+//    
+//    GAckBuf[0] = CMD_G_ACK ;
+//    GAckBuf[1] = error_id ;
+//    APP_TRACE_DBG(("%2x ",error_id));
+//    pcSendDateToBuf( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, GAckBuf, 2, 0, NULL, 0 ) ; 
      
+    
+}
+
+
+/*
+*********************************************************************************************************
+*                                           Send_Report()
+*
+* Description : Package and send report command  
+* Argument(s) : pkt_sn   : package index
+*               error_id :  error number as define
+* Return(s)   : None. 
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void  Send_Report (CPU_INT08U pkt_sn, CPU_INT08U error_id)
+{
+    
+    APP_TRACE_DBG(("Error: %2x ",error_id));
+    pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, (RAW_READ*)&error_id, pkt_sn, 0 ) ; 
+
     
 }
 
@@ -578,21 +652,19 @@ void  Send_GACK (CPU_INT08U  error_id)
 * Note(s)     : None.
 *********************************************************************************************************
 */
-static CPU_INT08U  EMB_Data_Build (EMB_BUF     *pEBuf, 
-                                   CPU_INT08U   cmd_type,
-                                   PCCMDDAT     *pPCCMD)
+CPU_INT08U  EMB_Data_Build (  CPU_INT16U   cmd_type, 
+                              CPU_INT08U  *pChar,                          
+                              RAW_READ     *pRawRead,
+                              CPU_INT32U  *p_emb_length)
 {
     
     CPU_INT08U   err;
-    CPU_INT32S   pos;  
-    CPU_INT08U  *pChar;
+    CPU_INT32S   pos;     
     emb_builder  builder;
-    CPU_INT08U   ver_buf[25];  //sizeof(Audio_Version) + szieof(fw_version)
-        
-    err      =  NO_ERR ;
-    pChar    =  &(pEBuf->data[0]);    
-    *pChar   =  EMB_DATA_FRAME;
-    pChar   +=  3;
+    CPU_INT08U   ver_buf[25];  //sizeof(Audio_Version) + szieof(fw_version)    
+    
+    err      =  NO_ERR ; 
+    pos      =  0;
     
     switch( cmd_type ){      
 
@@ -602,9 +674,7 @@ static CPU_INT08U  EMB_Data_Build (EMB_BUF     *pEBuf,
             pos = emb_append_attr_uint(&builder, pos, 2, *(CPU_INT32U *)(&Global_Ruler_State) ); 
             pos = emb_append_attr_uint(&builder, pos, 3, *(CPU_INT32U *)(&Global_Mic_State));    
             pos = emb_append_end(&builder, pos);
-            pEBuf->data[1] = pos & 0xFF;    
-            pEBuf->data[2] = (pos>>8) & 0xFF; 
-            pEBuf->length = pos + 3;            
+            *p_emb_length = pos;             
         break;
           
         case DATA_AB_INFO : 
@@ -615,31 +685,29 @@ static CPU_INT08U  EMB_Data_Build (EMB_BUF     *pEBuf,
             strcat( (char*)ver_buf, (char*)Audio_Version ); 
             pos = emb_append_attr_string(&builder, pos, 3, (const char*)ver_buf);    
             pos = emb_append_end(&builder, pos);
-            pEBuf->data[1] = pos & 0xFF;    
-            pEBuf->data[2] = (pos>>8) & 0xFF; 
-            pEBuf->length = pos + 3;          
+            *p_emb_length = pos;           
         break;
         
         case DATA_UIF_RAW_RD :
             pos = emb_init_builder(pChar, EMB_BUF_SIZE, cmd_type, &builder);
-            pos = emb_append_attr_uint(&builder, pos, 1, pPCCMD->raw_read.if_type);
-            pos = emb_append_attr_uint(&builder, pos, 2, pPCCMD->raw_read.dev_addr); 
-            pos = emb_append_attr_uint(&builder, pos, 3, pPCCMD->raw_read.data_len_read);            
-            pos = emb_append_attr_binary(&builder, pos, 4, pPCCMD->raw_read.pdata_read, pPCCMD->raw_read.data_len_read);
+            pos = emb_append_attr_uint(&builder, pos, 1, pRawRead->if_type);
+            pos = emb_append_attr_uint(&builder, pos, 2, pRawRead->dev_addr); 
+            pos = emb_append_attr_uint(&builder, pos, 3, pRawRead->data_len_read);            
+            pos = emb_append_attr_binary(&builder, pos, 4, pRawRead->pdata_read, pRawRead->data_len_read);
             pos = emb_append_end(&builder, pos);
-            pEBuf->data[1] = pos & 0xFF;    
-            pEBuf->data[2] = (pos>>8) & 0xFF; 
-            pEBuf->length = pos + 3;        
-        
+            *p_emb_length = pos;   
         break;
         
         default:
             err = CMD_NOT_SURRPORT ;    
             
-        break ;
-        
-    }     
- 
+        break ;       
+    } 
+    
+    if( pos > NEW_CMD_DATA_MLEN ) { 
+        err = EMB_LEN_OERFLOW_ERR;              
+    }
+    
     return err;
   
 }
@@ -657,25 +725,33 @@ static CPU_INT08U  EMB_Data_Build (EMB_BUF     *pEBuf,
 * Note(s)     : This routine do NOT support reentrance
 *********************************************************************************************************
 */
-CPU_INT08U  EMB_Data_Parse (EMB_BUF  *pEBuf_Cmd) 
+CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd ) 
 {
     
     CPU_INT08U    err; 
-    CPU_INT08U    cmd_type; 
+    CPU_INT08U    cmd_index, cmd_type; 
     CPU_INT32S    temp, temp2;      
     emb_t         root;
     PCCMDDAT      PCCmd;
     EMB_BUF      *pEBuf_Data;
+    
     CPU_INT08U    buf[3];
     CPU_INT08U   *pdata;
-    CPU_INT16U    data_length;
+    CPU_INT32U    data_length;
     const void   *pBin;
+    CPU_INT08U    pkt_sn;
+       
+    err          =  NO_ERR; 
     
-    err  =  NO_ERR;    
-    pEBuf_Data = &Emb_Buf_Data; 
-   
-    emb_attach( &(pEBuf_Cmd->data[0]), pEBuf_Cmd->length, &root );        
+    cmd_index    = (pNewCmd->cmd[0] <<8) + pNewCmd->cmd[1];
+    pkt_sn       = pNewCmd->pkt_sn;
+    data_length  = (pNewCmd->data_len[0] <<16) + (pNewCmd->data_len[1] <<8) + pNewCmd->data_len[2] ; // pNoahCmd->DataLen ;   
+      
+    emb_attach( pNewCmd->data, data_length, &root );        
     cmd_type = emb_get_id(&root);   
+    if( cmd_type != cmd_index ) {
+        APP_TRACE_INFO(("\r\nWARN: CMD Index(%d) != EMB Element ID(%d)\r\n",cmd_index,cmd_type));
+    }
     
 //    Time_Stamp();
 //    APP_TRACE_INFO(("\r\n::::: EMB_Data_Parse: cmd type=%d ",cmd_type));
@@ -683,133 +759,125 @@ CPU_INT08U  EMB_Data_Parse (EMB_BUF  *pEBuf_Cmd)
     switch( cmd_type )  {
         
         case PC_CMD_SET_AUDIO_CFG : 
-            Send_DACK(err);
+           
             temp = emb_get_attr_int(&root, 1, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
+            if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
             PCCmd.audio_cfg.type = (CPU_INT08U)temp;            
             temp = emb_get_attr_int(&root, 2, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
+            if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
             PCCmd.audio_cfg.sr = (CPU_INT16U)temp;            
             temp = emb_get_attr_int(&root, 3, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
+            if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
             PCCmd.audio_cfg.channels = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 4, 0);            
             PCCmd.audio_cfg.lin_ch_mask = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 5, 0);            
             PCCmd.audio_cfg.bit_length = (CPU_INT08U)temp; 
             err = Setup_Audio( &PCCmd.audio_cfg );
-            Send_GACK(err);
-   
+
         break ;
         
         case PC_CMD_START_AUDIO :
-            Send_DACK(err);
+
             temp = emb_get_attr_int(&root, 1, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
+            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.start_audio.type = (CPU_INT08U)temp;             
             temp = emb_get_attr_int(&root, 2, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
+            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.start_audio.padding = (CPU_INT08U)temp; 
             err = Ruler_Active_Control(1);              
-            if( err != NO_ERR ) { Send_GACK(err); break; }            
+            if( err != NO_ERR ) { err = EMB_CMD_ERR;  break; }            
             err = Start_Audio( PCCmd.start_audio );
-            Send_GACK(err);
+
         break ;
         
         case PC_CMD_STOP_AUDIO :
-            Send_DACK(err);  
+             
             err = Ruler_Active_Control(0);                 
-            if( err != NO_ERR ) { Send_GACK(err); break; }
+            if( err != NO_ERR ) { err = EMB_CMD_ERR;  break; }
             err = Stop_Audio(); 
-            Send_GACK(err);
+           
         break ;    
         
         case PC_CMD_RESET_AUDIO :
-            Send_DACK(err);           
+                   
             err = Reset_Audio(); 
-            Send_GACK(err);
+         
         break ; 
                 
         ////////////////////////////////////////////////////////////////////////        
         
         case PC_CMD_SET_IF_CFG :
-            Send_DACK(err);
+          
             temp = emb_get_attr_int(&root, 1, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
+            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.interface_cfg.if_type = (CPU_INT08U)temp;             
             temp = emb_get_attr_int(&root, 2, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
+            if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
             PCCmd.interface_cfg.speed = (CPU_INT16U)temp;   
             temp = emb_get_attr_int(&root, 3, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
+            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.interface_cfg.attribute = (CPU_INT08U)temp; 
             err = Setup_Interface( &PCCmd.interface_cfg );
-            Send_GACK(err);
+            
         break ;
         
         case PC_CMD_RAW_WRITE :
-//            Time_Stamp();
-//            APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE "));
-//            
-            Send_DACK(err);            
+        
+//            APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE "));          
+//            Time_Stamp();          
             temp = emb_get_attr_int(&root, 1, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
+            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_write.if_type = (CPU_INT08U)temp;             
             temp = emb_get_attr_int(&root, 2, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
+            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_write.dev_addr = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 3, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
+            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_write.data_len = (CPU_INT32U)temp;  
+//            Time_Stamp();
             pBin = emb_get_attr_binary(&root, 4, (int*)&temp);
-            if(pBin == NULL ) { Send_GACK(EMB_CMD_ERR);  break; }
+            if(pBin == NULL ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_write.pdata = (CPU_INT08U *)pBin; 
             err = Raw_Write( &PCCmd.raw_write );
-            Send_GACK(err);
 //            Time_Stamp();
-//            APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE end "));
-        
+//            APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE end "));  
+            
         break ;
         
-        case PC_CMD_RAW_READ :
-            Send_DACK(err);           
+        case PC_CMD_RAW_READ :  
+        
             temp = emb_get_attr_int(&root, 1, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
+            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_read.if_type = (CPU_INT08U)temp;             
             temp = emb_get_attr_int(&root, 2, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
+            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_read.dev_addr = (CPU_INT08U)temp;            
             temp = emb_get_attr_int(&root, 3, -1);           
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
-            PCCmd.raw_read.data_len_read = (CPU_INT32U)temp;  
-            
+            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
+            PCCmd.raw_read.data_len_read = (CPU_INT32U)temp;              
             temp = emb_get_attr_int(&root, 4, -1);
-            if(temp == -1 ) { 
-                //Send_GACK(EMB_CMD_ERR);  break; 
-                temp = 0;};
-            PCCmd.raw_read.data_len_write = (CPU_INT32U)temp;  
+            if(temp == -1 ) {  temp = 0;};
+            PCCmd.raw_read.data_len_write = (CPU_INT32U)temp;             
             pBin = emb_get_attr_binary(&root, 5, (int*)&temp);
-            if(pBin == NULL ) { 
-                //Send_GACK(EMB_CMD_ERR);  break; 
-            }            
-            PCCmd.raw_read.pdata_write = (CPU_INT08U *)pBin;             
+            if(pBin == NULL && temp) { err = EMB_CMD_ERR;  break; }            
+            PCCmd.raw_read.pdata_write = (CPU_INT08U *)pBin; 
+            
             err = Raw_Read( &PCCmd.raw_read );
-            if( err != NO_ERR ) { Send_GACK(err); break; }             
-            err = EMB_Data_Build( pEBuf_Data, DATA_UIF_RAW_RD, &PCCmd );                    
-            pdata = pEBuf_Data->data;
-            data_length = pEBuf_Data->length;
-            //APP_TRACE_INFO(("\r\n::::: data_length %d", data_length));
-            while( data_length > 0 ){ 
-                temp = data_length > (NOAH_CMD_DATA_MLEN-2) ? (NOAH_CMD_DATA_MLEN-2) : data_length ;  
-                //APP_TRACE_INFO(("\r\n::::: temp %d", temp));
-                err = pcSendDateToBuf( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, pdata, temp, 0, NULL, 0 ) ; 
-                //Dump_Data(pdata,temp);
-                if( OS_ERR_NONE != err ) { break;}                    
-                data_length -= temp;
-                pdata += temp;        
-            }      
-            Send_GACK(err);           
+            if( err != NO_ERR ) { err = EMB_CMD_ERR;  break; } 
+            
+            err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
+                                      &PCCmd.raw_read,
+                                      pkt_sn, 
+                                      DATA_UIF_RAW_RD ) ;   
+            
         break ;
+        
+        
+        
+        
+        
+/***************************************************************************
         
 //        case PC_CMD_BURST_WRITE :
 //            Send_DACK(err);            
@@ -1049,14 +1117,16 @@ CPU_INT08U  EMB_Data_Parse (EMB_BUF  *pEBuf_Cmd)
              
              Send_GACK(err);               
         break ;         
+*************************************************************************/  
+        
         
         default :            
-            err = CMD_NOT_SURRPORT ;
-            Send_DACK(err);
-            
+            err = CMD_NOT_SURRPORT ;   
         break ;
         
     }
+    
+    Send_Report( pkt_sn, err );
     
     return err;
 
@@ -1087,30 +1157,30 @@ CPU_INT08U  AB_Status_Change_Report (void)
     pEBuf = &Emb_Buf_Cmd;
     flag  = 0;    
 
-    for( i = 0; i < 4; i++ ) {
-        if( (Ruler_State_Previous[i] == 0) && (Global_Ruler_State[i] > 1) ||
-            (Ruler_State_Previous[i] > 1)  && (Global_Ruler_State[i] == 0) ) {
-            flag = 1; 
-            Ruler_State_Previous[i] =  Global_Ruler_State[i];   
-        }
-    }
-    
-    if( flag == 0 ) {//no state changed
-       return err;
-    }
-    
-    if( Global_Conn_Ready == 0 || Global_Idle_Ready == 0) { //no connection setup, or commu busy
-        return err;
-    } 
-    Global_Idle_Ready = 0 ;
-    
-    err = EMB_Data_Build( pEBuf, DATA_AB_STATUS, NULL );  
-    if( err != NO_ERR ) {
-        return err;
-    }
-    
-    err = pcSendDateToBuf( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, pEBuf->data, pEBuf->length, 0, NULL, 0 ) ;   
-    
+//    for( i = 0; i < 4; i++ ) {
+//        if( (Ruler_State_Previous[i] == 0) && (Global_Ruler_State[i] > 1) ||
+//            (Ruler_State_Previous[i] > 1)  && (Global_Ruler_State[i] == 0) ) {
+//            flag = 1; 
+//            Ruler_State_Previous[i] =  Global_Ruler_State[i];   
+//        }
+//    }
+//    
+//    if( flag == 0 ) {//no state changed
+//       return err;
+//    }
+//    
+//    if( Global_Conn_Ready == 0 || Global_Idle_Ready == 0) { //no connection setup, or commu busy
+//        return err;
+//    } 
+//    Global_Idle_Ready = 0 ;
+//    
+//    err = EMB_Data_Build( pEBuf, DATA_AB_STATUS, NULL );  
+//    if( err != NO_ERR ) {
+//        return err;
+//    }
+//    
+//    err = pcSendDateToBuf( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, pEBuf->data, pEBuf->length, 0, NULL, 0 ) ;   
+//    
     return err;
   
 }

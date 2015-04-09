@@ -264,7 +264,7 @@ void Buzzer_OnOff( unsigned char onoff )
         return;
     }
     
-    if( onoff == 1 ) {
+    if( onoff == 0 ) {
         PIO_Clear( &pinsBuzzer[0] ); //buzzer 
         
     } else {

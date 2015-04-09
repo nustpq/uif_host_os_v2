@@ -42,6 +42,9 @@ OS_EVENT * SPI_Sem = NULL ; //sem for TWI
 
 AT91PS_SPI spi_if = AT91C_BASE_SPI0 ;
 
+#define SPI_TIME_OUT  2000  //2000ms time out
+
+
 //------------------------------------------------------------------------------
 //         Exported functions
 //------------------------------------------------------------------------------
@@ -111,7 +114,7 @@ void SPI_Write(AT91S_SPI *spi, unsigned int npcs, unsigned short data)
 {
     unsigned char  err;
     
-    OSSemPend( SPI_Sem, 0, &err );
+    //OSSemPend( SPI_Sem, 0, &err );
     
     // Discard contents of RDR register
     //volatile unsigned int discard = spi->SPI_RDR;
@@ -120,7 +123,7 @@ void SPI_Write(AT91S_SPI *spi, unsigned int npcs, unsigned short data)
     spi->SPI_TDR = data | SPI_PCS(npcs);
     while ((spi->SPI_SR & AT91C_SPI_TDRE) == 0);
    
-    OSSemPost( SPI_Sem );
+    //OSSemPost( SPI_Sem );
       
 }
 
@@ -136,6 +139,7 @@ unsigned char SPI_WriteBuffer(AT91S_SPI *spi,
                                      unsigned int length)
 {
 #if !defined(CHIP_SPI_DMA)
+    
     // Check if first bank is free
     if (spi->SPI_TCR == 0) {
         spi->SPI_TPR = (unsigned int) buffer;
@@ -149,9 +153,52 @@ unsigned char SPI_WriteBuffer(AT91S_SPI *spi,
         spi->SPI_TNCR = length;
         return 1;
     }
+    // No free bank
+    else  
+    {
+        return 0;
+    }
+#else
+    unsigned char* startSourceAddr;
+    unsigned char* startDestAddr;
+    startSourceAddr = (unsigned char*)(buffer);
+    startDestAddr   = (unsigned char*)(&spi->SPI_TDR);
+       
+    // Clear any pending interrupts
+    //DMA_GetStatus();
+   
+    AT91C_BASE_HDMA->HDMA_CH[BOARD_SPI_DMA_CHANNEL].HDMA_SADDR = (unsigned int)startSourceAddr; 
+    AT91C_BASE_HDMA->HDMA_CH[BOARD_SPI_DMA_CHANNEL].HDMA_DADDR = (unsigned int)startDestAddr;
+    
+    AT91C_BASE_HDMA->HDMA_CH[BOARD_SPI_DMA_CHANNEL].HDMA_CTRLA = \
+                                        (length \
+                                        | AT91C_HDMA_SRC_WIDTH_BYTE \
+                                        | AT91C_HDMA_DST_WIDTH_BYTE \
+                                        | AT91C_HDMA_SCSIZE_1 \
+                                        | AT91C_HDMA_DCSIZE_1) ; 
+    
+    AT91C_BASE_HDMA->HDMA_CH[BOARD_SPI_DMA_CHANNEL].HDMA_CTRLB = \
+                                          AT91C_HDMA_SRC_DSCR_FETCH_DISABLE \
+                                        | AT91C_HDMA_DST_ADDRESS_MODE_FIXED \
+                                        | AT91C_HDMA_SRC_ADDRESS_MODE_INCR \
+                                        | AT91C_HDMA_FC_MEM2PER ;  
+    
+    AT91C_BASE_HDMA->HDMA_CH[BOARD_SPI_DMA_CHANNEL].HDMA_CFG = \
+                                         (DMA_HW_SRC_REQ_ID_SPI \
+                                        | DMA_HW_DEST_REQ_ID_SPI \
+                                        | AT91C_HDMA_SRC_H2SEL_SW \
+                                        | AT91C_HDMA_DST_H2SEL_HW \
+                                        | AT91C_HDMA_SOD_ENABLE \
+                                        | AT91C_HDMA_FIFOCFG_LARGESTBURST);        
+    
+ 
+    
+    DMA_EnableChannel(BOARD_SPI_DMA_CHANNEL);
+    
+    return 1;
+ 
 #endif      
-    // No free banks
-    return 0;
+
 }
 
 //------------------------------------------------------------------------------
@@ -161,8 +208,13 @@ unsigned char SPI_WriteBuffer(AT91S_SPI *spi,
 //------------------------------------------------------------------------------
 unsigned char SPI_IsWriteFinished(AT91S_SPI *pSpi)
 {
-   //   return ((pSpi->SPI_SR & AT91C_SPI_TXEMPTY) != 0);
+#if !defined(CHIP_SPI_DMA)
+ 
+    //   return ((pSpi->SPI_SR & AT91C_SPI_TXEMPTY) != 0);
    return ((pSpi->SPI_SR & AT91C_SPI_ENDTX) != 0);
+#else
+   return( DMAD_IsFinished(BOARD_SPI_DMA_CHANNEL) );
+#endif
 }
 
 
@@ -228,10 +280,58 @@ unsigned char SPI_ReadBuffer(AT91S_SPI *spi,
         
         return 1;
     }
-#endif
     // No free bank
-    return 0;
+    else  
+    {
+        return 0;
+    }
+    
+#else  
+    
+    unsigned char* startSourceAddr;
+    unsigned char* startDestAddr;
+    startSourceAddr = (unsigned char*)(&spi->SPI_RDR);
+    startDestAddr   = (unsigned char*)(buffer);
+       
+    // Clear any pending interrupts
+    //DMA_GetStatus();
+   
+    AT91C_BASE_HDMA->HDMA_CH[BOARD_SPI_DMA_CHANNEL].HDMA_SADDR = (unsigned int)startSourceAddr; 
+    AT91C_BASE_HDMA->HDMA_CH[BOARD_SPI_DMA_CHANNEL].HDMA_DADDR = (unsigned int)startDestAddr;
+    
+    AT91C_BASE_HDMA->HDMA_CH[BOARD_SPI_DMA_CHANNEL].HDMA_CTRLA = \
+                                        (length \
+                                        | AT91C_HDMA_SRC_WIDTH_BYTE \
+                                        | AT91C_HDMA_DST_WIDTH_BYTE \
+                                        | AT91C_HDMA_SCSIZE_1 \
+                                        | AT91C_HDMA_DCSIZE_1) ; 
+    
+    AT91C_BASE_HDMA->HDMA_CH[BOARD_SPI_DMA_CHANNEL].HDMA_CTRLB = \
+                                          AT91C_HDMA_SRC_DSCR_FETCH_DISABLE \
+                                        | AT91C_HDMA_DST_ADDRESS_MODE_INCR \
+                                        | AT91C_HDMA_SRC_ADDRESS_MODE_FIXED \
+                                        | AT91C_HDMA_FC_PER2MEM ;  
+    
+    AT91C_BASE_HDMA->HDMA_CH[BOARD_SPI_DMA_CHANNEL].HDMA_CFG = \
+                                         (DMA_HW_SRC_REQ_ID_SPI \
+                                        | DMA_HW_DEST_REQ_ID_SPI \
+                                        | AT91C_HDMA_SRC_H2SEL_HW \
+                                        | AT91C_HDMA_DST_H2SEL_SW \
+                                        | AT91C_HDMA_SOD_ENABLE \
+                                        | AT91C_HDMA_FIFOCFG_LARGESTBURST);        
+    
+
+    
+    DMA_EnableChannel(BOARD_SPI_DMA_CHANNEL);
+    
+    return 1;
+        
+#endif
+   
+
 }
+
+
 unsigned char SPI_ReadWriteBuffer(AT91S_SPI *spi,
                                     void *buffer_r,
                                     void *buffer_t,
@@ -265,7 +365,12 @@ unsigned char SPI_ReadWriteBuffer(AT91S_SPI *spi,
     // No free bank
     return 0;
 }
-#define SPI_TIME_OUT  2000  //2000ms time out
+                       
+                       
+
+
+
+
 
 //return 0 if write succeed
 //return 1 if write failed
@@ -279,17 +384,20 @@ unsigned char SPI_WriteBuffer_API(  void *buffer,  unsigned int length )
     //APP_TRACE_INFO(("\r\nSPI_MR:0x%0X ",  spi_if->SPI_MR));
     //APP_TRACE_INFO(("\r\nSPI_CSR[%d]:0x%0X ", 0, spi_if->SPI_CSR[0]));
     state = SPI_WriteBuffer( spi_if, buffer, length );
+ 
     //APP_TRACE_INFO(("\r\nstate:0x%d ",state));
-    if( state == 1 ) {
-        while( ! SPI_IsWriteFinished( spi_if ) ) {
-            OSTimeDly(1);
-            if( couter++ > SPI_TIME_OUT ) { //timeout : 2s
-                state = 0 ;
-                break;
-            }
-        }        
-    }    
-    
+//    if( state == 1 ) {
+//        while( ! SPI_IsWriteFinished( spi_if ) ) {            
+//        //while ((DMA_GetChannelStatus() & (DMA_ENA << 0)) == (DMA_ENA << 0)){ 
+//            //OSTimeDly(1);
+//            if( couter++ > SPI_TIME_OUT ) { //timeout : 2s
+//                state = 0 ;
+//                break;
+//            }
+//        }        
+//    }  
+    OSTimeDly(5);
+    DMA_DisableChannel(0);
     OSSemPost( SPI_Sem ); 
     //APP_TRACE_INFO(("\r\nstate:0x%d, couter: %d ",state,couter));
     return (state == 0) ;
@@ -395,38 +503,60 @@ void SPI_Initialize( AT91S_SPI *spi, unsigned int npcs, unsigned int spi_clk, un
 
 void SPI_Init(  unsigned int spi_clk, unsigned char format ) 
 {
-    
+   static unsigned int spi_clk_save ;
+   static unsigned int format_save ;
+
    unsigned int mode;
- 
+   
+   if( (spi_clk == spi_clk_save) && (format == format_save) ) {
+       APP_TRACE_INFO(("\r\nNo need re-init same SPI mode and clock."));
+       return;
+   }
+   spi_clk_save = spi_clk_save ;
+   format_save  = format ;
+   
    switch( format ) {
        
        case 1 :  //keep SPCK High, Rising edge latch data
-            mode = AT91C_SPI_CSAAT | AT91C_SPI_BITS_8 | AT91C_SPI_CPOL; 
+            mode = 0 | AT91C_SPI_BITS_8 | AT91C_SPI_CPOL; 
        break;
        
        case 2 :  //keep SPCK High, Falling edge latch data
-            mode = AT91C_SPI_CSAAT | AT91C_SPI_BITS_8 | AT91C_SPI_CPOL | AT91C_SPI_NCPHA; 
+            mode = 0 | AT91C_SPI_BITS_8 | AT91C_SPI_CPOL | AT91C_SPI_NCPHA; 
        break; 
        
        case 3 :  //keep SPCK Low, Rising edge latch data
-            mode = AT91C_SPI_CSAAT | AT91C_SPI_BITS_8 | AT91C_SPI_NCPHA; 
+            mode = 0 | AT91C_SPI_BITS_8 | AT91C_SPI_NCPHA; 
        break;  
        
        case 4 :  //keep SPCK Low,  Falling edge latch data
-            mode = AT91C_SPI_CSAAT | AT91C_SPI_BITS_8 ; 
+            mode = 0 | AT91C_SPI_BITS_8 ; 
        break;   
        
        default:  //keep SPCK High, Rising edge latch data
-            mode = AT91C_SPI_CSAAT | AT91C_SPI_BITS_8 | AT91C_SPI_CPOL; 
+            mode = 0 | AT91C_SPI_BITS_8 | AT91C_SPI_CPOL; 
        break;
        
    }
    
+   IRQ_DisableIT( AT91C_ID_SPI0 );
+   IRQ_DisableIT(AT91C_ID_HDMA);
+   
    SPI_Initialize( spi_if, 0, spi_clk, MCK, mode ) ;   // Configure SPI   
-  
+         
+    // Initialize DMA controller.    
+    DMAD_Initialize(BOARD_SPI_DMA_CHANNEL);    
+
+    // Configure and enable the SSC interrupt   
+    //BSP_IntVectSet( AT91C_ID_HDMA,                         
+    //                (CPU_FNCT_VOID)DMAD_Handler);
+    //IRQ_ConfigureIT(AT91C_ID_HDMA, AT91C_AIC_PRIOR_LOWEST-1, NULL);
+    //IRQ_EnableIT(AT91C_ID_HDMA);
+    //DMA_EnableChannel(BOARD_SPI_DMA_CHANNEL);
 }
 
-
+   
+         
 
 
 

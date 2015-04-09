@@ -53,12 +53,12 @@
 */
 
 
-#define  APP_CFG_TASK_UART_TX_PRIO                         4
+#define  APP_CFG_TASK_UART_TX_PRIO                         1
 #define  APP_CFG_TASK_UART_TX_RULER_PRIO                   13
 #define  APP_CFG_TASK_UART_RX_PRIO                         2
 #define  APP_CFG_TASK_NOAH_PRIO                            3
 #define  APP_CFG_TASK_NOAH_RULER_PRIO                      16
-#define  APP_CFG_TASK_CMD_PARSE_PRIO                       8
+#define  APP_CFG_TASK_CMD_PARSE_PRIO                       4
 
 
 #define  APP_CFG_TASK_USER_IF_PRIO                         10

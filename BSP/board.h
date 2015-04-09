@@ -606,9 +606,11 @@
 #define BOARD_DBGU_ID               AT91C_ID_DBGU
 
 /// Dma channel number
-#define BOARD_MCI_DMA_CHANNEL                         0
+//#define BOARD_MCI_DMA_CHANNEL                         0
+#define BOARD_SPI_DMA_CHANNEL                         0         
 #define BOARD_SSC_IN_DMA_CHANNEL                      1
 #define BOARD_SSC_OUT_DMA_CHANNEL                     2
+                                            
 /// MCI0 DMA hardware handshaking ID
 #define DMA_HW_SRC_REQ_ID_MCI0      AT91C_HDMA_SRC_PER_0
 #define DMA_HW_DEST_REQ_ID_MCI0     AT91C_HDMA_DST_PER_0
@@ -627,7 +629,9 @@
 #define BOARD_SSC_IN_DMA_HW_SRC_REQ_ID       AT91C_HDMA_SRC_PER_4
 #define BOARD_SSC_IN_DMA_HW_DEST_REQ_ID      AT91C_HDMA_DST_PER_4
    
-   
+#define DMA_HW_SRC_REQ_ID_SPI      AT91C_HDMA_SRC_PER_1
+#define DMA_HW_DEST_REQ_ID_SPI     AT91C_HDMA_DST_PER_1 
+                                            
 /// Rtc
 #define BOARD_RTC_ID                AT91C_ID_RTC
 

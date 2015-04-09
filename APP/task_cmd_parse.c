@@ -63,7 +63,7 @@ void App_TaskCMDParse( void *p_arg )
     
     CPU_INT08U   err ;
     CPU_INT08U  *pTaskMsgIN ;
-    NOAH_CMD     *pNoahCmd ; 
+    pNEW_CMD     pNewCmd ; 
     EMB_BUF      *pEBuf;
     
     pTaskMsgIN  = NULL;
@@ -79,18 +79,22 @@ void App_TaskCMDParse( void *p_arg )
         
         if( pTaskMsgIN != NULL && OS_ERR_NONE == err )   {           
        
-            pNoahCmd  = (NOAH_CMD *)pTaskMsgIN ; //change to NOAH CMD type              
-          
-            err = EMB_Data_Check( pNoahCmd, pEBuf, 0 ); 
+            pNewCmd  = (pNEW_CMD)pTaskMsgIN ; //change to NOAH CMD type              
+            err = EMB_Data_Parse( pNewCmd );
+            
             OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );  //release mem
-            if( err == OS_ERR_NONE ) {
-                if( pEBuf->state ) { // EMB data complete               
-                    err = EMB_Data_Parse( pEBuf );                     
-                }                
-            } else {
-                Send_DACK(err);
-                Init_EMB_BUF( pEBuf );
-            }            
+            
+//            err = EMB_Data_Check( pNewCmd, pEBuf, 0 ); 
+//            OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );  //release mem
+//            if( err == OS_ERR_NONE ) {
+//                if( pEBuf->state ) { // EMB data complete               
+//                                         
+//                }                
+//            } else {
+//                Send_DACK(err);
+//                Init_EMB_BUF( pEBuf );
+//            }
+            
             
         }
         

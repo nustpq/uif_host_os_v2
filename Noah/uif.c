@@ -114,10 +114,10 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
     err   = NULL;
     temp  = pInterface_Cfg->speed ;
     
-    if(  (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].speed     == pInterface_Cfg->speed) &&
-         (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].if_type   == pInterface_Cfg->if_type) )  {
+    if(  (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].speed   == pInterface_Cfg->speed) &&
+         (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].if_type == pInterface_Cfg->if_type) )  {
        
-        if( Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute  == pInterface_Cfg->attribute ) {
+        if( Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute == pInterface_Cfg->attribute ) {
             APP_TRACE_INFO(("\r\nNo need to set same interface\r\n"));
         } else {
             Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute = pInterface_Cfg->attribute;
@@ -214,7 +214,8 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
     switch( p_raw_write->if_type ) {
         ////////////////////////////////////////////////////////////////////////
         case UIF_TYPE_I2C:  
-        
+            
+            I2C_Mixer( I2C_MIX_UIF_S );
              //iM401 
             if( Global_UIF_Setting[p_raw_write->if_type - 1 ].attribute == ATTRI_IM401_LOAD_CODE ) {
                 OSTimeDly(1); 
@@ -369,19 +370,21 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
         break;
         //////////////////////////////////////////////////////////
         case UIF_TYPE_SPI:
+              //FM1388              
               if( Global_UIF_Setting[p_raw_write->if_type - 1 ].attribute == ATTRI_FM1388_LOAD_CODE ) {
                   size = p_raw_write->data_len / FM1388_ALLOWED_DATA_PACK_SIZE ;                
                   for( i = 0 ; i < size ; i++ ) {
-                      state =  SPI_WriteBuffer_API( p_raw_write->pdata, FM1388_ALLOWED_DATA_PACK_SIZE );              
+                      state =  SPI_WriteBuffer_API( p_raw_write->pdata, FM1388_ALLOWED_DATA_PACK_SIZE ); 
                       if (state != SUCCESS) {
+                          APP_TRACE_INFO(("\r\nUIF_TYPE_SPI 1388 error: %d",state));
+   
                           err = SPI_BUS_ERR;
                           return err;
                       }
-                      p_raw_write->pdata += FM1388_ALLOWED_DATA_PACK_SIZE;
-                      
+                      p_raw_write->pdata += FM1388_ALLOWED_DATA_PACK_SIZE;                      
                       OSTimeDly(1); 
                   }
-                  size = p_raw_write->data_len  % 246 ;
+                  size = p_raw_write->data_len  % FM1388_ALLOWED_DATA_PACK_SIZE ;
                   if( size ) {
                       state =  SPI_WriteBuffer_API( p_raw_write->pdata, size);              
                       if (state != SUCCESS) {
@@ -442,6 +445,8 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
     switch( p_raw_read->if_type ) {
         
         case UIF_TYPE_I2C:
+        
+              I2C_Mixer( I2C_MIX_UIF_M );
               if( Global_UIF_Setting[p_raw_read->if_type - 1 ].attribute == ATTRI_IM205 ) {                  
                   state = I2C_GPIO_Read_iM205(p_raw_read->dev_addr>>1, *(p_raw_read->pdata_write), pbuf); 
                   if (state != SUCCESS) {
@@ -499,7 +504,7 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
         APP_TRACE_INFO(("\r\nRaw_Read() failed: %d", err));
         
     } else {
-        p_raw_read->pdata_read = pbuf ; 
+        p_raw_read->pdata_read = pbuf ; //save data pointer
         Dump_Data( pbuf,  p_raw_read->data_len_read ); 
         
     }

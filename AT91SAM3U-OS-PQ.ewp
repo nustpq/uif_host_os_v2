@@ -2056,6 +2056,18 @@
       <name>$PROJ_DIR$\Driver\codec.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\Driver\dma.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Driver\dma.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Driver\dmad.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Driver\dmad.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\Driver\eefc.c</name>
     </file>
     <file>

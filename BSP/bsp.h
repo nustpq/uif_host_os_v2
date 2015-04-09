@@ -135,6 +135,8 @@
 #include  <commands.h>
 #include  <codec.h>
 #include  <xmodem.h>
+#include  <dma.h>
+#include  <dmad.h>
 
 
 

@@ -366,24 +366,33 @@ void UART2_Mixer( unsigned char index )
 }
 
 
+static unsigned char I2C_Mix_Index_Save =  0;  
 //I2C bus selector
 void I2C_Mixer( unsigned char index )
 {  
+#ifdef BOARD_TYPE_UIF 
     
-
-#ifdef BOARD_TYPE_UIF     
-  
-    if( index<= 3) { 
-   
-        GPIOPIN_Set_Fast(13, 1);//disable all I2C channels
-        GPIOPIN_Set_Fast(14, 1);//disable all I2C channels
-        GPIOPIN_Set_Fast(15, 1);//disable all I2C channels
-        
-        GPIOPIN_Set_Fast(12+index, 0);//enable index I2C channels        
-    
+    if( I2C_Mix_Index_Save == index ) {
+          return;
     }
-#endif 
+    
+    I2C_Mix_Index_Save = index ;    
+    
+//    if( index <= 3) {  
+//        GPIOPIN_Set_Fast(13, 1);//disable all I2C channels
+//        GPIOPIN_Set_Fast(14, 1);//disable all I2C channels
+//        GPIOPIN_Set_Fast(15, 1);//disable all I2C channels        
+//        GPIOPIN_Set_Fast(12+index, 0);//enable index I2C channels 
+//    }
+    for( unsigned char i = 1; i <= 3; i++ ) {
+        pinsGpios[12+i].type = (index == i) ? PIO_OUTPUT_0 : PIO_OUTPUT_1 ;
+        PIO_Configure(&pinsGpios[i], 1); 
+    }
+    
+#endif     
 }
+
+
 
 unsigned int Get_Switches( void )
 {

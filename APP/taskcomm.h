@@ -41,12 +41,12 @@
 #define  MCU_SW_RESET_PATTERN   0xA5000005
 
 
-#define EMB_BUF_SIZE            2048// 3072 //256*120=3072 //Be Careful to modify
+#define EMB_BUF_SIZE            (2048-8) //2048// 3072 //256*120=3072 //Be Careful to modify
 #define UART_CMD_DATA_LENGTH    255 
 
 /////////  UART Message Storage Area:  MemPartition_MsgUART   //////////////////
-#define MsgUARTQueue_SIZE       10                            //memory partition block numbers
-#define MsgUARTBody_SIZE        (UART_CMD_DATA_LENGTH + 5 )   //length of each message == length per frame: head+ datalength +data( MUST be 4 X )
+#define MsgUARTQueue_SIZE       5//10                            //memory partition block numbers
+#define MsgUARTBody_SIZE        (2048) //length of each message == length per frame: head+ datalength +data( MUST be 4 X )
 #define MAX_RESEND_TIMES        3  
 
 extern OS_MEM       *pMEM_Part_MsgUART;

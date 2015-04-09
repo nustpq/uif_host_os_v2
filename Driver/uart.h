@@ -34,8 +34,8 @@
 #define UART0_SEND_QUEUE_LENGTH     64     //Audio MCU
 #define UART0_RECE_QUEUE_LENGTH     64      
 
-#define UART1_SEND_QUEUE_LENGTH     1024   //PC 
-#define UART1_RECE_QUEUE_LENGTH     1024     
+#define UART1_SEND_QUEUE_LENGTH     (1024)   //PC 
+#define UART1_RECE_QUEUE_LENGTH     (1024)     
 
 #define UART2_SEND_QUEUE_LENGTH     4     // not used
 #define UART2_RECE_QUEUE_LENGTH     4    

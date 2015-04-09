@@ -64,48 +64,43 @@ void App_TaskUART_Tx( void *p_arg )
 {    
     (void)p_arg;
     
-    CPU_INT08U       errCode ; 
-    CPU_INT08U       sum ; 
+    CPU_INT08U       errCode ;  
     CPU_INT08U      *pTaskMsgIN ;
-    NOAH_CMD        *pPcCmd ; 
-    CPU_INT08U       resend_index;  
-    
-    CPU_INT32U       size;
-    CPU_INT08U       sync_data[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2_1 };
-        
+    pNEW_CMD         pPcCmd ;    
+    CPU_INT32U       counter ;
+    CPU_INT32U       size ;
+    CPU_INT08U       *pChar ;
+
     pTaskMsgIN  = NULL;
-    pPcCmd      = NULL;	
-    sum         = 0;
+    pPcCmd      = NULL;  
     errCode     = UNKOW_ERR_RPT ;       
 
      
-    unsigned char tt[512];
-        for (unsigned int i = 0; i<512; i++) {
-            tt[i] = '0'+i;
-        }
-//    while(1){
-
-//       kfifo_put(pUART_Send_kfifo[PC_UART], (unsigned char *)&tt , 512) ;
-//       UART_WriteStart( PC_UART );
-//       OSTimeDly(1);
-//                           
-//    }
+//    unsigned char tt[512];
+//        for (unsigned int i = 0; i<512; i++) {
+//            tt[i] = '0'+i;
+//        }
+////    while(1){
+//
+////       kfifo_put(pUART_Send_kfifo[PC_UART], (unsigned char *)&tt , 512) ;
+////       UART_WriteStart( PC_UART );
+////       OSTimeDly(1);
+////                           
+////    }
+//    
+//    while (DEF_TRUE) { 
+//
+//        // Noah to Uart transmit
+//        pTaskMsgIN   = (INT8U *)OSQPend( EVENT_MsgQ_Noah2PCUART, 0, &errCode );
+//        
+//        if( pTaskMsgIN != NULL && OS_ERR_NONE == errCode )   {  
+//          kfifo_put(pUART_Send_kfifo[PC_UART], (unsigned char *)&tt , 512) ;
+//          UART_WriteStart( PC_UART );   
+//        }
+//    }  
+//////////////////////////////////////////////////////////////////////////////      
     
-    while (DEF_TRUE) { 
-
-        // Noah to Uart transmit
-        pTaskMsgIN   = (INT8U *)OSQPend( EVENT_MsgQ_Noah2PCUART, 0, &errCode );
-        
-        if( pTaskMsgIN != NULL && OS_ERR_NONE == errCode )   {  
-          kfifo_put(pUART_Send_kfifo[PC_UART], (unsigned char *)&tt , 512) ;
-          UART_WriteStart( PC_UART );   
-        }
-    }
-    
-    
-    
-//////////////////////////////////////////////////////////////////////////////    
-    pcSendDateToBuf( EVENT_MsgQ_Noah2PCUART, SET_FRAME_HEAD(PcCmdTxID,FRAM_TYPE_EST),  NULL, 0, 0, NULL, 0 ) ;  // send a EST package on startup   
+    //pcSendDateToBuf( EVENT_MsgQ_Noah2PCUART, SET_FRAME_HEAD(PcCmdTxID,FRAM_TYPE_EST),  NULL, 0, 0, NULL, 0 ) ;  // send a EST package on startup   
     
     while (DEF_TRUE) { 
 
@@ -116,70 +111,31 @@ void App_TaskUART_Tx( void *p_arg )
 //            Time_Stamp();
 //            APP_TRACE_INFO(("\r\n:App_TaskUART_Tx : [%d] start ",pPcCmd->DataLen + 5));
                     
-            pPcCmd  = (NOAH_CMD *)pTaskMsgIN ;             
-            if( GET_FRAME_TYPE(pPcCmd->head) == FRAM_TYPE_DATA  ) {  //data frame
-                
-                for( resend_index = 0; resend_index < MAX_RESEND_TIMES; resend_index++ ) {     
-                  
-//                    errCode = Queue_Write( (void*)pUART_Send_Buf[PC_UART] , CMD_DATA_SYNC1   ); //Sync1
-//                    if( errCode != 0 ) {   break;  }
-//                    errCode = Queue_Write( (void*)pUART_Send_Buf[PC_UART], CMD_DATA_SYNC2_1 ); //Sync2        
-//                    if( errCode != 0 ) {   break;  }
-                    pPcCmd->head  = SET_FRAME_HEAD( PcCmdTxID, FRAM_TYPE_DATA ) ; //set frame ID for data transmit                                
-                    sum  =  CheckSum(   pPcCmd->head, &(pPcCmd->DataLen), pPcCmd->DataLen + 1); //calculate checksum      
-//                    
-//                    errCode = Queue_WriteBuf( pTaskMsgIN,  (void*)pUART_Send_Buf[PC_UART], pPcCmd->DataLen + 2 ); //3Bytes = head(1Bytes) + len(1Bytes)
-//                    if( errCode != 0 ) {   break;  }
-//                    errCode = Queue_Write( (void*)pUART_Send_Buf[PC_UART], sum   ); //  check sum(1Bytes)
-//                    if( errCode != 0 ) {   break;  }
-                    size = kfifo_get_free_space( pUART_Send_kfifo[PC_UART] );                    
-                    while( size <  pPcCmd->DataLen + 5 ) {
-                        OSTimeDly(5);
-                    }
-                    kfifo_put(pUART_Send_kfifo[PC_UART], sync_data , 2) ;
-                    kfifo_put(pUART_Send_kfifo[PC_UART], (unsigned char *)pPcCmd , pPcCmd->DataLen + 2) ;                     
-                    kfifo_put(pUART_Send_kfifo[PC_UART], &sum , 1) ;
-                    UART_WriteStart( PC_UART ); //send data  
-                    
-                    OSSemPend(ACK_Sem_PCUART, 1000, &errCode);//pending 1000ms for ACK back                     
-                    if( OS_ERR_NONE == errCode )   {               
-                        OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );    //release mem 
-                        PcCmdTxID += 0x40;// this frame send out ok, frame ++,   //0xC0 
-                        break;                        
-                    } 
-                    
+            pPcCmd   =  (pNEW_CMD)pTaskMsgIN ; 
+            pChar    =  (unsigned char *)pTaskMsgIN ; 
+            counter  =  (pPcCmd->data_len[0]<<16) + (pPcCmd->data_len[1]<<8) + pPcCmd->data_len[2];
+            counter +=  8;
+            
+#if( false )            
+            APP_TRACE_INFO(("\r\n############DATA==counter: %d ####################\r\n",counter)); 
+            for(unsigned int i = 0; i< counter; i++ ){                            
+                APP_TRACE_INFO(("%0X ", *(pChar+i) ));
+                if(i%32 == 31) {
+                    APP_TRACE_INFO(("\r\n"));
+                }                
+             }
+            APP_TRACE_INFO(("\r\n##########################################\r\n"));
+#endif  
+            while(1) {           
+                size = kfifo_get_free_space( pUART_Send_kfifo[PC_UART] );                    
+                if( size >= counter ) {
+                    kfifo_put(pUART_Send_kfifo[PC_UART], pTaskMsgIN, counter) ;
+                    break;                    
                 }
-                
-                if(  resend_index >= MAX_RESEND_TIMES ) {   // reach max send times                    
-                    OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );    //release mem a space at least
-                    pcSendDateToBuf( EVENT_MsgQ_Noah2PCUART, SET_FRAME_HEAD(PcCmdTxID+1,FRAM_TYPE_EST), NULL, 0, 1, NULL, 0) ;   //insert EST  package 
-                    Global_Conn_Ready = 0;
-                } 
-                
-                if(  resend_index > 1 ) {   // resend happens, debug use      
-                    Tx_ReSend_Happens ++ ;
-                }
-                
-            } else { //ACK / NAK  frame, no resend action  
-              
-//                    Queue_Write( (void*)pUART_Send_Buf[PC_UART], CMD_DATA_SYNC1   ); //Sync1
-//                    Queue_Write( (void*)pUART_Send_Buf[PC_UART], CMD_DATA_SYNC2_1 ); //Sync2   
-//                    Queue_WriteBuf( pTaskMsgIN,(void*)pUART_Send_Buf[PC_UART], 2 );
-                    size = kfifo_get_free_space( pUART_Send_kfifo[PC_UART] );                    
-                    while( size <  4 ) {
-                        OSTimeDly(5);
-                    }
-                    kfifo_put(pUART_Send_kfifo[PC_UART], sync_data , 2) ;
-                    kfifo_put(pUART_Send_kfifo[PC_UART], (unsigned char *)pPcCmd , 2) ;                 
-                 
-                    //OSQAccept( EVENT_MsgQ_Noah2PCUART, &errCode ); //delete message from queue
-                    OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );    //release mem 
-                    UART_WriteStart( PC_UART ); //send data 
-                    APP_TRACE_DBG(("\r\n>ACK"));
-            } 
-//             Time_Stamp();
-//             APP_TRACE_INFO(("\r\n:App_TaskUART_Tx : end "));
-         
+                OSTimeDly(1);
+            }
+            UART_WriteStart( PC_UART ); //send data                  
+            OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );
         }  
         
         ////OSTimeDly(5);		                                     	

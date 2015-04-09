@@ -38,7 +38,7 @@
 
 #define GPIO_I2C_DELAY  1  // 1ms timeout @ 48MHz MIP
 
-#define GPIO_CS    5                         //GPIO pin for iM204 CS pin 
+#define GPIO_CS    5                         //GPIO pin for iM205 CS pin 
 #define GPIO_SDA   6                         //GPIO pin for I2C SDA  
 #define GPIO_SCL   7                         //GPIO pin for I2C SCL  
   

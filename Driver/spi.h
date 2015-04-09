@@ -95,6 +95,10 @@
 #define SPI_DLYBCT(delay, masterClock) \
             ((unsigned int) (((masterClock / 1000000) * delay) / 32000) << 24)
 //------------------------------------------------------------------------------
+/// spi DMA Fifo size
+#define BOARD_SPI_DMA_FIFO_SIZE         (4*1024)
+/// spi Linked list size
+#define MAX_SSC_LLI_SIZE                    16
 
 //------------------------------------------------------------------------------
 //         Exported functions

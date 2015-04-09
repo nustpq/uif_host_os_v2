@@ -50,6 +50,8 @@ volatile CPU_INT08U  Global_Idle_Ready = 0 ; //flag check if no command from PC 
 *                   used.  The compiler should not generate any code for this statement.
 *********************************************************************************************************
 */
+#define  RX_DATA_LEN    64  //the larger the faster
+
 void App_TaskUART_Rx( void *p_arg )
 {     
    (void)p_arg; 
@@ -60,11 +62,12 @@ void App_TaskUART_Rx( void *p_arg )
     CMDREAD          CMD_Read_PC ;
     CMDREAD          CMD_Read_Ruler ;
     CPU_INT32U       total_counter;
-    CPU_INT08U       rx_data[256];
+    CPU_INT08U       rx_data[RX_DATA_LEN]; 
         
-    Init_CMD_Read( &CMD_Read_PC, EVENT_MsgQ_PCUART2Noah ) ;
+    //Init_CMD_Read( &CMD_Read_PC, EVENT_MsgQ_PCUART2Noah ) ;    
+    Init_CMD_Read( &CMD_Read_PC, EVENT_MsgQ_Noah2CMDParse ) ;
     Init_CMD_Read( &CMD_Read_Ruler, EVENT_MsgQ_RulerUART2Noah ) ;
-    idle_counter = 0;
+    idle_counter  = 0;
     total_counter = 0;
     
 	while (DEF_TRUE) {               
@@ -72,6 +75,7 @@ void App_TaskUART_Rx( void *p_arg )
         //counter = Queue_NData( (void*) pUART_Rece_Buf[PC_UART] ) ;  
         counter  = kfifo_get_data_size(pUART_Rece_kfifo[PC_UART]); 
         //APP_TRACE_INFO((" %4d ",counter)) ;  
+        
         if( counter ) {
             idle_counter = 0 ;
         } else {            
@@ -89,24 +93,30 @@ void App_TaskUART_Rx( void *p_arg )
 //             APP_TRACE_INFO(("\r\n:App_TaskUART_Rx check: [%d]start",counter));        
 //           
              //Queue_ReadBuf( rx_data, pUART_Rece_Buf[PC_UART], counter > 256 ? 256 : counter , &temp );
-             ////counter = counter < 256 ? counter : 256;
+             counter = counter < RX_DATA_LEN ? counter : RX_DATA_LEN;
              kfifo_get(pUART_Rece_kfifo[PC_UART], (unsigned char *)rx_data, counter) ; 
-             
-//             APP_TRACE_INFO(("\r\n============counter: %d =============\r\n",counter));             
-//             for(unsigned int i = 0; i< 8; i++ ){                 
-//                //Noah_CMD_Read( &CMD_Read_PC, rx_data[i] ) ;              
-//                APP_TRACE_INFO(("%0X ", rx_data[i] ));
-//                if(i%32 == 31) {
-//                    APP_TRACE_INFO(("\r\n"));
-//                }                
-//             }
+
+#if( false )            
+             APP_TRACE_INFO(("\r\n=====CMD====counter: %d =============\r\n",counter));             
+             for(unsigned int i = 0; i< counter; i++ ){  
+                APP_TRACE_INFO(("%0X ", rx_data[i] ));
+                if(i%32 == 31) {
+                    APP_TRACE_INFO(("\r\n"));
+                }                
+             }
              APP_TRACE_INFO(("\r\n==========total_counter: %d=====================\r\n",total_counter));
+#endif            
              
+            for(unsigned int i = 0; i< counter; i++ ){                 
+                 Noah_CMD_Read( &CMD_Read_PC, rx_data[i] ) ;  
+                 
+             }  
+            
              //Restart UART Rx if fifo free space enough
              UART_Rx_ReStart( PC_UART );                   
-                       
+        
             
-             
+            
              
              
 //          while( counter-- ) {              
@@ -129,7 +139,7 @@ void App_TaskUART_Rx( void *p_arg )
 //            Noah_CMD_Read( &CMD_Read_Ruler, temp ) ;
 //        } 
         
-        OSTimeDly(5); // note : UART1_RECE_QUEUE_LENGTH = 1024B; 115200/10/1000 =  11.52;
+        OSTimeDly(1); // note : UART1_RECE_QUEUE_LENGTH = 1024B; 115200/10/1000 =  11.52;
   
                     
 	}

@@ -499,22 +499,23 @@ void UART_Rx_ReStart( CPU_INT08U uart_index )
     OS_CPU_SR  cpu_sr = 0u;
 #endif
     
-    OS_ENTER_CRITICAL();
-    
-    counter = kfifo_get_free_space( pUART_Rece_kfifo[uart_index] );
-    
-    if( uartin_start_cmd && ( UART_PDC_LENGTH < counter)  ) {
-                  
-        uartin_start_cmd = false; 
-        pUARTREG[uart_index]->US_RPR  = (CPU_INT32U) pUART_Rece_Buf_PDC[uart_index];
-        pUARTREG[uart_index]->US_RCR  = UART_PDC_LENGTH;
-        pUARTREG[uart_index]->US_PTCR = AT91C_PDC_RXTEN;   
+    if( uartin_start_cmd ) { 
+   
+        OS_ENTER_CRITICAL();
         
-        pUARTREG[PC_UART]->US_IER  = AT91C_US_ENDRX | AT91C_US_TIMEOUT; //PQ
-    }   
-    
-    OS_EXIT_CRITICAL();
-    
+        counter = kfifo_get_free_space( pUART_Rece_kfifo[uart_index] );
+        
+        if( UART_PDC_LENGTH < counter ) {                      
+            uartin_start_cmd = false; 
+            pUARTREG[uart_index]->US_RPR  = (CPU_INT32U) pUART_Rece_Buf_PDC[uart_index];
+            pUARTREG[uart_index]->US_RCR  = UART_PDC_LENGTH;
+            pUARTREG[uart_index]->US_PTCR = AT91C_PDC_RXTEN;   
+            
+            pUARTREG[PC_UART]->US_IER  = AT91C_US_ENDRX | AT91C_US_TIMEOUT; //PQ
+        }   
+        
+        OS_EXIT_CRITICAL();
+    }
 }
 
 /*

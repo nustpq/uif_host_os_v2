@@ -114,13 +114,14 @@
 *                                           Noah CMD Defines
 *********************************************************************************************************
 */
-#define CMD_STAT_SYNC1    0x00
-#define CMD_STAT_SYNC2    0x01
-#define CMD_STAT_FLAG     0x02
-#define CMD_STAT_LENGTH   0x04
-#define CMD_STAT_DATA     0x08
-#define CMD_STAT_FRAM     0x10
-#define CMD_STAT_CHECKSUM 0x20
+#define STAT_SYNC1    0x00
+#define STAT_SYNC2    0x01
+#define STAT_FLAG     0x02
+#define STAT_LENGTH   0x04
+#define STAT_DATA     0x08
+#define STAT_FRAM     0x10
+#define STAT_CHECKSUM 0x20
+#define STAT_CMD      0x40
 
 #define CMD_DATA_SYNC1    0xeb
 #define CMD_DATA_SYNC2    0x90
@@ -251,8 +252,8 @@
 #define GET_FRAME_TYPE( head )                    ((head) & 0x3F)
 #define SET_FRAME_HEAD( frame_id, frame_type )    ((frame_type & 0x3F)|(frame_id & 0xC0))
 
-#define NOAH_CMD_DATA_MLEN     255 // max 255 cmd data per package
-
+#define NOAH_CMD_DATA_MLEN     255  // max 255 cmd data per package
+#define NEW_CMD_DATA_MLEN      (2048-8) //KFIFO size is 1024, EMB = 1024 - Header
 
 /*
 *********************************************************************************************************
@@ -275,10 +276,20 @@ typedef struct {
 }NOAH_CMD ;
 
 typedef struct {
+    unsigned char  head_sync_1 ;   //EB                             
+    unsigned char  data_len[3] ;   //MSB first
+    unsigned char  head_sync_2 ;   //90
+    unsigned char  pkt_sn ;        //1 ~31
+    unsigned char  cmd[2] ;        //MSB first
+    unsigned char  data[NEW_CMD_DATA_MLEN] ; 
+}*pNEW_CMD ;
+
+typedef struct {
     unsigned int   index;    
     unsigned int   length ;
     unsigned char *pdata; 
-    unsigned char  data[EMB_BUF_SIZE] ; 
+    unsigned char  data[EMB_BUF_SIZE] ;
+    unsigned char  pkt_sn;
     bool           state;
 }EMB_BUF ;
 
@@ -308,13 +319,11 @@ typedef union  {
 
 //#pragma pack()
 typedef struct {
-    
-    CPU_INT32U   state_mac;
-    CPU_INT08U  *pRecvPtr;
-    CPU_INT32U   PcCmdCounter;
-    CPU_INT32U   PcCmdDataLen;
+    void        *pRecvPtr;
     OS_EVENT    *pEvent;
-    
+    CPU_INT32U   state_mac;    
+    CPU_INT32U   PcCmdCounter;
+    CPU_INT32U   PcCmdDataLen;   
 }CMDREAD ;
 
 
@@ -325,7 +334,7 @@ typedef struct {
 */
 extern void Init_EMB_BUF( EMB_BUF* pEBuf ) ;
 extern void Init_CMD_Read( CMDREAD* pCMD_Read, OS_EVENT  *pOS_EVENT ) ;
-extern void Noah_CMD_Read( CMDREAD* pCMD_Read, CPU_INT08U ch ) ;
+extern void Noah_CMD_Read( CMDREAD* pCMD_Read, CPU_INT08U data_byte ) ;
 //extern CPU_INT08U Noah_CMD_Parse(   CPU_INT08U  *pCmdDat, 
 //                                    CPU_INT32U datalen
 //                                );
@@ -337,17 +346,27 @@ extern CPU_INT08U pcSendDateToBuf(  OS_EVENT   *pOS_EVENT,
                                     CPU_INT08U  *pex_dat,
                                     CPU_INT08U   ex_data_length 
                                  ) ;
+extern CPU_INT08U  pcSendDateToBuffer ( OS_EVENT    *pOS_EVENT,                               
+                                 RAW_READ    *p_raw_read,
+                                 CPU_INT08U   pkt_index,
+                                 CPU_INT16U   cmd_id                                 
+                               );
+extern CPU_INT08U  EMB_Data_Build (  CPU_INT16U   cmd_type, 
+                              CPU_INT08U  *pChar,                          
+                              RAW_READ     *pRawRead,
+                              CPU_INT32U  *p_emb_length);
+
 extern CPU_INT08U CheckSum(     CPU_INT08U init_data, 
                                 CPU_INT08U *pdata, 
                                 CPU_INT16U length
                           );
 extern CPU_INT08U  Noah_CMD_Parse_Ruler ( NOAH_CMD    *pNoahCmd,                                 
                                           CPU_INT08U  *pSessionDone); 
-extern CPU_INT08U EMB_Data_Check( NOAH_CMD *pNoahCmd, EMB_BUF *pEBuf, CPU_INT08U delay);
-extern CPU_INT08U EMB_Data_Parse( EMB_BUF *pEBuf ) ;
+extern CPU_INT08U EMB_Data_Check( pNEW_CMD pNoahCmd, EMB_BUF *pEBuf, CPU_INT08U delay);
+extern CPU_INT08U EMB_Data_Parse ( pNEW_CMD  pNewCmd )  ;
 extern CPU_INT08U  AB_Status_Change_Report (void);
 extern void  Send_DACK (CPU_INT08U  error_id);
 extern void  Send_GACK (CPU_INT08U  error_id);
-
+extern void  Send_Report (CPU_INT08U pkt_sn, CPU_INT08U error_id);
 
 #endif 

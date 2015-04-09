@@ -93,11 +93,8 @@ void  App_TaskUserIF (void *p_arg)
                     APP_TRACE_INFO(("Switch status updated: \r\n  SW1,  SW0 \r\n"));
                     APP_TRACE_INFO((" %4d, %4d\r\n", (key_state>>0)&(0x01),(key_state>>1)&(0x01) )); 
                     /**********************************************************************/
-                    //To do something to do with Switch selection...           
-                    
-   pcSendDateToBuf( EVENT_MsgQ_Noah2PCUART, SET_FRAME_HEAD(PcCmdTxID,FRAM_TYPE_EST),  NULL, 0, 0, NULL, 0 ) ;  // send a EST package on startup   
- 
-                    
+                    //To do something to do with Switch selection...  
+   
                     // Switch 'SW1' used to control Buzzer mute:
                     //         0: ON :  Buzzer muted
                     //         1: OFF:  Buzzer unmuted

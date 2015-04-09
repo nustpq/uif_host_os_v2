@@ -1766,6 +1766,7 @@ void AB_POST( void )
 #ifdef BOARD_TYPE_AB03   
     err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0 ); //Lin from SP1.Slot0
 #elif defined BOARD_TYPE_UIF
+    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH  ); 
     err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH  ); //Lin from SP1.Slot0
 #else 
     err = Init_FM36( SAMPLE_RATE_DEF );
