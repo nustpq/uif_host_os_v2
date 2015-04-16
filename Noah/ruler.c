@@ -44,7 +44,7 @@ volatile unsigned char  Ruler_Setup_Sync_Data;
 extern EMB_BUF   Emb_Buf_Data;
 extern EMB_BUF   Emb_Buf_Cmd;
 
-SET_VEC_CFG  Global_iM401_VEC_Cfg; 
+SET_VEC_CFG  Global_VEC_Cfg; 
 
 
 /*
@@ -238,14 +238,18 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         APP_TRACE_INFO(("\r\nSetup_Audio ERROR: %d\r\n ",data)); 
         return data; 
     }
+    I2C_Mixer(I2C_MIX_FM36_CODEC);
     err = Init_CODEC( pAudioCfg->sr,  pAudioCfg->bit_length);
+    I2C_Mixer(I2C_MIX_UIF_S);
     if( err != NO_ERR ) {
         APP_TRACE_INFO(("\r\nSetup_Audio Init_CODEC ERROR: %d\r\n",err)); 
     } 
 #ifdef BOARD_TYPE_AB03  
     err = Init_FM36_AB03( pAudioCfg->sr, mic_num, 1, 0 ); //Lin from SP1_RX, slot0~1
 #elif defined BOARD_TYPE_UIF
+    I2C_Mixer(I2C_MIX_FM36_CODEC);
     err = Init_FM36_AB03( pAudioCfg->sr, mic_num, 1, 0, pAudioCfg->bit_length ); //Lin from SP1_RX, slot0~1
+    I2C_Mixer(I2C_MIX_UIF_S);
 #else
     err = ReInit_FM36( pAudioCfg->sr ); 
 #endif
@@ -1374,18 +1378,29 @@ unsigned char Save_DSP_VEC( MCU_FLASH *p_dsp_vec )
  
 unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
 {  
-    unsigned char err; 
+    unsigned char err, index; 
     
     err = NO_ERR;
     
     if( (p_dsp_vec_cfg->vec_index_a > 7) || (p_dsp_vec_cfg->vec_index_b > 7) || (p_dsp_vec_cfg->delay > 65536 ) ) {
-        Global_iM401_VEC_Cfg.flag        = 0; //means error
+        Global_VEC_Cfg.flag        = 0; //means error
         return FW_VEC_SET_CFG_ERR;
     }
-    Global_iM401_VEC_Cfg.vec_index_a = p_dsp_vec_cfg->vec_index_a;
-    Global_iM401_VEC_Cfg.vec_index_b = p_dsp_vec_cfg->vec_index_b;
-    Global_iM401_VEC_Cfg.delay       = p_dsp_vec_cfg->delay;    
-    Global_iM401_VEC_Cfg.flag        = 0x55; //means cfg ok
+    Global_VEC_Cfg.vec_index_a = p_dsp_vec_cfg->vec_index_a;
+    Global_VEC_Cfg.vec_index_b = p_dsp_vec_cfg->vec_index_b;
+    Global_VEC_Cfg.delay       = p_dsp_vec_cfg->delay;  
+    Global_VEC_Cfg.type        = p_dsp_vec_cfg->type;
+    Global_VEC_Cfg.gpio        = p_dsp_vec_cfg->gpio;
+    Global_VEC_Cfg.flag        = 0x55; //means cfg ok    
+    Global_VEC_Cfg.trigger_en  = p_dsp_vec_cfg->trigger_en; 
+    
+    if( Global_VEC_Cfg.trigger_en ) {
+        err = MCU_Load_Vec(1);
+    } else {       
+        I2C_Mixer(I2C_MIX_FM36_CODEC);
+        err = FM36_PDMADC_CLK_Onoff(1); //enable PDM clock
+        I2C_Mixer(I2C_MIX_UIF_S); 
+    }
     return err;  
     
 }
@@ -1753,7 +1768,9 @@ void AB_POST( void )
     //Enable_FPGA();
 
     APP_TRACE_INFO(("\r\n1. CODEC... \r\n"));
-    err = Init_CODEC( SAMPLE_RATE_DEF,  SAMPLE_LENGTH);    
+    I2C_Mixer(I2C_MIX_FM36_CODEC);
+    err = Init_CODEC( SAMPLE_RATE_DEF,  SAMPLE_LENGTH);  
+    I2C_Mixer(I2C_MIX_UIF_S);
     if( err != NO_ERR ) {
         Global_Bridge_POST = POST_ERR_CODEC;
         APP_TRACE_INFO(("\r\n---Error : %d\r\n",err));
@@ -1766,8 +1783,10 @@ void AB_POST( void )
 #ifdef BOARD_TYPE_AB03   
     err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0 ); //Lin from SP1.Slot0
 #elif defined BOARD_TYPE_UIF
+    I2C_Mixer(I2C_MIX_FM36_CODEC);
     err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH  ); 
     err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH  ); //Lin from SP1.Slot0
+    I2C_Mixer(I2C_MIX_UIF_S);
 #else 
     err = Init_FM36( SAMPLE_RATE_DEF );
 #endif

@@ -49,6 +49,8 @@
 #define MsgUARTBody_SIZE        (2048) //length of each message == length per frame: head+ datalength +data( MUST be 4 X )
 #define MAX_RESEND_TIMES        3  
 
+#define DBG_UART_Send_Buf_Size 4096
+
 extern OS_MEM       *pMEM_Part_MsgUART;
 extern CPU_INT08U    MemPartition_MsgUART[MsgUARTQueue_SIZE][MsgUARTBody_SIZE];
 
@@ -76,6 +78,7 @@ extern OS_EVENT *ACK_Sem_RulerUART;
 extern OS_EVENT *Done_Sem_RulerUART;
 extern OS_EVENT *UART_MUX_Sem_lock;
 
+extern CPU_INT08U DBG_UART_Send_Buffer[];
 
 extern void App_TaskUART_Tx      ( void *pdata ) ;
 extern void App_TaskUART_Tx_Ruler( void *pdata ) ;
@@ -86,6 +89,7 @@ extern void App_TaskGenieShell   ( void *p_arg ) ;
 extern void App_TaskUserIF       ( void *p_arg ) ;
 extern void App_TaskJoy          ( void *p_arg ) ;
 extern void App_TaskCMDParse     ( void *p_arg ) ;
+extern void App_TaskDebugInfo    ( void *p_arg ) ;
 
 extern void Task_ReCreate_Shell( void );
 
@@ -98,6 +102,8 @@ extern CPU_INT32U       Tx_ReSend_Happens_Ruler ;
 extern volatile CPU_INT08U  Global_Conn_Ready;
 extern volatile CPU_INT08U  Global_Idle_Ready;
 extern unsigned int         test_counter1, test_counter2,test_counter3, test_counter4, test_counter5 ;
+extern CPU_INT16U debug_uart_fifo_data_max ;
+extern CPU_INT16U debug_uart_fifo_oveflow_counter ;
 
 extern void Port_Detect_Enable( unsigned char on_off );
 

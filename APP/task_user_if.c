@@ -211,12 +211,14 @@ void  App_TaskUserIF (void *p_arg)
                                 APP_TRACE_INFO(("GPIO[%d] is High Level.\r\n", ruler_id ));                                 
 //                                Global_Ruler_State[ruler_id] = RULER_STATE_DETACHED ;
 //                                Global_Mic_Mask[ruler_id]    = 0 ; 
-                                if( (ruler_id == 0) && (iM401_Ctrl_Enable == 1) ) {
+                                //if( (ruler_id == 0) && (iM401_Ctrl_Enable == 1) ) {
+                                if( (ruler_id == Global_VEC_Cfg.gpio) && (Global_VEC_Cfg.trigger_en) ) {
                                     //OSTimeDly(500);
                                     //iM401_Bypass();
                                     //OSTimeDly(3000);
                                     //iM401_Standby(); 
-                                    iM401_Load_Vec();
+                                    //iM401_Load_Vec();
+                                    MCU_Load_Vec( 0 );
                                 }
                                 
                             } 

@@ -546,7 +546,7 @@
 #define AT91C_IFLASH_NB_OF_PAGES           (512) // Internal FLASH 0 Number of Pages: 512
 #define AT91C_IFLASH_LOCK_REGION_SIZE     (8192) // Internal FLASH 0 Lock Region Size: 8 Kbytes
 #define AT91C_IFLASH_NB_OF_LOCK_BITS        (16) // Internal FLASH 0 Number of Lock Bits: 32
-#if 0
+#if 1
 #define AT91C_IFLASH1                 (0x100000)
 #define AT91C_IFLASH1_SIZE             (0x20000)
 #define AT91C_IFLASH1_PAGE_SIZE            (256) // Internal FLASH 1 Page Size: 256 bytes
@@ -754,20 +754,20 @@ typedef enum IRQn
 #define GPIO_AUDIO_RST    {1 << 3, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_PULLUP} //audio reset//uif2.2
 #define GPIO_FM_RST       {1 << 3, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_1, PIO_PULLUP} //FM36 reset//uif2.2
 
-#define I2C_SELECT1       {1 << 8, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT}   //default enable all I2C bus                                 
-#define I2C_SELECT2       {1 << 7, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT} 
-#define I2C_SELECT3       {1 << 4, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT}  
+#define I2C_SELECT1       {1 << 8, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_1, PIO_DEFAULT}   //default disable all I2C bus                                 
+#define I2C_SELECT2       {1 << 7, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_1, PIO_DEFAULT} 
+#define I2C_SELECT3       {1 << 4, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_1, PIO_DEFAULT}  
                                     
-#define  UIF_GPIO_0   {1 << 27, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT}                       
-#define  UIF_GPIO_1   {1 << 13, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT} 
-#define  UIF_GPIO_2   {1 << 12, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT} 
-#define  UIF_GPIO_3   {1 << 11, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT} 
-#define  UIF_GPIO_4   {1 << 2, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT} 
-#define  UIF_GPIO_5   {1 << 1, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT} 
-#define  UIF_GPIO_6   {1 << 0, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT} 
-#define  UIF_GPIO_7   {1 << 31, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT} 
-#define  UIF_GPIO_8   {1 << 29, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT} 
-#define  UIF_GPIO_9   {1 << 28, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT}     
+#define  UIF_GPIO_0   {1 << 27, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT}                       
+#define  UIF_GPIO_1   {1 << 13, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_INPUT, PIO_DEFAULT} 
+#define  UIF_GPIO_2   {1 << 12, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_INPUT, PIO_DEFAULT} 
+#define  UIF_GPIO_3   {1 << 11, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_INPUT, PIO_DEFAULT} 
+#define  UIF_GPIO_4   {1 << 2, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_INPUT, PIO_DEFAULT} 
+#define  UIF_GPIO_5   {1 << 1, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_INPUT, PIO_DEFAULT} 
+#define  UIF_GPIO_6   {1 << 0, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_INPUT, PIO_DEFAULT} 
+#define  UIF_GPIO_7   {1 << 31, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT} 
+#define  UIF_GPIO_8   {1 << 29, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT} 
+#define  UIF_GPIO_9   {1 << 28, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT}     
                                     
                                     
                                   

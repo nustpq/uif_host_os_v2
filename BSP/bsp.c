@@ -38,7 +38,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:H:V2.1]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:H:V2.22]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB01
 const CPU_CHAR hw_version[]  = "[HW:V1.0]"; 
@@ -1401,6 +1401,7 @@ void  BSP_Ser_Printf (CPU_CHAR *format, ...)
     va_end(vArgs);
 
     BSP_Ser_WrStr((CPU_CHAR*) buffer);
+    //BSP_Ser_WrStr_To_Buffer((CPU_CHAR*) buffer);
 }
 
 
@@ -1648,6 +1649,7 @@ void Head_Info ( void )
     APP_TRACE_INFO(("Global_Mic_Mask[3..0][] :        [%X - %X - %X - %X]\r\n", Global_Mic_Mask[3],Global_Mic_Mask[2],Global_Mic_Mask[1],Global_Mic_Mask[0] ));
     APP_TRACE_INFO(("Test Counter:            test_counter1, 2, 3, 4  =  %4d,%4d,%4d,%4d\r\n",  test_counter1, test_counter2,test_counter3, test_counter4));
     APP_TRACE_INFO(("Test Counter:  UART_WriteStart Failed :  %4d  times\r\n",   test_counter5));
+    APP_TRACE_INFO(("DBG_UART_FIFO: [Max_Usage: %d/%d ]  [FIFO Overflow Hit: %d times]\r\n", debug_uart_fifo_data_max,DBG_UART_Send_Buf_Size,debug_uart_fifo_oveflow_counter ));
     APP_TRACE_INFO(("\r\n"));
     Get_Task_Info ();
     Get_Flash_Info ();

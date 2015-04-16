@@ -18,7 +18,7 @@ static Pin pinsGpios[]  = {
 
     I2C_SELECT1,    I2C_SELECT2,     I2C_SELECT3,  // 13 - 15
 
-    BUZZER,         LED1,            LED2   //16 -18
+    BUZZER,         LED1,            LED2         //16 -18
                                   
 };
 
@@ -368,12 +368,16 @@ void UART2_Mixer( unsigned char index )
 
 static unsigned char I2C_Mix_Index_Save =  0;  
 //I2C bus selector
-void I2C_Mixer( unsigned char index )
+unsigned char I2C_Mixer( unsigned char index )
 {  
 #ifdef BOARD_TYPE_UIF 
     
+    if( index > 3 || index < 1 ) {
+        return 1;
+    }
+    
     if( I2C_Mix_Index_Save == index ) {
-          return;
+        return 0;
     }
     
     I2C_Mix_Index_Save = index ;    
@@ -386,9 +390,10 @@ void I2C_Mixer( unsigned char index )
 //    }
     for( unsigned char i = 1; i <= 3; i++ ) {
         pinsGpios[12+i].type = (index == i) ? PIO_OUTPUT_0 : PIO_OUTPUT_1 ;
-        PIO_Configure(&pinsGpios[i], 1); 
     }
-    
+    PIO_Configure(&pinsGpios[13], 3);     
+    APP_TRACE_INFO(("\r\nI2C_Mixer switch to: %d ", index ));   
+    //OSTimeDly(1);
 #endif     
 }
 

@@ -268,7 +268,7 @@ CPU_BOOLEAN  BSP_PLL_Cfg             (CPU_INT16U  pll_mul,
 */
 
 void         BSP_Ser_Init            (CPU_INT32U     baud_rate);
-void         BPS_Ser_WrByte          (CPU_CHAR       tx_byte);
+void         BSP_Ser_WrByte          (CPU_CHAR       tx_byte);
 void         BSP_Ser_WrStr           (CPU_CHAR      *tx_str);
 CPU_INT08U   BSP_Ser_RdByte          (void);
 void         BSP_Ser_RdStr           (CPU_CHAR      *rx_str,

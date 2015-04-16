@@ -53,12 +53,13 @@
 */
 
 
-#define  APP_CFG_TASK_UART_TX_PRIO                         1
+#define  APP_CFG_TASK_UART_TX_PRIO                         2
 #define  APP_CFG_TASK_UART_TX_RULER_PRIO                   13
-#define  APP_CFG_TASK_UART_RX_PRIO                         2
+#define  APP_CFG_TASK_UART_RX_PRIO                         3
 #define  APP_CFG_TASK_NOAH_PRIO                            3
 #define  APP_CFG_TASK_NOAH_RULER_PRIO                      16
-#define  APP_CFG_TASK_CMD_PARSE_PRIO                       4
+#define  APP_CFG_TASK_CMD_PARSE_PRIO                       1
+
 
 
 #define  APP_CFG_TASK_USER_IF_PRIO                         10
@@ -66,6 +67,8 @@
 
 #define  APP_CFG_TASK_SHELL_PRIO                           20
 #define  APP_CFG_TASK_START_PRIO                           21
+
+#define  APP_CFG_TASK_DBG_INFO_PRIO                        30
 
 #define  APP_CFG_TASK_PROBE_STR_PRIO                       37
 #define  PROBE_DEMO_INTRO_CFG_TASK_LED_PRIO                38
@@ -84,14 +87,15 @@
 */
 
 #define  APP_CFG_TASK_START_STK_SIZE                     128
-#define  APP_CFG_TASK_USER_IF_STK_SIZE                   512//256
+#define  APP_CFG_TASK_USER_IF_STK_SIZE                   256
 #define  APP_CFG_TASK_JOY_STK_SIZE                       128
 #define  APP_CFG_TASK_SHELL_STK_SIZE                     256
+#define  APP_CFG_TASK_DBG_INFO_STK_SIZE                  128
 
-#define  APP_CFG_TASK_UART_TX_STK_SIZE                   512//128
+#define  APP_CFG_TASK_UART_TX_STK_SIZE                   128
 #define  APP_CFG_TASK_UART_TX_RULER_STK_SIZE             128
-#define  APP_CFG_TASK_UART_RX_STK_SIZE                   512//256//128
-#define  APP_CFG_TASK_NOAH_STK_SIZE                      256//128
+#define  APP_CFG_TASK_UART_RX_STK_SIZE                   128
+#define  APP_CFG_TASK_NOAH_STK_SIZE                      128
 #define  APP_CFG_TASK_NOAH_RULER_STK_SIZE                128
 #define  APP_CFG_TASK_CMD_PARSE_STK_SIZE                 256
 

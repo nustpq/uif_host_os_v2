@@ -68,33 +68,23 @@ void App_TaskCMDParse( void *p_arg )
     
     pTaskMsgIN  = NULL;
     
-    pEBuf         = &Emb_Buf_Data;    
-    Init_EMB_BUF( pEBuf ); //need reset this when Noah connection reset
-    pEBuf         = &Emb_Buf_Cmd;    
-    Init_EMB_BUF( pEBuf ); //need reset this when Noah connection reset
+//    pEBuf         = &Emb_Buf_Data;    
+//    Init_EMB_BUF( pEBuf ); //need reset this when Noah connection reset
+//    pEBuf         = &Emb_Buf_Cmd;    
+//    Init_EMB_BUF( pEBuf ); //need reset this when Noah connection reset
     
     while( DEF_TRUE ) {     
         
-        pTaskMsgIN  = (INT8U *)OSQPend( EVENT_MsgQ_Noah2CMDParse, 0, &err );   
+        pTaskMsgIN  = (INT8U *)OSQPend( EVENT_MsgQ_Noah2CMDParse, 0, &err ); 
         
-        if( pTaskMsgIN != NULL && OS_ERR_NONE == err )   {           
-       
-            pNewCmd  = (pNEW_CMD)pTaskMsgIN ; //change to NOAH CMD type              
-            err = EMB_Data_Parse( pNewCmd );
+        if( pTaskMsgIN != NULL && OS_ERR_NONE == err )   { 
             
+            LED_Set( LED_DS2 );
+            
+            pNewCmd  = (pNEW_CMD)pTaskMsgIN ; //change to NOAH CMD type           
+            err = EMB_Data_Parse( pNewCmd );           
             OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );  //release mem
-            
-//            err = EMB_Data_Check( pNewCmd, pEBuf, 0 ); 
-//            OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );  //release mem
-//            if( err == OS_ERR_NONE ) {
-//                if( pEBuf->state ) { // EMB data complete               
-//                                         
-//                }                
-//            } else {
-//                Send_DACK(err);
-//                Init_EMB_BUF( pEBuf );
-//            }
-            
+            LED_Clear( LED_DS2 );
             
         }
         

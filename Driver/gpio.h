@@ -47,7 +47,7 @@ extern unsigned int Get_Port_Detect( void );
 
 extern void UART1_Mixer( unsigned char index ) ;
 extern void UART2_Mixer( unsigned char index ) ;
-extern void I2C_Mixer( unsigned char index ) ;
+extern unsigned char I2C_Mixer( unsigned char index ) ;
     
 extern void Pin_Reset_Codec( void );
 extern void Pin_Reset_FM36( void ) ;

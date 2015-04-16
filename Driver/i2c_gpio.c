@@ -39,8 +39,10 @@
 #define GPIO_I2C_DELAY  1  // 1ms timeout @ 48MHz MIP
 
 #define GPIO_CS    5                         //GPIO pin for iM205 CS pin 
-#define GPIO_SDA   6                         //GPIO pin for I2C SDA  
-#define GPIO_SCL   7                         //GPIO pin for I2C SCL  
+     
+     
+unsigned char GPIO_SDA  = 3 ;                         //GPIO pin for I2C SDA  
+unsigned char GPIO_SCL  = 4 ;                         //GPIO pin for I2C SCL  
   
                                                              
 static void delay( void )
@@ -352,8 +354,11 @@ unsigned char I2C_GPIO_Write_iM205 (unsigned char addr, unsigned char reg, unsig
 
 
 
-void I2C_GPIO_Init ( unsigned int speed )  
+void I2C_GPIO_Init ( unsigned int speed, unsigned char scl_gpio, unsigned char sda_gpio )  
 { 
+    
+    GPIO_SDA = sda_gpio;
+    GPIO_SCL = scl_gpio;
     
     GPIOPIN_Init_Fast( GPIO_SDA );
     GPIOPIN_Init_Fast( GPIO_SCL );

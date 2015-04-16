@@ -669,7 +669,7 @@ unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length )
         4, 5, 6, 7, 8, 11, 12, 13, 14, 18, 19, 20, 29, 30
     };
     
-    I2C_Mixer(I2C_MIX_FM36_CODEC);
+    
      
     Pin_Reset_Codec();
     

@@ -223,13 +223,17 @@ unsigned char TWID_Read      (
     unsigned char err;    
     unsigned char state; 
         
-    pAsync    = &twi_async; //force use async
+    //pAsync    = &twi_async; //force use async
     pTwi      = twid.pTwi; 
     pTransfer = (AsyncTwi *)twid.pTransfer; 
     state     = TWID_NO_ERROR;
-        
+    
+    if( num == 0 ) {
+        return state;
+    } 
+    
     if (pAsync) {  // Asynchronous transfer
-      
+        OSSemPend( TWI_Sem_lock, 0, &err );  
         if (pTransfer) { // Check that no transfer is already pending
             //TRACE_ERROR("TWID_Read: A transfer is already pending\n\r");   
             state =  TWID_ERROR_BUSY;
@@ -259,7 +263,7 @@ unsigned char TWID_Read      (
         }
         state          = pTransfer->status ;
         twid.pTransfer = NULL;
-        
+        OSSemPost( TWI_Sem_lock );
     }  else {  // Synchronous transfer
 
         OSSemPend( TWI_Sem_lock, 0, &err );  
@@ -325,13 +329,17 @@ unsigned char TWID_Write    (
     unsigned char err;     
     unsigned char state; 
         
-    pAsync    = &twi_async; //force use async    
+    //pAsync    = &twi_async; //force use async    
     pTwi      = twid.pTwi; 
     pTransfer = (AsyncTwi *)twid.pTransfer;      
     state     = TWID_NO_ERROR;
-        
+    
+    if( num == 0 ) {
+        return state;
+    }
+    
     if (pAsync) {  // Asynchronous transfer
-      
+         OSSemPend( TWI_Sem_lock, 0, &err );
         if (pTransfer) { // Check that no transfer is already pending
             //TRACE_ERROR("TWID_Read: A transfer is already pending\n\r");   
             state =  TWID_ERROR_BUSY;
@@ -358,7 +366,7 @@ unsigned char TWID_Write    (
         }
         state          =  pTransfer->status ;
         twid.pTransfer =  NULL;
-        
+        OSSemPost( TWI_Sem_lock );
     } else {   // Synchronous transfer   
 
         OSSemPend( TWI_Sem_lock, 0, &err ); 

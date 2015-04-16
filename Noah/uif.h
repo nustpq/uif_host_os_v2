@@ -19,6 +19,7 @@
 #define   UIF_TYPE_GPIO         3
 #define   UIF_TYPE_FM36_PATH    4
 #define   UIF_TYPE_I2C_GPIO     5
+#define   UIF_TYPE_I2C_Mixer    6
 
 #define   ATTRI_IM501_LOAD_CODE_IRAM       52
 #define   ATTRI_IM501_LOAD_CODE_DRAM       51
@@ -32,6 +33,13 @@
 
 #define   ATTRI_FM36_PATH_NORMAL    0
 #define   ATTRI_FM36_PATH_PWD_BP    1
+
+#define   GET_BYTE_LOW_4BIT( x )     ((x) & 0x0F) 
+#define   GET_BYTE_HIGH_4BIT( x )    (((x)>>4) & 0x0F) 
+#define   GET_I2C_GPIO_SCL(x)  GET_BYTE_LOW_4BIT( x ) 
+#define   GET_I2C_GPIO_SDA(x)  GET_BYTE_HIGH_4BIT( x ) 
+
+
 
 extern unsigned char Reg_RW_Data[];
 extern INTERFACE_CFG   Global_UIF_Setting[];

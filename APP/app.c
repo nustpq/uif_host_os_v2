@@ -66,7 +66,7 @@ static  OS_STK       App_TaskUART_TxRulerStk[APP_CFG_TASK_UART_TX_RULER_STK_SIZE
 static  OS_STK       App_TaskNoahStk[APP_CFG_TASK_NOAH_STK_SIZE];
 static  OS_STK       App_TaskNoahRulerStk[APP_CFG_TASK_NOAH_RULER_STK_SIZE];
 static  OS_STK       App_TaskCMDParseStk[APP_CFG_TASK_CMD_PARSE_STK_SIZE];
-                                             
+static  OS_STK       App_TaskDebugInfoStk[APP_CFG_TASK_DBG_INFO_STK_SIZE];                                    
 
 
 /*
@@ -179,7 +179,7 @@ static  void  App_TaskStart (void *p_arg)
     Math_Init();                                                /* Initialize the Mathematical module                   */
 
     BSP_Ser_Init(115200);                        
-    APP_TRACE_INFO(("\n\n\r"));
+    APP_TRACE_INFO(("\n\r\n\r"));
 
 #if (APP_CFG_PROBE_COM_MODULE_EN == DEF_ENABLED) || \
     (APP_CFG_PROBE_OS_PLUGIN_EN  == DEF_ENABLED)
@@ -202,8 +202,7 @@ static  void  App_TaskStart (void *p_arg)
 //        LED_Set( LED_DS1 );        
 //        OSTimeDlyHMSM(0, 0, 0, 30);         
 //        LED_Clear( LED_DS1 );
-//        OSTimeDlyHMSM(0, 0, 1, 740); 
-        
+//        OSTimeDlyHMSM(0, 0, 1, 740);         
         counter++;
         if(counter&0xFF) {
             LED_Set( LED_DS1 );   
@@ -495,6 +494,22 @@ static  void  App_TaskCreate (void)
     OSTaskNameSet(APP_CFG_TASK_CMD_PARSE_PRIO, "CMD_Parse", &err);
 #endif 
     
+////////////////////////////////////////////////////////////////////////////////
+    
+    OSTaskCreateExt((void (*)(void *)) App_TaskDebugInfo,
+                    (void           *) 0,
+                    (OS_STK         *)&App_TaskDebugInfoStk[APP_CFG_TASK_DBG_INFO_STK_SIZE - 1],
+                    (INT8U           ) APP_CFG_TASK_DBG_INFO_PRIO,
+                    (INT16U          ) APP_CFG_TASK_DBG_INFO_PRIO,
+                    (OS_STK         *)&App_TaskDebugInfoStk[0],
+                    (INT32U          ) APP_CFG_TASK_DBG_INFO_STK_SIZE,
+                    (void *)0,
+                    (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+
+#if (OS_TASK_NAME_EN > 0)
+    OSTaskNameSet(APP_CFG_TASK_CMD_PARSE_PRIO, "Debug_Info", &err);
+#endif     
+ 
     
 }
 

@@ -76,7 +76,7 @@ extern unsigned char I2C_GPIO_Write_iM205 (unsigned char addr, unsigned char reg
 extern unsigned char I2C_GPIO_Read(unsigned char addr, unsigned char* buf, unsigned int len) ;
 extern unsigned char I2C_GPIO_Read_iM205(unsigned char addr, unsigned char reg, unsigned char *val) ;
 
-extern void I2C_GPIO_Init ( unsigned int speed )  ;
+extern void I2C_GPIO_Init ( unsigned int speed, unsigned char scl_gpio, unsigned char sda_gpio ) ;
 extern void CS_GPIO_Init ( void );
 extern unsigned char CS_GPIO_Write (unsigned char mode_toggle_num, unsigned char gain_toggle_num);
 

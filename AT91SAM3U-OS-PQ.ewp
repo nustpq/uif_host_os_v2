@@ -1963,6 +1963,9 @@
       <name>$PROJ_DIR$\APP\task_cmd_parse.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\APP\task_debug_info.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\APP\task_joy.c</name>
     </file>
     <file>

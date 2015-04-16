@@ -133,9 +133,9 @@ void  App_TaskJoy (void *p_arg)
             }
         }
    
-        AB_Status_Change_Report();
-        
-        OSTimeDly(100); 
+        //AB_Status_Change_Report();        
+        //OSTimeDly(100);
+        OSTimeDly(1); 
        
     }
       

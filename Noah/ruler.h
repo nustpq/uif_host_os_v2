@@ -91,13 +91,13 @@
 #define FW_DOWNLAD_STATE_UNFINISHED    0xAA
 #define FW_DOWNLAD_STATE_FINISHED      0x55
 
-#define FLASH_ADDR_FW_BIN_MAX_SIZE   ( 0x10000 )  //64kB
-#define FLASH_ADDR_FW_STATE          ( AT91C_IFLASH + AT91C_IFLASH_CODE_SIZE )  //from 128kB-
+#define FLASH_ADDR_FW_BIN_MAX_SIZE   ( 0x10000 )  //64kB max for ruler fw bin
+#define FLASH_ADDR_FW_STATE          ( AT91C_IFLASH1 )  //from 128kB-
 #define FLASH_ADDR_FW_BIN            ( FLASH_ADDR_FW_STATE + AT91C_IFLASH_PAGE_SIZE ) //from 128kB+256
 
 #define FLASH_ADDR_FW_VEC_SIZE       ( 0x2000 ) //8kB
-#define FLASH_ADDR_FW_VEC_NUM        ( 7 )      //64kB = 8kB * 7+1
-#define FLASH_ADDR_FW_VEC_STATE      ( AT91C_IFLASH + AT91C_IFLASH_CODE_SIZE + FLASH_ADDR_FW_BIN_MAX_SIZE  ) //256*4
+#define FLASH_ADDR_FW_VEC_NUM        ( 7 )      //(64kB = 8kB*7 
+#define FLASH_ADDR_FW_VEC_STATE      ( AT91C_IFLASH1 +  FLASH_ADDR_FW_BIN_MAX_SIZE  ) //256*4
 #define FLASH_ADDR_FW_VEC            ( FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * FLASH_ADDR_FW_VEC_NUM ) //from 128kB + 64kB + (0.256*4)kB
 
 
@@ -225,6 +225,7 @@ typedef struct {
     unsigned short   speed;
 }INTERFACE_CFG ;
 
+
 typedef struct {
     unsigned char    if_type;      
     unsigned char    dev_addr;   
@@ -274,8 +275,10 @@ typedef struct {
     unsigned char    vec_index_a;   
     unsigned char    vec_index_b;
     unsigned char    flag;
-    unsigned char    reserved;
+    unsigned char    type; //41£º iM401,  51: iM501
     unsigned int     delay; 
+    unsigned char    gpio; //irq trigger GPIO index
+    unsigned char    trigger_en;
 }SET_VEC_CFG ;    
    
 
@@ -291,7 +294,7 @@ extern volatile unsigned char Global_Bridge_POST;
 extern volatile unsigned int  Global_Mic_Mask[];
 extern volatile unsigned char Ruler_Setup_Sync_Data;
 
-extern SET_VEC_CFG  Global_iM401_VEC_Cfg;
+extern SET_VEC_CFG  Global_VEC_Cfg;
 
 extern void          Init_Global_Var( void );
 extern unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg );

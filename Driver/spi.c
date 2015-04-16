@@ -360,17 +360,23 @@ unsigned char SPI_ReadWriteBuffer(AT91S_SPI *spi,
         spi->SPI_TNCR = length_t;
         
         return 1;
-    }
-#endif
+    }    
     // No free bank
-    return 0;
+    else  
+    {
+        return 0;
+    }
+#else
+    
+    
+    
+    
+    
+#endif
+ 
 }
+           
                        
-                       
-
-
-
-
 
 //return 0 if write succeed
 //return 1 if write failed
@@ -380,29 +386,26 @@ unsigned char SPI_WriteBuffer_API(  void *buffer,  unsigned int length )
     unsigned char err;
     unsigned int  couter = 0 ;
 
-    OSSemPend( SPI_Sem, 0, &err );   
-    //APP_TRACE_INFO(("\r\nSPI_MR:0x%0X ",  spi_if->SPI_MR));
-    //APP_TRACE_INFO(("\r\nSPI_CSR[%d]:0x%0X ", 0, spi_if->SPI_CSR[0]));
-    state = SPI_WriteBuffer( spi_if, buffer, length );
- 
-    //APP_TRACE_INFO(("\r\nstate:0x%d ",state));
-//    if( state == 1 ) {
-//        while( ! SPI_IsWriteFinished( spi_if ) ) {            
-//        //while ((DMA_GetChannelStatus() & (DMA_ENA << 0)) == (DMA_ENA << 0)){ 
-//            //OSTimeDly(1);
-//            if( couter++ > SPI_TIME_OUT ) { //timeout : 2s
-//                state = 0 ;
-//                break;
-//            }
-//        }        
-//    }  
-    OSTimeDly(5);
-    DMA_DisableChannel(0);
-    OSSemPost( SPI_Sem ); 
+    //OSSemPend( SPI_Sem, 0, &err );     
+    state = SPI_WriteBuffer( spi_if, buffer, length ); 
+    if( state == 1 ) {
+        //while( ! SPI_IsWriteFinished( spi_if ) ) {      
+        while( !((AT91C_BASE_HDMA->HDMA_EBCISR) & (DMA_BTC<<BOARD_SPI_DMA_CHANNEL) ) ) {
+            OSTimeDly(1);
+            if( couter++ > SPI_TIME_OUT ) { //timeout : 2s
+                state = 0 ;
+                break;
+            }
+        }        
+    }  
+    DMA_DisableChannel( BOARD_SPI_DMA_CHANNEL );
+    //OSSemPost( SPI_Sem ); 
     //APP_TRACE_INFO(("\r\nstate:0x%d, couter: %d ",state,couter));
     return (state == 0) ;
     
 }
+
+
 
 
 //return 0 if read succeed
@@ -412,12 +415,14 @@ unsigned char SPI_ReadBuffer_API(  void *buffer,  unsigned int length )
     unsigned char state;
     unsigned char err = 0;
     unsigned int  couter = 0 ;   
-    OSSemPend( SPI_Sem, 0, &err );    
+    
+    //OSSemPend( SPI_Sem, 0, &err );    
 
     state = SPI_ReadBuffer( spi_if, buffer,length );
   
     if( state == 1 ) {
-        while( ! SPI_IsReadFinished( spi_if ) ) {
+        //while( ! SPI_IsReadFinished( spi_if ) ) {
+        while( !((AT91C_BASE_HDMA->HDMA_EBCISR) & (DMA_BTC<<BOARD_SPI_DMA_CHANNEL) ) ) {      
             OSTimeDly(1);
             if( couter++ > SPI_TIME_OUT ) { //timeout : 2s
                 err = 2 ;
@@ -431,7 +436,7 @@ unsigned char SPI_ReadBuffer_API(  void *buffer,  unsigned int length )
 
     }        
     
-    OSSemPost( SPI_Sem ); 
+    //OSSemPost( SPI_Sem ); 
     
     return err ;
     
@@ -443,12 +448,13 @@ unsigned char SPI_ReadWriteBuffer_API(  void *buffer_r,  void *buffer_w, unsigne
     unsigned char err = 0;
     unsigned int  couter = 0 ;
    
-    OSSemPend( SPI_Sem, 0, &err );    
+    //OSSemPend( SPI_Sem, 0, &err );    
 
     state = SPI_ReadWriteBuffer( spi_if, buffer_r, buffer_w, length_r, length_w );
   
     if( state == 1 ) {
-        while( ! SPI_IsReadFinished( spi_if ) ) {
+        //while( ! SPI_IsReadFinished( spi_if ) ) {
+        while( !((AT91C_BASE_HDMA->HDMA_EBCISR) & (DMA_BTC<<BOARD_SPI_DMA_CHANNEL) ) ) {
             OSTimeDly(1);
             if( couter++ > SPI_TIME_OUT ) { //timeout : 2s
                 err = 2 ;
@@ -462,7 +468,7 @@ unsigned char SPI_ReadWriteBuffer_API(  void *buffer_r,  void *buffer_w, unsigne
 
     }        
     
-    OSSemPost( SPI_Sem ); 
+    //OSSemPost( SPI_Sem ); 
     
     return err ;
     
@@ -512,6 +518,7 @@ void SPI_Init(  unsigned int spi_clk, unsigned char format )
        APP_TRACE_INFO(("\r\nNo need re-init same SPI mode and clock."));
        return;
    }
+   
    spi_clk_save = spi_clk_save ;
    format_save  = format ;
    

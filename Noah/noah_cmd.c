@@ -172,19 +172,19 @@ void  Noah_CMD_Read (CMDREAD    *pCMD_Read,
                state_mac = STAT_SYNC1; 
                PcCmdCounter = 0 ;  
                PcCmdDataLen = 0 ;                
-//               err  = OSQPost( pCMD_Read->pEvent, pRecvPtr); // EVENT_MsgQ_PCUART2Noah  //Send valid CMD inf to Uart2task0 Messege Queue                    
-//               if( OS_ERR_NONE == err )  {              
-//                   pRecvPtr  = NULL;                 
-//               } else {  
-//                   OSMemPut( pMEM_Part_MsgUART, pRecvPtr );              
-//               }
-////                Time_Stamp();
-////                APP_TRACE_INFO(("\r\n::::: Noah_CMD_Read post data "));
+               err  = OSQPost( pCMD_Read->pEvent, pRecvPtr); // EVENT_MsgQ_PCUART2Noah  //Send valid CMD inf to Uart2task0 Messege Queue                    
+               if( OS_ERR_NONE == err )  {              
+                   pRecvPtr  = NULL;                 
+               } else {  
+                   OSMemPut( pMEM_Part_MsgUART, pRecvPtr );              
+               }
+//                Time_Stamp();
+//                APP_TRACE_INFO(("\r\n::::: Noah_CMD_Read post data "));
               
                
-            err = EMB_Data_Parse( pRecvPtr );
-            
-            OSMemPut( pMEM_Part_MsgUART, pRecvPtr );  //release mem
+//            err = EMB_Data_Parse( pRecvPtr );
+//            
+//            OSMemPut( pMEM_Part_MsgUART, pRecvPtr );  //release mem
             
             
             }
@@ -822,10 +822,10 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             
         break ;
         
-        case PC_CMD_RAW_WRITE :
-        
+        case PC_CMD_RAW_WRITE :        
 //            APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE "));          
-//            Time_Stamp();          
+//            Time_Stamp();
+       // LED_Set( LED_DS1 );
             temp = emb_get_attr_int(&root, 1, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_write.if_type = (CPU_INT08U)temp;             
@@ -835,14 +835,14 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             temp = emb_get_attr_int(&root, 3, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_write.data_len = (CPU_INT32U)temp;  
-//            Time_Stamp();
+//            Time_Stamp();           
             pBin = emb_get_attr_binary(&root, 4, (int*)&temp);
             if(pBin == NULL ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_write.pdata = (CPU_INT08U *)pBin; 
             err = Raw_Write( &PCCmd.raw_write );
 //            Time_Stamp();
 //            APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE end "));  
-            
+//LED_Clear( LED_DS1 );            
         break ;
         
         case PC_CMD_RAW_READ :  
@@ -874,7 +874,47 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         break ;
         
         
+        case PC_CMD_MCU_FLASH_WRITE :
+
+            temp = emb_get_attr_int(&root, 1, -1);
+            if(temp == -1 ) { err = EMB_CMD_ERR; break; }
+            PCCmd.mcu_flash.addr_index = (CPU_INT08U)temp;             
+            temp = emb_get_attr_int(&root, 2, -1);
+            if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
+            PCCmd.mcu_flash.data_len = (CPU_INT32U)temp;        
+            pBin = emb_get_attr_binary(&root, 3, (int*)&temp);
+            if(pBin == NULL ) { err = EMB_CMD_ERR;  break; }
+            PCCmd.mcu_flash.pdata = (CPU_INT08U *)pBin;
+            pBin = emb_get_attr_binary(&root, 4, (int*)&temp);
+            if(pBin == NULL ) { err = EMB_CMD_ERR;  break; }
+            PCCmd.mcu_flash.pStr = (CPU_INT08U *)pBin;          
+            err = Save_DSP_VEC(  &PCCmd.mcu_flash );    
+            
+        break ;
         
+        case PC_CMD_SET_VEC_CFG :
+                     
+            temp = emb_get_attr_int(&root, 1, -1);
+            if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
+            PCCmd.set_vec_cfg.vec_index_a = (CPU_INT08U)temp;             
+            temp = emb_get_attr_int(&root, 2, -1);
+            if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
+            PCCmd.set_vec_cfg.vec_index_b = (CPU_INT08U)temp;
+            temp = emb_get_attr_int(&root, 3, -1);
+            if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
+            PCCmd.set_vec_cfg.delay = (CPU_INT32U)temp;  
+            temp = emb_get_attr_int(&root, 4, -1);
+            if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
+            PCCmd.set_vec_cfg.type = (CPU_INT08U)temp; 
+            temp = emb_get_attr_int(&root, 5, -1);
+            if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
+            PCCmd.set_vec_cfg.gpio = (CPU_INT08U)temp; 
+            temp = emb_get_attr_int(&root, 6, -1);
+            if(temp == -1 ) { temp = 0; }  //trigger disable
+            PCCmd.set_vec_cfg.trigger_en = (CPU_INT08U)temp;
+            err = Set_DSP_VEC( &PCCmd.set_vec_cfg );    
+           
+        break ;
         
         
 /***************************************************************************
@@ -924,38 +964,7 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
 //            Send_GACK(err);
 //        break ;
     
-        case PC_CMD_MCU_FLASH_WRITE :
-            Send_DACK(err);            
-            temp = emb_get_attr_int(&root, 1, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
-            PCCmd.mcu_flash.addr_index = (CPU_INT08U)temp;             
-            temp = emb_get_attr_int(&root, 2, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
-            PCCmd.mcu_flash.data_len = (CPU_INT32U)temp;        
-            pBin = emb_get_attr_binary(&root, 3, (int*)&temp);
-            if(pBin == NULL ) { Send_GACK(EMB_CMD_ERR);  break; }
-            PCCmd.mcu_flash.pdata = (CPU_INT08U *)pBin;
-            pBin = emb_get_attr_binary(&root, 4, (int*)&temp);
-            if(pBin == NULL ) { Send_GACK(EMB_CMD_ERR);  break; }
-            PCCmd.mcu_flash.pStr = (CPU_INT08U *)pBin;          
-            err = Save_DSP_VEC(  &PCCmd.mcu_flash );    
-            Send_GACK(err);
-        break ;
-        
-        case PC_CMD_SET_VEC_CFG :
-            Send_DACK(err);            
-            temp = emb_get_attr_int(&root, 1, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
-            PCCmd.set_vec_cfg.vec_index_a = (CPU_INT08U)temp;             
-            temp = emb_get_attr_int(&root, 2, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
-            PCCmd.set_vec_cfg.vec_index_b = (CPU_INT08U)temp;
-            temp = emb_get_attr_int(&root, 3, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
-            PCCmd.set_vec_cfg.delay = (CPU_INT32U)temp;                
-            err = Set_DSP_VEC( &PCCmd.set_vec_cfg );    
-            Send_GACK(err);
-        break ;
+
         ////////////////////////////////////////////////////////////////////////        
         
         case PC_CMD_RAED_RULER_INFO : 

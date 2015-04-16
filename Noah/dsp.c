@@ -504,6 +504,30 @@ unsigned char FM36_PWD_Bypass( void )
     
 }  
 
+unsigned char FM36_PDMADC_CLK_Onoff( unsigned char onoff )
+{
+    unsigned char  err ;
+    unsigned short temp;
+    
+    APP_TRACE_INFO(("\r\nEnable/Disbale FM36 ADC PDM CLK : ",onoff));    
+    err = DM_LegacyRead( FM36_I2C_ADDR, 0x3FCF,(unsigned char *)&temp ) ;
+    if( OS_ERR_NONE != err ) {
+        err = FM36_RD_DM_ERR;
+        return err ;
+    }
+    if( onoff ) {  //Normal operation
+        temp |= 0x20; 
+    } else {    //PDMCLK_OFF
+        temp &= ~0x20; 
+    }
+    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FCF, temp ) ;  
+    if( OS_ERR_NONE != err ) {
+        return FM36_WR_DM_ERR;;
+    }  
+    
+    return err;
+    
+}  
 
 /*
 *********************************************************************************************************
@@ -538,7 +562,6 @@ unsigned char Init_FM36_AB03( unsigned short sr, unsigned char mic_num, unsigned
 //        
 //    }   
     
-    I2C_Mixer(I2C_MIX_FM36_CODEC);
     Pin_Reset_FM36();  
     
 //    err = HOST_SingleWrite_2(FM36_I2C_ADDR, 0x0C, 2); //reset
@@ -663,7 +686,7 @@ unsigned char Init_FM36_AB03( unsigned short sr, unsigned char mic_num, unsigned
 
 
 /**********************************   For iM401 control **********************/
-
+/*
 static unsigned char iM401_Standby_Cmd[][3]=
 {
     0x91,0x00,0x00,
@@ -765,8 +788,11 @@ unsigned char iM401_Bypass( void )
     return 0;
     
 }
+*/
+////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////
+
+
 
 unsigned char iM401_Load_Vec( void )
 {     
@@ -777,13 +803,13 @@ unsigned char iM401_Load_Vec( void )
     err = NO_ERR;
     APP_TRACE_INFO(("\r\nLoad iM401 vec stored in MCU flash...\r\n"));    
    
-    if( Global_iM401_VEC_Cfg.flag != 0x55 ) {
+    if( Global_VEC_Cfg.flag != 0x55 ) {
         APP_TRACE_INFO(("\r\nvec conf data error!\r\n")); 
         err = FW_VEC_SET_CFG_ERR;
         return err;
     }
         
-    index = Global_iM401_VEC_Cfg.vec_index_a ;
+    index = Global_VEC_Cfg.vec_index_a ;
     if( index != 0 ) {        
         Read_Flash_State(&flash_info, FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * index  );
         if( flash_info.f_w_state != FW_DOWNLAD_STATE_FINISHED ) {
@@ -801,9 +827,9 @@ unsigned char iM401_Load_Vec( void )
         } 
     } 
     
-    OSTimeDly( Global_iM401_VEC_Cfg.delay );
+    OSTimeDly( Global_VEC_Cfg.delay );
 
-    index = Global_iM401_VEC_Cfg.vec_index_b ;
+    index = Global_VEC_Cfg.vec_index_b ;
     if( index != 0 ) {        
         Read_Flash_State(&flash_info, FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * index );
         if( flash_info.f_w_state != FW_DOWNLAD_STATE_FINISHED ) {
@@ -826,4 +852,85 @@ unsigned char iM401_Load_Vec( void )
 }
 
 
-
+unsigned char MCU_Load_Vec( unsigned char firsttime )
+{     
+    unsigned char err;
+    unsigned char i, index, *pChar; 
+    unsigned char dev_addr, data_num;
+    FLASH_INFO    flash_info;   
+    
+    err = NO_ERR;
+    
+    if( Global_VEC_Cfg.type == 41 ) {
+        APP_TRACE_INFO(("\r\nLoad iM401 vec stored in MCU flash...\r\n"));
+        dev_addr = iM401_I2C_ADDR;
+        data_num = 3;
+    } else if(Global_VEC_Cfg.type == 51 ) {
+        APP_TRACE_INFO(("\r\nLoad iM501 vec stored in MCU flash...\r\n"));
+        dev_addr = iM501_I2C_ADDR;
+        data_num = 4;
+    } else {
+        APP_TRACE_INFO(("\r\nvec conf data error!\r\n")); 
+        return FW_VEC_SET_CFG_ERR;         
+    }
+    
+    if( Global_VEC_Cfg.flag != 0x55 ) {
+        APP_TRACE_INFO(("\r\nvec conf data error!\r\n")); 
+        return FW_VEC_SET_CFG_ERR;
+    }
+    
+    if( firsttime == 0 ) {   //not first time pwd
+        index = Global_VEC_Cfg.vec_index_a ;
+        if( index != 0 ) {        
+            Read_Flash_State(&flash_info, FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * index  );
+            if( flash_info.f_w_state != FW_DOWNLAD_STATE_FINISHED ) {    
+              APP_TRACE_INFO(("\r\nvec data state error...\r\n"));
+              return FW_VEC_SAVE_STATE_ERR;;
+            }   
+            if(Global_VEC_Cfg.type == 51 ) {
+               I2C_Mixer(I2C_MIX_FM36_CODEC);
+               err = FM36_PDMADC_CLK_Onoff(1); //enable PDM clock
+               I2C_Mixer(I2C_MIX_UIF_S);              
+            }
+            APP_TRACE_INFO(("Load vec[%d] (%d Bytes) ...\r\n",index,flash_info.bin_size));
+            pChar = (unsigned char *)FLASH_ADDR_FW_VEC + index * FLASH_ADDR_FW_VEC_SIZE;
+            for( i = 0; i < flash_info.bin_size ;  ) {
+                data_num = *(pChar+i) ;
+                err =  TWID_Write(  dev_addr>>1, 0, 0, pChar + i + 1 , data_num, NULL); 
+                i += ( data_num + 1 );               
+                if ( err != SUCCESS )  {
+                    return(I2C_BUS_ERR) ;
+                }
+            } 
+        }         
+        OSTimeDly( Global_VEC_Cfg.delay * 1000 );  //delay second
+    }
+    index = Global_VEC_Cfg.vec_index_b ;
+    if( index != 0 ) {        
+        Read_Flash_State(&flash_info, FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * index );
+        if( flash_info.f_w_state != FW_DOWNLAD_STATE_FINISHED ) {
+          err = FW_VEC_SAVE_STATE_ERR;
+          APP_TRACE_INFO(("\r\nvec data state error...\r\n"));
+          return err;
+        }       
+        APP_TRACE_INFO(("Load vec[%d] (%d Bytes) ...\r\n",index,flash_info.bin_size));
+        pChar = (unsigned char *)FLASH_ADDR_FW_VEC + index * FLASH_ADDR_FW_VEC_SIZE;
+        for( i = 0; i < flash_info.bin_size ;  ) {
+            data_num = *(pChar+i) ;
+            err =  TWID_Write(  dev_addr>>1, 0, 0, pChar + i + 1 , data_num, NULL); 
+            i += ( data_num + 1 );     
+            if ( err != SUCCESS )  {
+                return(I2C_BUS_ERR) ;
+            }
+        } 
+        if(Global_VEC_Cfg.type == 51 ) {    
+          I2C_Mixer(I2C_MIX_FM36_CODEC);
+          err = FM36_PDMADC_CLK_Onoff(0); //disable PDM clock
+          I2C_Mixer(I2C_MIX_UIF_S);
+          
+        }
+    } 
+    
+    return err;     
+    
+}
