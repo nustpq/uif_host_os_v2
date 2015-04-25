@@ -130,7 +130,10 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
     switch( pInterface_Cfg->if_type )  {
         
         case UIF_TYPE_I2C :
-            if( temp <= 400 && temp >= 10) { 
+            if( Global_UIF_Setting[ UIF_TYPE_I2C - 1 ].speed  == temp ) {
+                break;
+            }
+            if( temp <= 1000 && temp >= 10) { 
                 TWI_Init( temp * 1000 );     
                 APP_TRACE_INFO(("\r\nI2C port is set to %d kHz\r\n",temp));        
             }  else {
@@ -151,7 +154,10 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
             }   
         break ;
         
-        case UIF_TYPE_SPI :  
+        case UIF_TYPE_SPI :
+            if( Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].speed  == temp ) {
+                break;
+            }
             if( temp <= 1000 && temp >= 10) {  
                 SPI_Init(  temp * 1000, pInterface_Cfg->attribute );    
                 APP_TRACE_INFO(("\r\nSPI port is set to %d kHz \r\n",temp));        
@@ -161,8 +167,13 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
             }              
         break ;
         
-        case UIF_TYPE_FM36_PATH :       
-            
+        case UIF_TYPE_FM36_PATH :           
+        break ;
+        
+        case UIF_TYPE_FM36_PDMCLK :
+           I2C_Mixer(I2C_MIX_FM36_CODEC);
+           err = FM36_PDMADC_CLK_Set(pInterface_Cfg->attribute); 
+           I2C_Mixer(I2C_MIX_UIF_S);                       
         break ;
         
         case UIF_TYPE_GPIO :       

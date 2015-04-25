@@ -20,6 +20,7 @@
 #define   UIF_TYPE_FM36_PATH    4
 #define   UIF_TYPE_I2C_GPIO     5
 #define   UIF_TYPE_I2C_Mixer    6
+#define   UIF_TYPE_FM36_PDMCLK  7
 
 #define   ATTRI_IM501_LOAD_CODE_IRAM       52
 #define   ATTRI_IM501_LOAD_CODE_DRAM       51

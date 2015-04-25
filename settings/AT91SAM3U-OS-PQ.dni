@@ -33,7 +33,7 @@ Stop=1
 Freq=10000000
 MultiCoreRunAll=1
 [DebugChecksum]
-Checksum=882077841
+Checksum=-711258916
 [JLinkDriver]
 CStepIntDis=_ 0
 [Exceptions]

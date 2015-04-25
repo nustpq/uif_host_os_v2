@@ -154,7 +154,21 @@ typedef struct {
     unsigned char    channels ; //1~6 
     unsigned char    lin_ch_mask;
     unsigned char    bit_length; //16, 24, 32
+    unsigned char    gpio_rec_bit_mask;
 }AUDIO_CFG ;
+
+
+//typedef struct {
+//  
+//  unsigned char  type;//Rec: =0x00, Play: =0x01
+//  unsigned char  channel_num; //1~8
+//  unsigned short sample_rate;
+//  unsigned char  bit_length; // 16, 24, 32
+//  unsigned char  gpio_rec_num;
+//  unsigned char  gpio_rec_start_index;
+//  unsigned char  gpio_rec_bit_mask;  
+//}AUDIO_CFG;
+
 
 typedef struct {
     unsigned char    type;    //rec = 1,  play = 2, rec&play = 3   

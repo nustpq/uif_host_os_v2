@@ -773,6 +773,9 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             PCCmd.audio_cfg.lin_ch_mask = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 5, 0);            
             PCCmd.audio_cfg.bit_length = (CPU_INT08U)temp; 
+            temp = emb_get_attr_int(&root, 6, 0);   
+            if( temp == -1 ) { temp = 0 ;}
+            PCCmd.audio_cfg.gpio_rec_bit_mask = (CPU_INT08U)temp; 
             err = Setup_Audio( &PCCmd.audio_cfg );
 
         break ;
@@ -823,8 +826,8 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         break ;
         
         case PC_CMD_RAW_WRITE :        
-//            APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE "));          
-//            Time_Stamp();
+          //  APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE "));          
+         //  Time_Stamp();
        // LED_Set( LED_DS1 );
             temp = emb_get_attr_int(&root, 1, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
@@ -840,7 +843,7 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             if(pBin == NULL ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_write.pdata = (CPU_INT08U *)pBin; 
             err = Raw_Write( &PCCmd.raw_write );
-//            Time_Stamp();
+ //           Time_Stamp();
 //            APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE end "));  
 //LED_Clear( LED_DS1 );            
         break ;
@@ -869,7 +872,7 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
                                       &PCCmd.raw_read,
                                       pkt_sn, 
-                                      DATA_UIF_RAW_RD ) ;   
+                                      DATA_UIF_RAW_RD ) ;  
             
         break ;
         

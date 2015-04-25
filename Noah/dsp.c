@@ -33,10 +33,14 @@
 
 
 //Note: This routine do NOT support reentrance
-static unsigned int sr_saved      = 0;
-static unsigned int mic_num_saved = 0;
+
 static bool flag_power_lose       = true;
 
+static unsigned short sr_saved               = 0;
+static unsigned char  mic_num_saved          = 0;
+static unsigned char  lin_sp_index_saved     = 0;
+static unsigned char  start_slot_index_saved = 0;
+static unsigned char  bit_length_saved       = 0;
 
 
 
@@ -509,7 +513,7 @@ unsigned char FM36_PDMADC_CLK_Onoff( unsigned char onoff )
     unsigned char  err ;
     unsigned short temp;
     
-    APP_TRACE_INFO(("\r\nEnable/Disbale FM36 ADC PDM CLK : ",onoff));    
+    APP_TRACE_INFO(("\r\nEnable/Disbale FM36 ADC PDM CLK: %d",onoff));    
     err = DM_LegacyRead( FM36_I2C_ADDR, 0x3FCF,(unsigned char *)&temp ) ;
     if( OS_ERR_NONE != err ) {
         err = FM36_RD_DM_ERR;
@@ -528,6 +532,52 @@ unsigned char FM36_PDMADC_CLK_Onoff( unsigned char onoff )
     return err;
     
 }  
+
+unsigned char FM36_PDMADC_CLK_Set( unsigned char pdm_clk_mhz )
+{
+    
+    unsigned char  err ;
+    unsigned short data ;
+    
+    APP_TRACE_INFO(("\r\nConf FM36 PDMADC Clock = %dMHz\r\n", pdm_clk_mhz));
+      
+    switch ( pdm_clk_mhz ) {
+        case 4 : //4.096
+            data = 0x0F;
+        break;  
+        case 3 : //3.072
+            data = 0x13;
+        break;
+        case 2 : //2.048
+            data = 0x1B;
+        break;
+        case 1 : //1.024
+            data = 0x33;
+        break; 
+        default ://2.048
+            APP_TRACE_INFO(("Not supported PDM CLK, reset to default 2.048MHz\r\n"));
+            data = 0x1B;
+        break;
+    }
+    
+    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FED, data ) ;
+    if( OS_ERR_NONE != err ) {
+        return FM36_WR_DM_ERR;;
+    } 
+    
+    err = DM_LegacyRead( FM36_I2C_ADDR, 0x3FE4,(unsigned char *)&data ) ;
+    if( OS_ERR_NONE != err ) {
+        err = FM36_RD_DM_ERR;
+        return err ;
+    }     
+    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FE4, data) ;// must rewrite 3fe4 to setting PLL.
+    if( OS_ERR_NONE != err ) {
+        return FM36_WR_DM_ERR;;
+    }     
+  
+    return err;
+    
+}
 
 /*
 *********************************************************************************************************
@@ -552,15 +602,20 @@ unsigned char Init_FM36_AB03( unsigned short sr, unsigned char mic_num, unsigned
     unsigned short addr, val; 
     unsigned char  err ;     
    
-//    if( sr == sr_saved  &&  mic_num == mic_num_saved ) { //just check this 2 parameters, b/c other won't change in AB03
-//        APP_TRACE_INFO(("No need Re-Init FM36\r\n"));
-//        return NO_ERR;
-//        
-//    } else {
-//        sr_saved = sr ;
-//        mic_num_saved = mic_num ;
-//        
-//    }   
+    if( sr == sr_saved  &&  \
+        mic_num == mic_num_saved && \
+        lin_sp_index == lin_sp_index_saved && \
+        start_slot_index == start_slot_index_saved && \
+        bit_length == bit_length_saved  ) {    
+        APP_TRACE_INFO(("No need Re-Init FM36\r\n"));
+        return NO_ERR;        
+    } else {
+        sr_saved = sr ;
+        mic_num_saved = mic_num ;
+        lin_sp_index_saved = lin_sp_index;
+        start_slot_index_saved = start_slot_index ;
+        bit_length_saved = bit_length;
+    }   
     
     Pin_Reset_FM36();  
     
@@ -880,6 +935,7 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
     }
     
     if( firsttime == 0 ) {   //not first time pwd
+        
         index = Global_VEC_Cfg.vec_index_a ;
         if( index != 0 ) {        
             Read_Flash_State(&flash_info, FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * index  );
@@ -902,9 +958,12 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
                     return(I2C_BUS_ERR) ;
                 }
             } 
-        }         
-        OSTimeDly( Global_VEC_Cfg.delay * 1000 );  //delay second
+        }  
+        
+        OSTimeDly( Global_VEC_Cfg.delay );  //delay mSecond
+        
     }
+    
     index = Global_VEC_Cfg.vec_index_b ;
     if( index != 0 ) {        
         Read_Flash_State(&flash_info, FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * index );

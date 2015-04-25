@@ -102,6 +102,32 @@ static unsigned char Check_Actived_Mic_Number( void )
 
 /*
 *********************************************************************************************************
+*                                           Get_Mask_Num()
+*
+* Description : Check mask bit number
+* Argument(s) : None.
+* Return(s)   : mic_counter : the total actived MICs number.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+unsigned char Get_Mask_Num( unsigned int mask )
+{
+   unsigned char i;
+   unsigned char num = 0;
+   
+   for ( i = 0 ; i<32; i++ ) {
+       if( mask & (1<<i) ) {
+           num++;
+       }
+   }
+   return num;
+    
+}
+
+
+/*
+*********************************************************************************************************
 *                                           Check_UART_Mixer_Ready()
 *
 * Description : Check and wait until all data transmission inbuffer for current channel ruler is done .
@@ -140,7 +166,6 @@ void Check_UART_Mixer_Ready( void )
 }
 
 
-
 /*
 *********************************************************************************************************
 *                                           Setup_Audio()
@@ -158,10 +183,11 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
     unsigned char err; 
     unsigned char mic_num; 
     unsigned char data  = 0xFF;
-    unsigned char buf[] = { 
+    unsigned char buf[] = {         
         CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_SET_AUDIO_CFG,\
         pAudioCfg->type, pAudioCfg->channels,\
-       (pAudioCfg->sr)&0xFF, ((pAudioCfg->sr)>>8)&0xFF, pAudioCfg->bit_length
+       (pAudioCfg->sr)&0xFF, ((pAudioCfg->sr)>>8)&0xFF, pAudioCfg->bit_length,\
+        0, 0, pAudioCfg->gpio_rec_bit_mask           
     };
     
     //APP_TRACE_INFO(("Setup_Audio [%s]:[%d SR]:[%d CH]: %s\r\n",(pAudioCfg->type == 0) ? "REC " : "PLAY", pAudioCfg->sr, pAudioCfg->channels,((pAudioCfg->type == 0) && (pAudioCfg->lin_ch_mask == 0)) ? "LIN Disabled" : "LIN Enabled"));
@@ -205,6 +231,7 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
     //No add here!
     //
     //
+    
 #ifdef BOARD_TYPE_AB03    
     //check play ch num
     if(  (pAudioCfg->type == 1) && ( pAudioCfg->channels > 4 ) ) { //for AB03
@@ -226,6 +253,18 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
          APP_TRACE_INFO(("Lin 2 channels added...%d\r\n",buf[4])); 
     }
 
+#ifdef BOARD_TYPE_UIF    
+    if ( pAudioCfg->type == 0 ) {
+        buf[8] = Get_Mask_Num( pAudioCfg->gpio_rec_bit_mask ); //gpio num
+        buf[9] = buf[4];  //gpio start index
+        buf[4] += buf[8]; //add gpio num to channel 
+        if(  buf[4] > 8 ) {
+            APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO Rec channel num(=%d) > 8 NOT allowed for AB03\r\n", buf[4]));
+            return AUD_CFG_MIC_NUM_MAX_ERR ;
+        }
+    }
+#endif
+    //Dump_Data(buf, sizeof(buf));
     
     UART2_Mixer(3); 
     USART_SendBuf( AUDIO_UART, buf, sizeof(buf)) ; 

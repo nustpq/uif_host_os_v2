@@ -70,8 +70,7 @@ void  App_TaskUserIF (void *p_arg)
     Init_Global_Var(); 
     iM401_Ctrl_Enable = 1;
     AB_POST();
-    
-
+  
 #ifndef BOARD_TYPE_AB01  
     APP_TRACE_INFO(( "\r\nWARNING: NOT AB01, NO MCU CRT UART SWITCH\r\n"));
 #endif
