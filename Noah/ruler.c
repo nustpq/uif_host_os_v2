@@ -1421,7 +1421,7 @@ unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
     
     err = NO_ERR;
     
-    if( (p_dsp_vec_cfg->vec_index_a > 7) || (p_dsp_vec_cfg->vec_index_b > 7) || (p_dsp_vec_cfg->delay > 65536 ) ) {
+    if( (p_dsp_vec_cfg->vec_index_a > 7) || (p_dsp_vec_cfg->vec_index_b > 7) || (p_dsp_vec_cfg->delay > 65535 ) ) {
         Global_VEC_Cfg.flag        = 0; //means error
         return FW_VEC_SET_CFG_ERR;
     }

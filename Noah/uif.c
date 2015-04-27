@@ -296,7 +296,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
              
                 case ATTRI_IM501_LOAD_CODE_IRAM : //iM501 IRAM  
                      //I2C_Mixer( I2C_MIX_UIF_S );
-                     OSTimeDly(1);            
+                     //OSTimeDly(1);            
                      buf[0] = 0x4A;  //Command byte, write I2C host register with one address byte and two data bytes
                      buf[1] = 0x08;  //address, byte counter                 
                      buf[2] = ((p_raw_write->data_len - 3 - 4 - 1) >> 8) & 0xFF;
@@ -334,7 +334,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                 
                  case ATTRI_IM501_LOAD_CODE_DRAM : //iM501 DRAM 
                      //I2C_Mixer( I2C_MIX_UIF_S );
-                     OSTimeDly(1);            
+                     //OSTimeDly(1);            
                      buf[0] = 0x4A;  //Command byte, write I2C host register with one address byte and two data bytes
                      buf[1] = 0x08;  //address, byte counter                 
                      buf[2] = ((p_raw_write->data_len - 3 - 2 - 1) >> 8) & 0xFF;

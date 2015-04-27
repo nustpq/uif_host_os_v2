@@ -936,18 +936,18 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
     
     if( firsttime == 0 ) {   //not first time pwd
         
-        index = Global_VEC_Cfg.vec_index_a ;
+        index = Global_VEC_Cfg.vec_index_a ; //Power up
+        if(Global_VEC_Cfg.type == 51 ) {
+           I2C_Mixer(I2C_MIX_FM36_CODEC);
+           err = FM36_PDMADC_CLK_Onoff(1); //enable PDM clock
+           I2C_Mixer(I2C_MIX_UIF_S);              
+        }
         if( index != 0 ) {        
             Read_Flash_State(&flash_info, FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * index  );
             if( flash_info.f_w_state != FW_DOWNLAD_STATE_FINISHED ) {    
               APP_TRACE_INFO(("\r\nvec data state error...\r\n"));
               return FW_VEC_SAVE_STATE_ERR;;
             }   
-            if(Global_VEC_Cfg.type == 51 ) {
-               I2C_Mixer(I2C_MIX_FM36_CODEC);
-               err = FM36_PDMADC_CLK_Onoff(1); //enable PDM clock
-               I2C_Mixer(I2C_MIX_UIF_S);              
-            }
             APP_TRACE_INFO(("Load vec[%d] (%d Bytes) ...\r\n",index,flash_info.bin_size));
             pChar = (unsigned char *)FLASH_ADDR_FW_VEC + index * FLASH_ADDR_FW_VEC_SIZE;
             for( i = 0; i < flash_info.bin_size ;  ) {
@@ -960,11 +960,11 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
             } 
         }  
         
-        OSTimeDly( Global_VEC_Cfg.delay );  //delay mSecond
+        OSTimeDly( Global_VEC_Cfg.delay );  //Delay mSecond
         
     }
     
-    index = Global_VEC_Cfg.vec_index_b ;
+    index = Global_VEC_Cfg.vec_index_b ; // Power down
     if( index != 0 ) {        
         Read_Flash_State(&flash_info, FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * index );
         if( flash_info.f_w_state != FW_DOWNLAD_STATE_FINISHED ) {
@@ -982,13 +982,12 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
                 return(I2C_BUS_ERR) ;
             }
         } 
-        if(Global_VEC_Cfg.type == 51 ) {    
-          I2C_Mixer(I2C_MIX_FM36_CODEC);
-          err = FM36_PDMADC_CLK_Onoff(0); //disable PDM clock
-          I2C_Mixer(I2C_MIX_UIF_S);
-          
-        }
-    } 
+    }
+    if(Global_VEC_Cfg.type == 51 ) {    
+       I2C_Mixer(I2C_MIX_FM36_CODEC);
+       err = FM36_PDMADC_CLK_Onoff(0); //disable PDM clock
+       I2C_Mixer(I2C_MIX_UIF_S);          
+    }     
     
     return err;     
     
