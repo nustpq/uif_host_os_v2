@@ -32,7 +32,7 @@
 #include <includes.h>
 
 
-INTERFACE_CFG   Global_UIF_Setting[4];     //ruler type = 3
+INTERFACE_CFG   Global_UIF_Setting[ UIF_TYPE_CMD_NUM ];     //ruler type = 3
 unsigned char   Reg_RW_Data[ EMB_BUF_SIZE ];
 
 

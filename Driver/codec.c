@@ -659,6 +659,9 @@ unsigned char config_aic3204[][2] = {
 
 #define CFG_PARA_NUM  14
 
+static unsigned int  codec_saved_sr;
+static unsigned char codec_saved_sample_length;
+
 unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length ) 
 {
     unsigned char err;
@@ -669,8 +672,14 @@ unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length )
         4, 5, 6, 7, 8, 11, 12, 13, 14, 18, 19, 20, 29, 30
     };
     
-    
-     
+    if( (sr == codec_saved_sr)  && (sample_length == codec_saved_sample_length) ) {
+        APP_TRACE_INFO(("No need Re-Init CODEC\r\n"));
+        return 0;
+    } else {
+        codec_saved_sr = sr;
+        codec_saved_sample_length = sample_length;
+    }
+         
     Pin_Reset_Codec();
     
     for( unsigned char i = 0; i<sizeof(CODEC_PARA_TABLE[0][0])>>1; i++ ) {

@@ -13,6 +13,9 @@
 #ifndef __UIF_H__
 #define __UIF_H__
 
+//Global_UIF_Setting CMD:  num = 7
+//note: CMD nums must not exceed boundary
+#define   UIF_TYPE_CMD_NUM      8
 
 #define   UIF_TYPE_I2C          1
 #define   UIF_TYPE_SPI          2

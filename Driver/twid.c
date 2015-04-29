@@ -227,7 +227,7 @@ unsigned char TWID_Read      (
     unsigned char err;    
     unsigned char state; 
         
-    pAsync    = &twi_async; //force use async
+    //pAsync    = &twi_async; //force use async
     pTwi      = twid.pTwi; 
     pTransfer = (AsyncTwi *)twid.pTransfer; 
     state     = TWID_NO_ERROR;
@@ -339,7 +339,7 @@ unsigned char TWID_Write    (
     unsigned char err;     
     unsigned char state; 
         
-    pAsync    = &twi_async; //force use async    
+    //pAsync    = &twi_async; //force use async    
     pTwi      = twid.pTwi; 
     pTransfer = (AsyncTwi *)twid.pTransfer;      
     state     = TWID_NO_ERROR;

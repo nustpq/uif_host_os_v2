@@ -189,7 +189,7 @@ static unsigned short int fm36_para_table_3[][2] =
    //DAC
    //{0x226A, 0xBB80}, //3.072Hz
    //{0x226A, 0x7d00}, //2.048M 
-  {0x226A, 0x3e80},//1.024   //clock from iM401
+   {0x226A, 0x3e80},//1.024   //clock from iM401
    
    ///////////////// SP1 Format  //////////////////
    //reset in Config_SPx_Format()
@@ -276,7 +276,7 @@ static unsigned short int fm36_para_table_3[][2] =
   //{0x22B3, 0}, 
   {0x22FA, 0xFF}, 
   
-  {0x22E5, 0x20}, //PDMDAC CLOCK As Input
+  {0x22E5, 0x20}, //PDM DAC CLOCK As Input
   {0x22EB, 0x0006}, //Actual MIC number in system.
   
   {0x22F1, 0xD800}, //pwd reset mode., enable pwd bypass
@@ -510,24 +510,43 @@ unsigned char FM36_PWD_Bypass( void )
 
 unsigned char FM36_PDMADC_CLK_Onoff( unsigned char onoff )
 {
-    unsigned char  err ;
-    unsigned short temp;
+    unsigned char  err ;  
     
     APP_TRACE_INFO(("\r\nEnable/Disbale FM36 ADC PDM CLK: %d",onoff));    
-    err = DM_LegacyRead( FM36_I2C_ADDR, 0x3FCF,(unsigned char *)&temp ) ;
-    if( OS_ERR_NONE != err ) {
-        err = FM36_RD_DM_ERR;
-        return err ;
-    }
-    if( onoff ) {  //Normal operation
-        temp |= 0x20; 
+
+    if( onoff ) {  //Normal operation 
+        
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FCF, 0x20 ) ;  //turn on clk
+        if( OS_ERR_NONE != err ) {
+            return FM36_WR_DM_ERR;
+        }          
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3F90, 0 ) ;  //power up MIC0-5
+        if( OS_ERR_NONE != err ) {
+            return FM36_WR_DM_ERR;
+        }  
+        OSTimeDly(5);  //depop time
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3F96, 0x3F ) ;  //unmute MIC0-5
+        if( OS_ERR_NONE != err ) {
+            return FM36_WR_DM_ERR;
+        }  
+        
     } else {    //PDMCLK_OFF
-        temp &= ~0x20; 
+        
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3F96, 0x3F3F ) ;  //mute MIC0-5
+        if( OS_ERR_NONE != err ) {
+            return FM36_WR_DM_ERR;
+        }     
+        OSTimeDly(5); //wait data 0 to cyclebuffer
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3F90, 0x3F ) ;  //power down MIC0-5 
+        if( OS_ERR_NONE != err ) {
+            return FM36_WR_DM_ERR;
+        } 
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FCF, 0 ) ;  //turn off clk
+        if( OS_ERR_NONE != err ) {
+            return FM36_WR_DM_ERR;
+        } 
+        
     }
-    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FCF, temp ) ;  
-    if( OS_ERR_NONE != err ) {
-        return FM36_WR_DM_ERR;;
-    }  
     
     return err;
     
@@ -537,40 +556,58 @@ unsigned char FM36_PDMADC_CLK_Set( unsigned char pdm_clk_mhz )
 {
     
     unsigned char  err ;
-    unsigned short data ;
+    unsigned short data1,data2,data3 ;
     
     APP_TRACE_INFO(("\r\nConf FM36 PDMADC Clock = %dMHz\r\n", pdm_clk_mhz));
       
     switch ( pdm_clk_mhz ) {
         case 4 : //4.096
-            data = 0x0F;
+            data3 = 0x0F;
+            data2 = 0x7D80;
+            data1 = 0xFA00;
         break;  
         case 3 : //3.072
-            data = 0x13;
+            data3 = 0x13;
+            data2 = 0x3E80;
+            data1 = 0xBB80;
         break;
         case 2 : //2.048
-            data = 0x1B;
+            data3 = 0x1B;
+            data2 = 0x3E80;
+            data1 = 0x7D00;
         break;
         case 1 : //1.024
-            data = 0x33;
+            data3 = 0x33;
+            data2 = 0x3E80;
+            data1 = 0x3E80;
         break; 
         default ://2.048
             APP_TRACE_INFO(("Not supported PDM CLK, reset to default 2.048MHz\r\n"));
-            data = 0x1B;
+            data3 = 0x1B;
+            data2 = 0x3E80;
+            data1 = 0x7D00;
         break;
     }
     
-    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FED, data ) ;
+    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FD5, data1 ) ;
     if( OS_ERR_NONE != err ) {
         return FM36_WR_DM_ERR;;
-    } 
+    }
+    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FCD, data2 ) ;
+    if( OS_ERR_NONE != err ) {
+        return FM36_WR_DM_ERR;;
+    }
+    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FED, data3 ) ;
+    if( OS_ERR_NONE != err ) {
+        return FM36_WR_DM_ERR;;
+    }
     
-    err = DM_LegacyRead( FM36_I2C_ADDR, 0x3FE4,(unsigned char *)&data ) ;
+    err = DM_LegacyRead( FM36_I2C_ADDR, 0x3FE4,(unsigned char *)&data1 ) ;
     if( OS_ERR_NONE != err ) {
         err = FM36_RD_DM_ERR;
         return err ;
     }     
-    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FE4, data) ;// must rewrite 3fe4 to setting PLL.
+    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FE4, data1) ;// must rewrite 3fe4 to setting PLL.
     if( OS_ERR_NONE != err ) {
         return FM36_WR_DM_ERR;;
     }     
@@ -918,12 +955,10 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
     
     if( Global_VEC_Cfg.type == 41 ) {
         APP_TRACE_INFO(("\r\nLoad iM401 vec stored in MCU flash...\r\n"));
-        dev_addr = iM401_I2C_ADDR;
-        data_num = 3;
+        dev_addr = iM401_I2C_ADDR;        
     } else if(Global_VEC_Cfg.type == 51 ) {
         APP_TRACE_INFO(("\r\nLoad iM501 vec stored in MCU flash...\r\n"));
-        dev_addr = iM501_I2C_ADDR;
-        data_num = 4;
+        dev_addr = iM501_I2C_ADDR;       
     } else {
         APP_TRACE_INFO(("\r\nvec conf data error!\r\n")); 
         return FW_VEC_SET_CFG_ERR;         
@@ -937,10 +972,10 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
     if( firsttime == 0 ) {   //not first time pwd
         
         index = Global_VEC_Cfg.vec_index_a ; //Power up
-        if(Global_VEC_Cfg.type == 51 ) {
-           I2C_Mixer(I2C_MIX_FM36_CODEC);
-           err = FM36_PDMADC_CLK_Onoff(1); //enable PDM clock
-           I2C_Mixer(I2C_MIX_UIF_S);              
+        if( Global_VEC_Cfg.type == 51 ) {
+            I2C_Mixer(I2C_MIX_FM36_CODEC);
+            FM36_PDMADC_CLK_Onoff(1); //enable PDM clock    
+            I2C_Mixer(I2C_MIX_UIF_S); 
         }
         if( index != 0 ) {        
             Read_Flash_State(&flash_info, FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * index  );
@@ -983,12 +1018,13 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
             }
         } 
     }
+    
     if(Global_VEC_Cfg.type == 51 ) {    
        I2C_Mixer(I2C_MIX_FM36_CODEC);
-       err = FM36_PDMADC_CLK_Onoff(0); //disable PDM clock
+       FM36_PDMADC_CLK_Onoff(0); //disable PDM clock
        I2C_Mixer(I2C_MIX_UIF_S);          
     }     
-    
+     
     return err;     
     
 }
