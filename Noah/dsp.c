@@ -541,7 +541,7 @@ unsigned char FM36_PDMADC_CLK_Onoff( unsigned char onoff )
         if( OS_ERR_NONE != err ) {
             return FM36_WR_DM_ERR;
         } 
-        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FCF, 0 ) ;  //turn off clk
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FCF, 0x24 ) ;  //turn off clk
         if( OS_ERR_NONE != err ) {
             return FM36_WR_DM_ERR;
         } 
