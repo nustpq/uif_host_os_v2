@@ -304,8 +304,8 @@ static unsigned short int fm36_para_table_3[][2] =
   
   /**************** MEMS Gain Control **********************/
   //{0x3F91, 0x0000}, //MEMS MIC TYPE, SW default setting as MEMS type
-  {0x3F92, 0x0000} //MEMS MIC gain = 0dB
-  //{0x3F92, 0x0555} //MEMS MIC gain = 6dB
+  //{0x3F92, 0x0000} //MEMS MIC gain = 0dB
+  {0x3F92, 0x0555} //MEMS MIC gain = 6dB
   //{0x3F92, 0x0AAA} //MEMS MIC gain = 12dB //SW default setting
   //{0x3F92, 0x0FFF} //MEMS MIC gain = 18dB
 

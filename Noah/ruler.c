@@ -1660,18 +1660,26 @@ unsigned char Set_Volume(  SET_VOLUME *pdata )
     //APP_TRACE_INFO(("Set Volume : Mic_Gain[%d]dB, LOUT_Gain[-%d.%d]dB, SPKOUT_Gain[-%d.%d]dB : ", 
     //                     pdata->mic, pdata->lout/10, pdata->lout%10, pdata->spk/10, pdata->spk%10 )); 
     //APP_TRACE_INFO(("\r\n%6.6f, %6.6f\r\n",2.31,0.005));
+    
+    I2C_Mixer(I2C_MIX_FM36_CODEC);
+
     err = DMIC_PGA_Control( pdata->mic ); 
     //APP_TRACE_INFO((" %s [0x%X]\r\n", err == OS_ERR_NONE ? "OK" : "FAIL" , err )); 
     if( OS_ERR_NONE != err ) {  
         APP_TRACE_INFO(( "FAIL [0x%X]\r\n", err )); 
+        I2C_Mixer(I2C_MIX_UIF_S); 
         return err;    
     }
     err = CODEC_Set_Volume( pdata->spk, pdata->lout );
     if( OS_ERR_NONE != err ) {    
         APP_TRACE_INFO(( "FAIL [0x%X]\r\n", err )); 
+        I2C_Mixer(I2C_MIX_UIF_S); 
         return err;    
     }
     APP_TRACE_INFO(( "OK\r\n" )); 
+    
+    I2C_Mixer(I2C_MIX_UIF_S); 
+    
     return err;  
 }
 
