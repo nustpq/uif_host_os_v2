@@ -299,9 +299,10 @@ static  void  App_EventCreate (void)
     Bsp_Ser_Tx_Sem_lock = OSSemCreate(1); 
     Bsp_Ser_Rx_Sem_lock = OSSemCreate(1); 
     DBGU_Tx_Sem_lock    = OSSemCreate(1); 
-    DBGU_Tx_Sem_lock    = OSSemCreate(1); 
-    UART_MUX_Sem_lock   = OSSemCreate(1); //ruker UART MUX 
-    //if error then halt MCU
+    DBGU_Tx_Sem_lock    = OSSemCreate(1);     
+    GPIO_Sem_I2C_Mixer  = OSSemCreate(1); ; //sem for I2C mixer
+    UART_MUX_Sem_lock   = OSSemCreate(1); 
+    //ruler UART MUX //if error then halt MCU
     if( NULL == UART_MUX_Sem_lock )  while(1); //last Event creat failure means OS_MAX_EVENTS is not enough
 
 #if (OS_EVENT_NAME_EN > 0)    

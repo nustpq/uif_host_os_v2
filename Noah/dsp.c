@@ -177,6 +177,7 @@ static unsigned short int fm36_para_table_3[][2] =
   
   //////////////////  PDM CLOCK SETTING   /////////////////
   {0x2265, 0x0000}, //ADC clock source, 0: ADC =PLL, 2: ADC=DCA, 3: ADC=1/2 DAC 
+  
   //{0x2266, 0x0013}, //3.072Hz
   {0x2266, 0x001B}, //2.048M
   //{0x2266, 0x0033},//1.024
@@ -279,7 +280,7 @@ static unsigned short int fm36_para_table_3[][2] =
   {0x22E5, 0x20}, //PDM DAC CLOCK As Input
   {0x22EB, 0x0006}, //Actual MIC number in system.
   
-  {0x22F1, 0xD800}, //pwd reset mode., enable pwd bypass
+  {0x22F1, 0xD800}, //pwd resume mode., enable pwd bypass
   
   {0x22FB, 0 },  //run flag
   
@@ -493,13 +494,16 @@ static unsigned char Config_SR( unsigned short sr )
     
 }  
 
+
+
 unsigned char FM36_PWD_Bypass( void )
 {
     
     unsigned char  err ;    
     APP_TRACE_INFO(("\r\nPower down FM36 to bypass SP0<-->SP1\r\n"));
      
-    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FEF, 0x2000 ) ; //pwd
+    //err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FEF, 0x2000 ) ; //pwd
+    err = DM_SingleWrite( FM36_I2C_ADDR, 0x22F9, 1 ) ; //pwd
     if( OS_ERR_NONE != err ) {
         return FM36_WR_DM_ERR;;
     }  
@@ -552,69 +556,102 @@ unsigned char FM36_PDMADC_CLK_Onoff( unsigned char onoff )
     
 }  
 
-unsigned char FM36_PDMADC_CLK_Set( unsigned char pdm_clk_mhz )
+unsigned char FM36_PDMADC_CLK_Set( unsigned char pdm_dac_clk, unsigned char pdm_adc_clk, unsigned char type )
 {
     
     unsigned char  err ;
     unsigned short data1,data2,data3 ;
     
-    APP_TRACE_INFO(("\r\nConf FM36 PDMADC Clock = %dMHz\r\n", pdm_clk_mhz));
-      
-    switch ( pdm_clk_mhz ) {
+    APP_TRACE_INFO(("\r\nConf FM36 PDMADC Clock = %dMHz\r\n", pdm_adc_clk));      
+    switch ( pdm_adc_clk ) {
         case 4 : //4.096
-            data3 = 0x0F;
-            data2 = 0x7D80;
+            data3 = 0x0F;            
             data1 = 0xFA00;
         break;  
         case 3 : //3.072
-            data3 = 0x13;
-            data2 = 0x3E80;
+            data3 = 0x13;           
             data1 = 0xBB80;
         break;
         case 2 : //2.048
-            data3 = 0x1B;
-            data2 = 0x3E80;
+            data3 = 0x1B;           
             data1 = 0x7D00;
         break;
         case 1 : //1.024
-            data3 = 0x33;
-            data2 = 0x3E80;
+            data3 = 0x33;         
             data1 = 0x3E80;
         break; 
         default ://2.048
             APP_TRACE_INFO(("Not supported PDM CLK, reset to default 2.048MHz\r\n"));
-            data3 = 0x1B;
-            data2 = 0x3E80;
+            data3 = 0x1B;          
             data1 = 0x7D00;
         break;
     }
     
-    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FD5, data1 ) ;
-    if( OS_ERR_NONE != err ) {
-        return FM36_WR_DM_ERR;;
-    }
-    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FCD, data2 ) ;
-    if( OS_ERR_NONE != err ) {
-        return FM36_WR_DM_ERR;;
-    }
-    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FED, data3 ) ;
-    if( OS_ERR_NONE != err ) {
-        return FM36_WR_DM_ERR;;
+    APP_TRACE_INFO(("\r\nConf FM36 PDMDAC Clock = %dMHz\r\n", pdm_dac_clk));
+    switch ( pdm_dac_clk ) {
+        case 4 : //4.096           
+            data2 = 0xFA00;            
+        break;  
+        case 3 : //3.072           
+            data2 = 0xBB80;            
+        break;
+        case 2 : //2.048           
+            data2 = 0x7D00;;            
+        break;
+        case 1 : //1.024           
+            data2 = 0x3E80;          
+        break; 
+        default ://1.024
+            APP_TRACE_INFO(("Not supported PDM CLK, reset to default 1.024MHz\r\n"));            
+            data2 = 0x3E80;           
+        break;
     }
     
-    err = DM_LegacyRead( FM36_I2C_ADDR, 0x3FE4,(unsigned char *)&data1 ) ;
-    if( OS_ERR_NONE != err ) {
-        err = FM36_RD_DM_ERR;
-        return err ;
-    }     
-    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FE4, data1) ;// must rewrite 3fe4 to setting PLL.
-    if( OS_ERR_NONE != err ) {
-        return FM36_WR_DM_ERR;;
-    }     
-  
+    if( type == 0 ) { //para set before run
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x2267, data1 ) ;
+        if( OS_ERR_NONE != err ) {
+            return FM36_WR_DM_ERR;;
+        }
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x226A, data2 ) ;
+        if( OS_ERR_NONE != err ) {
+            return FM36_WR_DM_ERR;;
+        }
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x2266, data3 ) ;
+        if( OS_ERR_NONE != err ) {
+            return FM36_WR_DM_ERR;;
+        }
+        
+    } else { //on the fly check
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FD5, data1 ) ;
+        if( OS_ERR_NONE != err ) {
+            return FM36_WR_DM_ERR;;
+        }
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FCD, data2 ) ;
+        if( OS_ERR_NONE != err ) {
+            return FM36_WR_DM_ERR;;
+        }
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FED, data3 ) ;
+        if( OS_ERR_NONE != err ) {
+            return FM36_WR_DM_ERR;;
+        }
+        
+        err = DM_LegacyRead( FM36_I2C_ADDR, 0x3FE4,(unsigned char *)&data1 ) ;
+        if( OS_ERR_NONE != err ) {
+            err = FM36_RD_DM_ERR;
+            return err ;
+        }     
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FE4, data1) ;// must rewrite 3fe4 to setting PLL.
+        if( OS_ERR_NONE != err ) {
+            return FM36_WR_DM_ERR;;
+        }     
+    }
+    
     return err;
     
 }
+
+
+
 
 /*
 *********************************************************************************************************
@@ -639,11 +676,12 @@ unsigned char Init_FM36_AB03( unsigned short sr, unsigned char mic_num, unsigned
     unsigned short addr, val; 
     unsigned char  err ;     
    
-    if( sr == sr_saved  &&  \
-        mic_num == mic_num_saved && \
-        lin_sp_index == lin_sp_index_saved && \
+    if( sr               == sr_saved  &&  \
+        mic_num          == mic_num_saved && \
+        lin_sp_index     == lin_sp_index_saved && \
         start_slot_index == start_slot_index_saved && \
-        bit_length == bit_length_saved  ) {    
+        bit_length       == bit_length_saved  ) 
+    {    
         APP_TRACE_INFO(("No need Re-Init FM36\r\n"));
         return NO_ERR;        
     } else {
@@ -654,8 +692,8 @@ unsigned char Init_FM36_AB03( unsigned short sr, unsigned char mic_num, unsigned
         bit_length_saved = bit_length;
     }   
     
-    Pin_Reset_FM36();  
-    
+    Pin_Reset_FM36();
+     
 //    err = HOST_SingleWrite_2(FM36_I2C_ADDR, 0x0C, 2); //reset
 //    if( OS_ERR_NONE != err ) {
 //        return FM36_WR_HOST_ERR;
@@ -725,7 +763,11 @@ unsigned char Init_FM36_AB03( unsigned short sr, unsigned char mic_num, unsigned
             err = Config_SR( sr );
             if( OS_ERR_NONE != err ) {
                 return err ;
-            }            
+            }
+            err = FM36_PDMADC_CLK_Set( GET_BYTE_HIGH_4BIT(Global_UIF_Setting[ UIF_TYPE_FM36_PDMCLK - 1 ].attribute), GET_BYTE_LOW_4BIT(Global_UIF_Setting[ UIF_TYPE_FM36_PDMCLK - 1 ].attribute), 0 );
+            if( OS_ERR_NONE != err ) {
+                return err ;
+            }
         } 
         
         err = DM_SingleWrite( FM36_I2C_ADDR, addr, val ) ;

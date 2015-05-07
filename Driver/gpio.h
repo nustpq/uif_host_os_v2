@@ -61,6 +61,8 @@ extern void GPIOPIN_Init_Fast( unsigned int pin );
 extern void GPIOPIN_Get_Fast( unsigned char pin, unsigned char * pdata );
 extern void GPIOPIN_Set_Fast( unsigned char pin , unsigned char data );
 
+extern OS_EVENT *GPIO_Sem_I2C_Mixer;
+
 #endif
 
 

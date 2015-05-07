@@ -31,7 +31,7 @@ static const Pin pinsSwitches[] = {  SW0,  SW1 };
 static const unsigned int numGpios = PIO_LISTSIZE(pinsGpios);
 
 
-
+OS_EVENT *GPIO_Sem_I2C_Mixer; //sem for I2C mixer
 
 void GPIO_Init(void)
 {  
@@ -366,20 +366,29 @@ void UART2_Mixer( unsigned char index )
 }
 
 
+
 static unsigned char I2C_Mix_Index_Save =  0;  
 //I2C bus selector
 unsigned char I2C_Mixer( unsigned char index )
 {  
 #ifdef BOARD_TYPE_UIF 
     
+    unsigned char err = 0;
+    
     if( index > 3 || index < 1 ) {
         return 1;
     }
     
-    if( I2C_Mix_Index_Save == index ) {
-        return 0;
+    OSSemPend( GPIO_Sem_I2C_Mixer, 1000, &err );
+    if( OS_ERR_NONE != err ) {  
+        APP_TRACE_INFO(( "I2C_Mixer OSSemPend err [0x%X]\r\n", err ));        
+        return err;    
     }
     
+    if( I2C_Mix_Index_Save == index ) { //no need re-set 
+        OSSemPost( GPIO_Sem_I2C_Mixer );
+        return err;
+    }    
     I2C_Mix_Index_Save = index ;    
     
 //    if( index <= 3) {  
@@ -392,9 +401,13 @@ unsigned char I2C_Mixer( unsigned char index )
         pinsGpios[12+i].type = (index == i) ? PIO_OUTPUT_0 : PIO_OUTPUT_1 ;
     }
     PIO_Configure(&pinsGpios[13], 3);     
-    APP_TRACE_INFO(("\r\nI2C_Mixer switch to: %d ", index ));   
+    APP_TRACE_INFO(("\r\nI2C_Mixer switch to: %d ", index ));  
+    
+    OSSemPost( GPIO_Sem_I2C_Mixer );
+    
     //OSTimeDly(1);
-#endif     
+#endif
+    
 }
 
 

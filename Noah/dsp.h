@@ -41,6 +41,8 @@ extern unsigned char DMIC_PGA_Control( unsigned short gain );
 
 extern unsigned char FM36_PWD_Bypass( void );
 
-extern unsigned char FM36_PDMADC_CLK_Set( unsigned char pdm_clk_mhz );
+extern unsigned char FM36_PDMADC_CLK_Set( unsigned char pdm_dac_clk, unsigned char pdm_adc_clk, unsigned char type );
+
 extern unsigned char Init_FM36_AB03_temp(void );
+
 #endif
