@@ -469,7 +469,7 @@ void Pin_Reset_Codec( void )
 
 void Pin_Reset_FM36( void )
 {
-
+    
     PIO_Clear(&pinsGpios[11]);
     OSTimeDly(20) ;
     PIO_Set(&pinsGpios[11]);

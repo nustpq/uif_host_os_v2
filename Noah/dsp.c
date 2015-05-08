@@ -669,6 +669,11 @@ unsigned char FM36_PDMADC_CLK_Set( unsigned char pdm_dac_clk, unsigned char pdm_
 * Note(s)     : None.
 *********************************************************************************************************
 */
+unsigned char Init_FM36_AB03_Preset( void )
+{
+    return ( Init_FM36_AB03( sr_saved, mic_num_saved, lin_sp_index_saved, start_slot_index_saved, bit_length_saved ));
+}
+
 unsigned char Init_FM36_AB03( unsigned short sr, unsigned char mic_num, unsigned char lin_sp_index, unsigned char start_slot_index, unsigned char bit_length )
 {
     unsigned int   i;

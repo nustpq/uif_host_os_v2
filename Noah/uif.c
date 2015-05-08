@@ -172,8 +172,8 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
                 I2C_Mixer(I2C_MIX_FM36_CODEC);
                 FM36_PWD_Bypass();
                 I2C_Mixer(I2C_MIX_UIF_S);
-            } else {                
-                Pin_Reset_FM36();
+            } else {                  
+                Init_FM36_AB03_Preset();
             }
         break ;
         
