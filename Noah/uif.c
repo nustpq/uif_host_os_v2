@@ -168,31 +168,35 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         break ;
         
         case UIF_TYPE_FM36_PATH :  
-            if( Global_UIF_Setting[ UIF_TYPE_FM36_PATH - 1 ].attribute == ATTRI_FM36_PATH_PWD_BP ) {
-                I2C_Mixer(I2C_MIX_FM36_CODEC);
-                FM36_PWD_Bypass();
-                I2C_Mixer(I2C_MIX_UIF_S);
-            } else {                  
-                Init_FM36_AB03_Preset();
+            I2C_Mixer(I2C_MIX_FM36_CODEC);           
+            if( (pInterface_Cfg->attribute == ATTRI_FM36_PATH_PWD_BP ) && ( Global_UIF_Setting[ UIF_TYPE_FM36_PATH - 1 ].attribute != ATTRI_FM36_PATH_PWD_BP ) ) {                
+                err = FM36_PWD_Bypass();                
+            } 
+            if( (pInterface_Cfg->attribute == ATTRI_FM36_PATH_NORMAL ) && ( Global_UIF_Setting[ UIF_TYPE_FM36_PATH - 1 ].attribute != ATTRI_FM36_PATH_NORMAL ) ) {                  
+                err = Init_FM36_AB03_Preset();                
             }
+            I2C_Mixer(I2C_MIX_UIF_S);
         break ;
         
         case UIF_TYPE_FM36_PDMCLK :
            I2C_Mixer(I2C_MIX_FM36_CODEC);
-           err = FM36_PDMADC_CLK_Set( GET_BYTE_HIGH_4BIT(pInterface_Cfg->attribute), GET_BYTE_LOW_4BIT(pInterface_Cfg->attribute), 1 ); //pdm_dac_clk, pdm_adc_clk, type=ontheflychange
+           //err = FM36_PDMADC_CLK_Set( GET_BYTE_HIGH_4BIT(pInterface_Cfg->attribute), GET_BYTE_LOW_4BIT(pInterface_Cfg->attribute), 1 ); //pdm_dac_clk, pdm_adc_clk, type=ontheflychange
+           Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute = pInterface_Cfg->attribute; //save clock data in attribute to global for  Init_FM36_AB03_Preset() use
+           err = Init_FM36_AB03_Preset(); 
            I2C_Mixer(I2C_MIX_UIF_S);                       
         break ;
         
         case UIF_TYPE_GPIO :       
-            GPIOPIN_Set( GET_BYTE_HIGH_4BIT(pInterface_Cfg->attribute), GET_BYTE_LOW_4BIT(pInterface_Cfg->attribute));
+           err = GPIOPIN_Set( GET_BYTE_HIGH_4BIT(pInterface_Cfg->attribute), GET_BYTE_LOW_4BIT(pInterface_Cfg->attribute));
         break ; 
         
         case UIF_TYPE_I2C_Mixer :       
-             err = I2C_Mixer( pInterface_Cfg->attribute );
+           err = I2C_Mixer( pInterface_Cfg->attribute );
         break ;
         
+           
         default:
-             err = UIF_TYPE_NOT_SUPPORT;
+           err = UIF_TYPE_NOT_SUPPORT;
         break;
     }
     

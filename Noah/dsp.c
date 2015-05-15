@@ -502,8 +502,8 @@ unsigned char FM36_PWD_Bypass( void )
     unsigned char  err ;    
     APP_TRACE_INFO(("\r\nPower down FM36 to bypass SP0<-->SP1\r\n"));
      
-    //err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FEF, 0x2000 ) ; //pwd
-    err = DM_SingleWrite( FM36_I2C_ADDR, 0x22F9, 1 ) ; //pwd
+    err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FEF, 0x2000 ) ; //pwd
+    //err = DM_SingleWrite( FM36_I2C_ADDR, 0x22F9, 1 ) ; //pwd
     if( OS_ERR_NONE != err ) {
         return FM36_WR_DM_ERR;;
     }  
@@ -671,10 +671,15 @@ unsigned char FM36_PDMADC_CLK_Set( unsigned char pdm_dac_clk, unsigned char pdm_
 */
 unsigned char Init_FM36_AB03_Preset( void )
 {
-    return ( Init_FM36_AB03( sr_saved, mic_num_saved, lin_sp_index_saved, start_slot_index_saved, bit_length_saved ));
+    return ( Init_FM36_AB03( sr_saved, mic_num_saved, lin_sp_index_saved, start_slot_index_saved, bit_length_saved, 1 ) );   
 }
 
-unsigned char Init_FM36_AB03( unsigned short sr, unsigned char mic_num, unsigned char lin_sp_index, unsigned char start_slot_index, unsigned char bit_length )
+unsigned char Init_FM36_AB03( unsigned short sr, 
+                              unsigned char mic_num, 
+                              unsigned char lin_sp_index, 
+                              unsigned char start_slot_index, 
+                              unsigned char bit_length, 
+                              unsigned char force_reset)
 {
     unsigned int   i;
     unsigned short temp, temp2 ;
@@ -685,7 +690,8 @@ unsigned char Init_FM36_AB03( unsigned short sr, unsigned char mic_num, unsigned
         mic_num          == mic_num_saved && \
         lin_sp_index     == lin_sp_index_saved && \
         start_slot_index == start_slot_index_saved && \
-        bit_length       == bit_length_saved  ) 
+        bit_length       == bit_length_saved && \
+        force_reset      == 0  ) 
     {    
         APP_TRACE_INFO(("No need Re-Init FM36\r\n"));
         return NO_ERR;        
@@ -813,10 +819,10 @@ unsigned char Init_FM36_AB03( unsigned short sr, unsigned char mic_num, unsigned
         return FM36_CHECK_COUNTER_ERR;
     } 
     
-    if( Global_UIF_Setting[ UIF_TYPE_FM36_PATH - 1 ].attribute == ATTRI_FM36_PATH_PWD_BP ) {
-        FM36_PWD_Bypass();
-        
-    }
+//    if( Global_UIF_Setting[ UIF_TYPE_FM36_PATH - 1 ].attribute == ATTRI_FM36_PATH_PWD_BP ) {
+//        FM36_PWD_Bypass();
+//        
+//    }
     
     return err;
     

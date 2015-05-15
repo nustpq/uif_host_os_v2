@@ -934,6 +934,9 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
               
         break ;
         
+        case PC_CMD_PING :
+             APP_TRACE_INFO(("\r\n:PING Package. "));  
+        break;
 /***************************************************************************
         
 //        case PC_CMD_BURST_WRITE :

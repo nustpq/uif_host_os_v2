@@ -35,13 +35,13 @@
 #define   FM1388_ALLOWED_DATA_PACK_SIZE    (240+6)
 #define   EEPROM_ALLOWED_DATA_PACK_SIZE    (128+2)
 
-#define   ATTRI_FM36_PATH_NORMAL    0
-#define   ATTRI_FM36_PATH_PWD_BP    1
+#define   ATTRI_FM36_PATH_NORMAL           0
+#define   ATTRI_FM36_PATH_PWD_BP           1
 
 #define   GET_BYTE_LOW_4BIT( x )     ((x) & 0x0F) 
 #define   GET_BYTE_HIGH_4BIT( x )    (((x)>>4) & 0x0F) 
-#define   GET_I2C_GPIO_SCL(x)  GET_BYTE_LOW_4BIT( x ) 
-#define   GET_I2C_GPIO_SDA(x)  GET_BYTE_HIGH_4BIT( x ) 
+#define   GET_I2C_GPIO_SCL(x)        GET_BYTE_LOW_4BIT( x ) 
+#define   GET_I2C_GPIO_SDA(x)        GET_BYTE_HIGH_4BIT( x ) 
 
 
 

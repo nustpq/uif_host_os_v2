@@ -30,7 +30,8 @@ extern unsigned char Init_FM36_AB03( unsigned short sr,
                                      unsigned char mic_num,
                                      unsigned char lin_sp_index, 
                                      unsigned char start_slot_index,
-                                     unsigned char bit_length );
+                                     unsigned char bit_length,
+                                     unsigned char force_reset );
 
 extern unsigned char Init_FM36( unsigned short sr );
 

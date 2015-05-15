@@ -284,10 +284,10 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         APP_TRACE_INFO(("\r\nSetup_Audio Init_CODEC ERROR: %d\r\n",err)); 
     } 
 #ifdef BOARD_TYPE_AB03  
-    err = Init_FM36_AB03( pAudioCfg->sr, mic_num, 1, 0 ); //Lin from SP1_RX, slot0~1
+    err = Init_FM36_AB03( pAudioCfg->sr, mic_num, 1, 0, 0 ); //Lin from SP1_RX, slot0~1
 #elif defined BOARD_TYPE_UIF
     I2C_Mixer(I2C_MIX_FM36_CODEC);
-    err = Init_FM36_AB03( pAudioCfg->sr, mic_num, 1, 0, pAudioCfg->bit_length ); //Lin from SP1_RX, slot0~1
+    err = Init_FM36_AB03( pAudioCfg->sr, mic_num, 1, 0, pAudioCfg->bit_length, 0 ); //Lin from SP1_RX, slot0~1
     I2C_Mixer(I2C_MIX_UIF_S);
 #else
     err = ReInit_FM36( pAudioCfg->sr ); 
@@ -1828,11 +1828,11 @@ void AB_POST( void )
     
     APP_TRACE_INFO(("\r\n2. FM36 DSP... \r\n"));
 #ifdef BOARD_TYPE_AB03   
-    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0 ); //Lin from SP1.Slot0
+    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, 0 ); //Lin from SP1.Slot0
 #elif defined BOARD_TYPE_UIF
     I2C_Mixer(I2C_MIX_FM36_CODEC);
-    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH  ); 
-    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH  ); //Lin from SP1.Slot0
+    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH, 0  ); 
+    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH, 0  ); //Lin from SP1.Slot0
     I2C_Mixer(I2C_MIX_UIF_S);
 #else 
     err = Init_FM36( SAMPLE_RATE_DEF );
