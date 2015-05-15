@@ -654,7 +654,7 @@ void  Send_Report (CPU_INT08U pkt_sn, CPU_INT08U error_id)
 */
 CPU_INT08U  EMB_Data_Build (  CPU_INT16U   cmd_type, 
                               CPU_INT08U  *pChar,                          
-                              RAW_READ     *pRawRead,
+                              RAW_READ    *pRawRead,
                               CPU_INT32U  *p_emb_length)
 {
     
@@ -826,9 +826,9 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         break ;
         
         case PC_CMD_RAW_WRITE :        
-          //  APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE "));          
-         //  Time_Stamp();
-       // LED_Set( LED_DS1 );
+           // APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE "));          
+           // Time_Stamp();
+           // LED_Set( LED_DS1 );
             temp = emb_get_attr_int(&root, 1, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_write.if_type = (CPU_INT08U)temp;             
@@ -838,14 +838,14 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             temp = emb_get_attr_int(&root, 3, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_write.data_len = (CPU_INT32U)temp;  
-//            Time_Stamp();           
+          // Time_Stamp();           
             pBin = emb_get_attr_binary(&root, 4, (int*)&temp);
             if(pBin == NULL ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_write.pdata = (CPU_INT08U *)pBin; 
             err = Raw_Write( &PCCmd.raw_write );
- //           Time_Stamp();
-//            APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE end "));  
-//LED_Clear( LED_DS1 );            
+          // Time_Stamp();
+          // APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE end "));  
+          // LED_Clear( LED_DS1 );            
         break ;
         
         case PC_CMD_RAW_READ :  
@@ -932,11 +932,19 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             PCCmd.set_volume.spk = (CPU_INT32U)temp;      
             err = Set_Volume( &PCCmd.set_volume ) ;
               
-        break ;
+        break ;      
+
+           
+        case PC_CMD_RAED_AB_INFO : 
+             
+             err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
+                                      &PCCmd.raw_read,
+                                      pkt_sn, 
+                                      DATA_AB_INFO ) ;           
+        break ; 
         
-        case PC_CMD_PING :
-             APP_TRACE_INFO(("\r\n:PING Package. "));  
-        break;
+        
+        
 /***************************************************************************
         
 //        case PC_CMD_BURST_WRITE :

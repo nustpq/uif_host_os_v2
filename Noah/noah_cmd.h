@@ -234,8 +234,7 @@
 #define  PC_CMD_DOWNLOAD_RULER_FW    100
 #define  PC_CMD_UPDATE_RULER_FW      101
 #define  PC_CMD_UPDATE_AB_FW         102
-
-#define  PC_CMD_PING                 200
+ 
 
 //Data
 #define  DATA_RULER_INFO             5
