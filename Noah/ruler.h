@@ -293,6 +293,7 @@ typedef struct {
     unsigned int     delay; 
     unsigned char    gpio; //irq trigger GPIO index
     unsigned char    trigger_en;
+    unsigned char    pdm_clk_off; //trun off pdm clk after pwd or not
 }SET_VEC_CFG ;    
    
 

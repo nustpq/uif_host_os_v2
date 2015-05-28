@@ -38,7 +38,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:H:V2.36]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:H:V2.37]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB01
 const CPU_CHAR hw_version[]  = "[HW:V1.0]"; 
@@ -655,6 +655,7 @@ void  BSP_LED_Init (void)
 */
 
 void  BSP_LED_Off (CPU_INT08U led)
+
 {
     switch (led) {
         case 0:
@@ -1400,8 +1401,12 @@ void  BSP_Ser_Printf (CPU_CHAR *format, ...)
     vsprintf((char *)buffer, (char const *)format, vArgs);
     va_end(vArgs);
 
-    BSP_Ser_WrStr((CPU_CHAR*) buffer);
-    //BSP_Ser_WrStr_To_Buffer((CPU_CHAR*) buffer);
+#ifndef DBG_UART_METHOD_TASK_EN    
+    BSP_Ser_WrStr((CPU_CHAR*) buffer); 
+#else
+    BSP_Ser_WrStr_To_Buffer((CPU_CHAR*) buffer);
+#endif
+    
 }
 
 
@@ -1529,7 +1534,7 @@ void  Get_Task_Info (void)
 
 /*
 *********************************************************************************************************
-*                                         Get_Run_Time()
+*                                         Get_Uptime()
 *
 * Description : Print run time information
 *
@@ -1543,7 +1548,7 @@ void  Get_Task_Info (void)
 *********************************************************************************************************
 */
 
-void Get_Run_Time( void )
+void Get_Uptime( void )
 {
   
     INT32U time   ;
@@ -1558,7 +1563,7 @@ void Get_Run_Time( void )
     hour = time / 3600 % 24 ;
     day  = time / 3600 / 24 ;
     
-    APP_TRACE_INFO(("OS Running Time  =  %02d days : %02d hours : %02d min : %02d sec\r\n", day,hour,min, sec )); 
+    APP_TRACE_INFO(("OS Uptime  =  %02d days : %02d hours : %02d min : %02d sec\r\n", day,hour,min, sec )); 
 
 }
 
@@ -1634,7 +1639,7 @@ void Head_Info ( void )
     APP_TRACE_INFO(("Micrium uC/OS-II on the Atmel AT91SAM7A3. Version : V%d.%d \r\n",(OSVersion()/ 100),(OSVersion() % 100)  ));
     APP_TRACE_INFO(("CPU Usage = %d%%, CPU Speed = %3d MHz, Tick_Per_Second = %6d ticks/sec  \r\n", OSCPUUsage,  (BSP_CPU_ClkFreq() / 1000000L),OS_TICKS_PER_SEC ));
     APP_TRACE_INFO(("#Ticks = %8d, #CtxSw = %8d \r\n", OSTime, OSCtxSwCtr )); 
-    Get_Run_Time();
+    Get_Uptime();
     APP_TRACE_INFO(("\r\n"));  
     APP_TRACE_INFO(("-------------------------------------------------   GLOBAL VARIABLES STATUS   ------------------------------------------------------\r\n")); 
     APP_TRACE_INFO(("MEM_Part_MsgUART :         %7d(Max%2d) / %2d   of the memory partiation used\r\n", pMEM_Part_MsgUART->OSMemNBlks - pMEM_Part_MsgUART->OSMemNFree, pMEM_Part_MsgUART->OSMemNBlks - pMEM_Part_MsgUART->OSMemNFreeMin,  pMEM_Part_MsgUART->OSMemNBlks)); 

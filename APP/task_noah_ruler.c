@@ -156,7 +156,7 @@ void App_TaskNoah_Ruler( void *p_arg )
                     OSSemSet( Done_Sem_RulerUART, 0, &err );
                     test_counter4++;
                     APP_TRACE_DBG(("EST/ESTA"));   
-                break ;         
+                break ;        
                         
                 case FRAM_TYPE_ACK :
                   

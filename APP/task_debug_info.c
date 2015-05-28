@@ -64,6 +64,9 @@ void  App_TaskDebugInfo (void *p_arg)
     
     (void)p_arg;    
     
+    debug_uart_fifo_data_max = 0;
+    debug_uart_fifo_oveflow_counter = 0;
+    
     kfifo_init_static( &DBG_UART_Send_kFIFO, (unsigned char *)DBG_UART_Send_Buffer, DBG_UART_Send_Buf_Size);
    
     
@@ -103,11 +106,11 @@ void BSP_Ser_WrStr_To_Buffer( char *p_str )
     len  = strlen( p_str );
     temp = kfifo_get_free_space( &DBG_UART_Send_kFIFO );
     
-    if( len <= temp ) {
-        kfifo_put( &DBG_UART_Send_kFIFO, (unsigned char *)p_str,  len);        
-    } else {
+    if( len > temp ) {
+        len = temp ;      
         debug_uart_fifo_oveflow_counter++ ;        
     }
+    kfifo_put( &DBG_UART_Send_kFIFO, (unsigned char *)p_str,  len); 
     
 }
 

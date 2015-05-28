@@ -1025,7 +1025,7 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
     if( firsttime == 0 ) {   //not first time pwd
         
         index = Global_VEC_Cfg.vec_index_a ; //Power up
-        if( Global_VEC_Cfg.type == 51 ) {
+        if(  Global_VEC_Cfg.pdm_clk_off ) {
             I2C_Mixer(I2C_MIX_FM36_CODEC);
             FM36_PDMADC_CLK_Onoff(1); //enable PDM clock    
             I2C_Mixer(I2C_MIX_UIF_S); 
@@ -1072,7 +1072,7 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
         } 
     }
     
-    if(Global_VEC_Cfg.type == 51 ) {    
+    if(  Global_VEC_Cfg.pdm_clk_off ) {    
        I2C_Mixer(I2C_MIX_FM36_CODEC);
        FM36_PDMADC_CLK_Onoff(0); //disable PDM clock
        I2C_Mixer(I2C_MIX_UIF_S);          

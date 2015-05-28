@@ -169,7 +169,7 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         
         case UIF_TYPE_FM36_PATH :  
             I2C_Mixer(I2C_MIX_FM36_CODEC);           
-            if( (pInterface_Cfg->attribute == ATTRI_FM36_PATH_PWD_BP ) && ( Global_UIF_Setting[ UIF_TYPE_FM36_PATH - 1 ].attribute != ATTRI_FM36_PATH_PWD_BP ) ) {                
+            if( (pInterface_Cfg->attribute == ATTRI_FM36_PATH_PWD_BP ) ){//&& ( Global_UIF_Setting[ UIF_TYPE_FM36_PATH - 1 ].attribute != ATTRI_FM36_PATH_PWD_BP ) ) {                
                 err = FM36_PWD_Bypass();                
             } 
             if( (pInterface_Cfg->attribute == ATTRI_FM36_PATH_NORMAL ) && ( Global_UIF_Setting[ UIF_TYPE_FM36_PATH - 1 ].attribute != ATTRI_FM36_PATH_NORMAL ) ) {                  
@@ -179,24 +179,23 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         break ;
         
         case UIF_TYPE_FM36_PDMCLK :
-           I2C_Mixer(I2C_MIX_FM36_CODEC);
-           //err = FM36_PDMADC_CLK_Set( GET_BYTE_HIGH_4BIT(pInterface_Cfg->attribute), GET_BYTE_LOW_4BIT(pInterface_Cfg->attribute), 1 ); //pdm_dac_clk, pdm_adc_clk, type=ontheflychange
-           Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute = pInterface_Cfg->attribute; //save clock data in attribute to global for  Init_FM36_AB03_Preset() use
-           err = Init_FM36_AB03_Preset(); 
-           I2C_Mixer(I2C_MIX_UIF_S);                       
+            I2C_Mixer(I2C_MIX_FM36_CODEC);
+            //err = FM36_PDMADC_CLK_Set( GET_BYTE_HIGH_4BIT(pInterface_Cfg->attribute), GET_BYTE_LOW_4BIT(pInterface_Cfg->attribute), 1 ); //pdm_dac_clk, pdm_adc_clk, type=ontheflychange
+            Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute = pInterface_Cfg->attribute; //save clock data in attribute to global for  Init_FM36_AB03_Preset() use
+            err = Init_FM36_AB03_Preset(); 
+            I2C_Mixer(I2C_MIX_UIF_S);                       
         break ;
         
         case UIF_TYPE_GPIO :       
-           err = GPIOPIN_Set( GET_BYTE_HIGH_4BIT(pInterface_Cfg->attribute), GET_BYTE_LOW_4BIT(pInterface_Cfg->attribute));
+            err = GPIOPIN_Set( GET_BYTE_HIGH_4BIT(pInterface_Cfg->attribute), GET_BYTE_LOW_4BIT(pInterface_Cfg->attribute));
         break ; 
         
         case UIF_TYPE_I2C_Mixer :       
-           err = I2C_Mixer( pInterface_Cfg->attribute );
+            err = I2C_Mixer( pInterface_Cfg->attribute );
         break ;
-        
-           
+                   
         default:
-           err = UIF_TYPE_NOT_SUPPORT;
+            err = UIF_TYPE_NOT_SUPPORT;
         break;
     }
     
@@ -237,7 +236,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                          p_raw_write->if_type,p_raw_write->dev_addr,p_raw_write->data_len));    
     Dump_Data( p_raw_write->pdata,  p_raw_write->data_len );    
     
-    err = NO_ERR;
+    err    = NO_ERR;
     pChar  = p_raw_write->pdata ;
     
     switch( p_raw_write->if_type ) {
@@ -476,11 +475,11 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
                   
               } else {
                   state =  TWID_Write( p_raw_read->dev_addr>>1,
-                                      0, 
-                                      0, 
-                                      p_raw_read->pdata_write, 
-                                      p_raw_read->data_len_write, 
-                                      NULL );     
+                                       0, 
+                                       0, 
+                                       p_raw_read->pdata_write, 
+                                       p_raw_read->data_len_write, 
+                                       NULL );     
                   if (state != SUCCESS) {
                       err = I2C_BUS_ERR;
                       break;
@@ -500,8 +499,11 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
         break;
         
         case UIF_TYPE_SPI:      
-        
-              state =  SPI_ReadWriteBuffer_API(  pbuf, 
+              
+           // state =  SPI_WriteBuffer_API(  p_raw_read->pdata_write, p_raw_read->data_len_write );            
+           // state =  SPI_ReadBuffer_API(   pbuf,  p_raw_read->data_len_read + 1 );
+            
+            state =  SPI_ReadWriteBuffer_API(  pbuf, 
                                                p_raw_read->pdata_write, 
                                                p_raw_read->data_len_read + 1, 
                                                p_raw_read->data_len_write);// +1 fix SPI bug

@@ -35,6 +35,10 @@
 
 volatile CPU_INT08U  Global_Idle_Ready = 0 ; //flag check if no command from PC for sometime
 
+#define          RX_DATA_LEN    512//64  //the larger the faster
+CPU_INT08U       rx_data[RX_DATA_LEN];
+
+
 /*
 *********************************************************************************************************
 *                                    App_TaskUART_Rx()
@@ -50,55 +54,58 @@ volatile CPU_INT08U  Global_Idle_Ready = 0 ; //flag check if no command from PC 
 *                   used.  The compiler should not generate any code for this statement.
 *********************************************************************************************************
 */
-#define  RX_DATA_LEN    64  //the larger the faster
 
 void App_TaskUART_Rx( void *p_arg )
-{     
-   (void)p_arg; 
+{   
     
+   (void)p_arg; 
+   
+    CPU_INT32U       i;
     CPU_INT16U       temp ;	
     CPU_INT16U       counter ;	
     CPU_INT08U       idle_counter ;	    
     CMDREAD          CMD_Read_PC ;
     CMDREAD          CMD_Read_Ruler ;
     CPU_INT32U       total_counter;
-    CPU_INT08U       rx_data[RX_DATA_LEN]; 
-        
+         
     //Init_CMD_Read( &CMD_Read_PC, EVENT_MsgQ_PCUART2Noah ) ;    
     Init_CMD_Read( &CMD_Read_PC, EVENT_MsgQ_Noah2CMDParse ) ;
     Init_CMD_Read( &CMD_Read_Ruler, EVENT_MsgQ_RulerUART2Noah ) ;
     idle_counter  = 0;
     total_counter = 0;
     
-	while (DEF_TRUE) {               
-   
-        //counter = Queue_NData( (void*) pUART_Rece_Buf[PC_UART] ) ;  
+    
+    while (DEF_TRUE) {  
+      
         counter  = kfifo_get_data_size(pUART_Rece_kfifo[PC_UART]); 
         //APP_TRACE_INFO((" %4d ",counter)) ;  
         
         if( counter ) {
             idle_counter = 0 ;
-        } else {            
+            
+        } else { 
+            
             if( idle_counter++ >= 100 ) { // 100*5ms = 500ms
                 Global_Idle_Ready = 1 ;                
                 idle_counter = 0 ;
                 LED_Clear(LED_DS2); //mute communication LED when >500ms free
-            }   
+            }  
+            
         }
+    
         total_counter += counter;
         
         if( counter ) {
 //             APP_TRACE_INFO(("\r\n\r\n---"));
 //             Time_Stamp();
-//             APP_TRACE_INFO(("\r\n:App_TaskUART_Rx check: [%d]start",counter));        
-//           
-             //Queue_ReadBuf( rx_data, pUART_Rece_Buf[PC_UART], counter > 256 ? 256 : counter , &temp );
+//             APP_TRACE_INFO(("\r\n:App_TaskUART_Rx check: [%d]start",counter));   
+            
              counter = counter < RX_DATA_LEN ? counter : RX_DATA_LEN;
              kfifo_get(pUART_Rece_kfifo[PC_UART], (unsigned char *)rx_data, counter) ; 
 
 #if( false )            
              APP_TRACE_INFO(("\r\n=====CMD====counter: %d =============\r\n",counter));             
-             for(unsigned int i = 0; i< counter; i++ ){  
+             for(i = 0; i< counter; i++ ){  
                 APP_TRACE_INFO(("%0X ", rx_data[i] ));
                 if(i%32 == 31) {
                     APP_TRACE_INFO(("\r\n"));
@@ -107,15 +114,13 @@ void App_TaskUART_Rx( void *p_arg )
              APP_TRACE_INFO(("\r\n==========total_counter: %d=====================\r\n",total_counter));
 #endif            
              
-            for(unsigned int i = 0; i< counter; i++ ){                 
-                 Noah_CMD_Read( &CMD_Read_PC, rx_data[i] ) ;  
-                 
-             }  
+            for(i = 0; i< counter; i++ ){                 
+                 Noah_CMD_Read( &CMD_Read_PC, rx_data[i] ) ;                   
+            }  
             
-             //Restart UART Rx if fifo free space enough
-             UART_Rx_ReStart( PC_UART );                   
+            //Restart UART Rx if fifo free space enough
+            UART_Rx_ReStart( PC_UART );                   
         
-            
             
              
              

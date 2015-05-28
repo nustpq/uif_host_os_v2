@@ -363,7 +363,7 @@ unsigned char TWID_Write    (
         pTransfer->pData        = pData;
         pTransfer->num          = num;
         pTransfer->transferred  = 1;    
-         twi_rw_done = 0;
+        twi_rw_done = 0;
         // Enable write interrupt and start the transfer
      
         //BSP_IntEn(AT91C_ID_TWI);

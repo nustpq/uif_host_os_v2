@@ -546,14 +546,16 @@
 #define AT91C_IFLASH_NB_OF_PAGES           (512) // Internal FLASH 0 Number of Pages: 512
 #define AT91C_IFLASH_LOCK_REGION_SIZE     (8192) // Internal FLASH 0 Lock Region Size: 8 Kbytes
 #define AT91C_IFLASH_NB_OF_LOCK_BITS        (16) // Internal FLASH 0 Number of Lock Bits: 32
-#if 1
-#define AT91C_IFLASH1                 (0x100000)
-#define AT91C_IFLASH1_SIZE             (0x20000)
-#define AT91C_IFLASH1_PAGE_SIZE            (256) // Internal FLASH 1 Page Size: 256 bytes
-#define AT91C_IFLASH1_NB_OF_PAGES          (512) // Internal FLASH 1 Number of Pages: 512
-#define AT91C_IFLASH1_LOCK_REGION_SIZE   (8192) // Internal FLASH 1 Lock Region Size: 8 Kbytes
-#define AT91C_IFLASH1_NB_OF_LOCK_BITS       (16) // Internal FLASH 1 Number of Lock Bits: 32
-#endif
+
+// Redefined in line 6825 in file AT91SAM3U4.h 
+//#if 1
+//#define AT91C_IFLASH1                 (0x100000)
+//#define AT91C_IFLASH1_SIZE             (0x20000)
+//#define AT91C_IFLASH1_PAGE_SIZE            (256) // Internal FLASH 1 Page Size: 256 bytes
+//#define AT91C_IFLASH1_NB_OF_PAGES          (512) // Internal FLASH 1 Number of Pages: 512
+//#define AT91C_IFLASH1_LOCK_REGION_SIZE   (8192) // Internal FLASH 1 Lock Region Size: 8 Kbytes
+//#define AT91C_IFLASH1_NB_OF_LOCK_BITS       (16) // Internal FLASH 1 Number of Lock Bits: 32
+//#endif
 
 /// Indicates chip has an EFC.
 #define AT91C_BASE_EFC    AT91C_BASE_EFC0
@@ -607,9 +609,10 @@
 
 /// Dma channel number
 //#define BOARD_MCI_DMA_CHANNEL                         0
-#define BOARD_SPI_DMA_CHANNEL                         0         
-#define BOARD_SSC_IN_DMA_CHANNEL                      1
-#define BOARD_SSC_OUT_DMA_CHANNEL                     2
+#define BOARD_SPI_IN_DMA_CHANNEL                      0
+#define BOARD_SPI_OUT_DMA_CHANNEL                     1   
+#define BOARD_SSC_IN_DMA_CHANNEL                      2
+#define BOARD_SSC_OUT_DMA_CHANNEL                     3
                                             
 /// MCI0 DMA hardware handshaking ID
 #define DMA_HW_SRC_REQ_ID_MCI0      AT91C_HDMA_SRC_PER_0
@@ -629,8 +632,10 @@
 #define BOARD_SSC_IN_DMA_HW_SRC_REQ_ID       AT91C_HDMA_SRC_PER_4
 #define BOARD_SSC_IN_DMA_HW_DEST_REQ_ID      AT91C_HDMA_DST_PER_4
    
-#define DMA_HW_SRC_REQ_ID_SPI      AT91C_HDMA_SRC_PER_1
-#define DMA_HW_DEST_REQ_ID_SPI     AT91C_HDMA_DST_PER_1 
+#define SPI_IN_DMA_HW_SRC_REQ_ID        AT91C_HDMA_SRC_PER_3
+#define SPI_IN_DMA_HW_DEST_REQ_ID       AT91C_HDMA_DST_PER_3 
+#define SPI_OUT_DMA_HW_SRC_REQ_ID       AT91C_HDMA_SRC_PER_1
+#define SPI_OUT_DMA_HW_DEST_REQ_ID      AT91C_HDMA_DST_PER_1 
                                             
 /// Rtc
 #define BOARD_RTC_ID                AT91C_ID_RTC

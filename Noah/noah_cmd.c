@@ -825,10 +825,10 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             
         break ;
         
-        case PC_CMD_RAW_WRITE :        
-           // APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE "));          
-           // Time_Stamp();
-           // LED_Set( LED_DS1 );
+        case PC_CMD_RAW_WRITE :  
+        
+            //APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE "));          
+            //Time_Stamp();         
             temp = emb_get_attr_int(&root, 1, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_write.if_type = (CPU_INT08U)temp;             
@@ -837,15 +837,15 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             PCCmd.raw_write.dev_addr = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 3, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
-            PCCmd.raw_write.data_len = (CPU_INT32U)temp;  
-          // Time_Stamp();           
+            PCCmd.raw_write.data_len = (CPU_INT32U)temp;                        
             pBin = emb_get_attr_binary(&root, 4, (int*)&temp);
             if(pBin == NULL ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_write.pdata = (CPU_INT08U *)pBin; 
+            //Time_Stamp(); 
             err = Raw_Write( &PCCmd.raw_write );
-          // Time_Stamp();
-          // APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE end "));  
-          // LED_Clear( LED_DS1 );            
+            //Time_Stamp();
+            //APP_TRACE_INFO(("\r\n::::: PC_CMD_RAW_WRITE end\r\n"));  
+                     
         break ;
         
         case PC_CMD_RAW_READ :  
@@ -863,11 +863,11 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             if(temp == -1 ) {  temp = 0;};
             PCCmd.raw_read.data_len_write = (CPU_INT32U)temp;             
             pBin = emb_get_attr_binary(&root, 5, (int*)&temp);
-            if(pBin == NULL && temp) { err = EMB_CMD_ERR;  break; }            
+            if((pBin == NULL) && temp) { err = EMB_CMD_ERR;  break; }            
             PCCmd.raw_read.pdata_write = (CPU_INT08U *)pBin; 
             
             err = Raw_Read( &PCCmd.raw_read );
-            if( err != NO_ERR ) { err = EMB_CMD_ERR;  break; } 
+            if( err != NO_ERR ) { /*err = EMB_CMD_ERR; */ break; } 
             
             err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
                                       &PCCmd.raw_read,
@@ -913,8 +913,11 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
             PCCmd.set_vec_cfg.gpio = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 6, -1);
-            if(temp == -1 ) { temp = 0; }  //trigger disable
+            if(temp == -1 ) { temp = 0; }  //default trigger disable            
             PCCmd.set_vec_cfg.trigger_en = (CPU_INT08U)temp;
+            temp = emb_get_attr_int(&root, 7, -1);
+            if(temp == -1 ) { temp = 1; }  //default turn off pdm clk after pwd             
+            PCCmd.set_vec_cfg.pdm_clk_off = (CPU_INT08U)temp;
             err = Set_DSP_VEC( &PCCmd.set_vec_cfg );    
            
         break ;

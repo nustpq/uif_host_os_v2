@@ -34,6 +34,9 @@
 #ifndef  APP_CFG_MODULE_PRESENT
 #define  APP_CFG_MODULE_PRESENT
 
+
+#define  DBG_UART_METHOD_TASK_EN  //this define enable the DBG UART in task for speed up
+
 /*
 *********************************************************************************************************
 *                                   ADDITIONAL uC/MODULE ENABLES
@@ -53,12 +56,12 @@
 */
 
 
-#define  APP_CFG_TASK_UART_TX_PRIO                         2
+#define  APP_CFG_TASK_UART_TX_PRIO                         3
 #define  APP_CFG_TASK_UART_TX_RULER_PRIO                   13
-#define  APP_CFG_TASK_UART_RX_PRIO                         3
-#define  APP_CFG_TASK_NOAH_PRIO                            3
+#define  APP_CFG_TASK_UART_RX_PRIO                         5
+#define  APP_CFG_TASK_NOAH_PRIO                            4
 #define  APP_CFG_TASK_NOAH_RULER_PRIO                      16
-#define  APP_CFG_TASK_CMD_PARSE_PRIO                       1
+#define  APP_CFG_TASK_CMD_PARSE_PRIO                       2
 
 
 
@@ -66,9 +69,9 @@
 #define  APP_CFG_TASK_JOY_PRIO                   (APP_CFG_TASK_USER_IF_PRIO+1)
 
 #define  APP_CFG_TASK_SHELL_PRIO                           20
-#define  APP_CFG_TASK_START_PRIO                           21
+#define  APP_CFG_TASK_START_PRIO                           30
 
-#define  APP_CFG_TASK_DBG_INFO_PRIO                        30
+#define  APP_CFG_TASK_DBG_INFO_PRIO                        21
 
 #define  APP_CFG_TASK_PROBE_STR_PRIO                       37
 #define  PROBE_DEMO_INTRO_CFG_TASK_LED_PRIO                38

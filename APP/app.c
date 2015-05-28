@@ -179,7 +179,7 @@ static  void  App_TaskStart (void *p_arg)
     Math_Init();                                                /* Initialize the Mathematical module                   */
 
     BSP_Ser_Init(115200);                        
-    APP_TRACE_INFO(("\n\r\n\r"));
+    //APP_TRACE_INFO(("\n\r\n\r"));
 
 #if (APP_CFG_PROBE_COM_MODULE_EN == DEF_ENABLED) || \
     (APP_CFG_PROBE_OS_PLUGIN_EN  == DEF_ENABLED)
@@ -242,7 +242,7 @@ void  App_BufferCreate (void)
   
     CPU_INT08U  err;
     
-    APP_TRACE_INFO(("Creating Application Buffer...\r\n"));
+    //APP_TRACE_INFO(("Creating Application Buffer...\r\n"));
     
 #if (OS_MEM_EN > 0)
     
@@ -280,7 +280,7 @@ void  App_BufferCreate (void)
 static  void  App_EventCreate (void)
 {
     
-    APP_TRACE_INFO(("Creating Application Events...\r\n"));
+    //APP_TRACE_INFO(("Creating Application Events...\r\n"));
       
 #if (OS_EVENT_NAME_EN  > 0 )
     CPU_INT08U  err;
@@ -347,12 +347,35 @@ static  void  App_EventCreate (void)
 
 static  void  App_TaskCreate (void)
 {
+        
+#ifndef DBG_UART_METHOD_TASK_EN    
+    
     APP_TRACE_INFO(("Creating Application Tasks...\r\n"));
+    
+#else
     
 #if (OS_TASK_NAME_EN > 0)
     CPU_INT08U  err;
 #endif
+ 
+    OSTaskCreateExt((void (*)(void *)) App_TaskDebugInfo,
+                    (void           *) 0,
+                    (OS_STK         *)&App_TaskDebugInfoStk[APP_CFG_TASK_DBG_INFO_STK_SIZE - 1],
+                    (INT8U           ) APP_CFG_TASK_DBG_INFO_PRIO,
+                    (INT16U          ) APP_CFG_TASK_DBG_INFO_PRIO,
+                    (OS_STK         *)&App_TaskDebugInfoStk[0],
+                    (INT32U          ) APP_CFG_TASK_DBG_INFO_STK_SIZE,
+                    (void *)0,
+                    (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
 
+#if (OS_TASK_NAME_EN > 0)
+    OSTaskNameSet(APP_CFG_TASK_DBG_INFO_PRIO, "Debug_Info", &err);
+#endif     
+
+#endif
+////////////////////////////////////////////////////////////////////////////// 
+    
+    
     OSTaskCreateExt((void (*)(void *)) App_TaskJoy,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskJoyStk[APP_CFG_TASK_JOY_STK_SIZE - 1],
@@ -444,7 +467,7 @@ static  void  App_TaskCreate (void)
                     (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
 
 #if (OS_TASK_NAME_EN > 0)
-    OSTaskNameSet(APP_CFG_TASK_USER_IF_PRIO, "UserI/F", &err);
+    OSTaskNameSet(APP_CFG_TASK_USER_IF_PRIO, "User I/F", &err);
 #endif
  
  
@@ -497,20 +520,7 @@ static  void  App_TaskCreate (void)
     
 ////////////////////////////////////////////////////////////////////////////////
     
-    OSTaskCreateExt((void (*)(void *)) App_TaskDebugInfo,
-                    (void           *) 0,
-                    (OS_STK         *)&App_TaskDebugInfoStk[APP_CFG_TASK_DBG_INFO_STK_SIZE - 1],
-                    (INT8U           ) APP_CFG_TASK_DBG_INFO_PRIO,
-                    (INT16U          ) APP_CFG_TASK_DBG_INFO_PRIO,
-                    (OS_STK         *)&App_TaskDebugInfoStk[0],
-                    (INT32U          ) APP_CFG_TASK_DBG_INFO_STK_SIZE,
-                    (void *)0,
-                    (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
 
-#if (OS_TASK_NAME_EN > 0)
-    OSTaskNameSet(APP_CFG_TASK_CMD_PARSE_PRIO, "Debug_Info", &err);
-#endif     
- 
     
 }
 

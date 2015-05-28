@@ -1432,10 +1432,11 @@ unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
     Global_VEC_Cfg.gpio        = p_dsp_vec_cfg->gpio;
     Global_VEC_Cfg.flag        = 0x55; //means cfg ok    
     Global_VEC_Cfg.trigger_en  = p_dsp_vec_cfg->trigger_en; 
+    Global_VEC_Cfg.pdm_clk_off = p_dsp_vec_cfg->pdm_clk_off; 
     
     if( Global_VEC_Cfg.trigger_en ) {
         err = MCU_Load_Vec(1);
-    } else {       
+    } else {    
         I2C_Mixer(I2C_MIX_FM36_CODEC);
         err = FM36_PDMADC_CLK_Onoff(1); //enable PDM clock
         I2C_Mixer(I2C_MIX_UIF_S); 
