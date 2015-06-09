@@ -36,15 +36,14 @@
 
 
 
-#define GPIO_I2C_DELAY  1  // 1ms timeout @ 48MHz MIP
+#define GPIO_I2C_DELAY  480  // 1us timeout @ 96MHz 
 
-#define GPIO_CS    5                         //GPIO pin for iM205 CS pin 
-     
-     
 unsigned char GPIO_SDA  = 3 ;                         //GPIO pin for I2C SDA  
 unsigned char GPIO_SCL  = 4 ;                         //GPIO pin for I2C SCL  
-  
-                                                             
+unsigned char GPIO_CS   = 5 ;                         //GPIO pin for FL204 CS pin toggle
+               
+
+
 static void delay( void )
 {
     
@@ -52,7 +51,6 @@ static void delay( void )
     //while(i--);
     
 }
-
 
   
 static void i2c_start( void )  
@@ -378,39 +376,39 @@ unsigned char CS_GPIO_Write (unsigned char mode_toggle_num, unsigned char gain_t
     
 #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register */
     OS_CPU_SR  cpu_sr = 0u;
-#endif 
-        
+#endif         
        
     OS_ENTER_CRITICAL();    
-  
+    //toggle mode must be done in 10ms
     for ( i=0; i< mode_toggle_num; i++ ) {  
         GPIOPIN_Set_Fast( GPIO_CS, 1);
-        delay(); 
+        delay_us(10); 
         GPIOPIN_Set_Fast( GPIO_CS, 0);                    
-        delay(); 
+        delay_us(10); 
     }
-        
     OS_EXIT_CRITICAL();
     
-    OSTimeDly(10);  //10ms quiet period between 
+    //10ms quiet period between toggle mode and toggle gain
+    OSTimeDly(10); 
     
     OS_ENTER_CRITICAL();    
-  
+    //toggle gain must be done in 10ms
     for ( i=0; i< gain_toggle_num; i++ ) {  
         GPIOPIN_Set_Fast( GPIO_CS, 1);
-        delay(); 
+        delay_us(10); 
         GPIOPIN_Set_Fast( GPIO_CS, 0);                    
-        delay(); 
+        delay_us(10); 
     }
-        
     OS_EXIT_CRITICAL();
    
     return 0;
+    
 }
 
 
-void CS_GPIO_Init ( void )  
+void CS_GPIO_Init ( unsigned char cs_gpio )  
 { 
+    GPIO_CS = cs_gpio;
     
     GPIOPIN_Init_Fast( GPIO_CS );   
     GPIOPIN_Set_Fast(  GPIO_CS, 0 );

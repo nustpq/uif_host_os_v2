@@ -193,7 +193,11 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         case UIF_TYPE_I2C_Mixer :       
             err = I2C_Mixer( pInterface_Cfg->attribute );
         break ;
-                   
+        
+        case UIF_TYPE_GPIO_CLK :       
+            CS_GPIO_Init( pInterface_Cfg->attribute );
+        break ;   
+        
         default:
             err = UIF_TYPE_NOT_SUPPORT;
         break;
@@ -423,6 +427,11 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
              err = GPIOPIN_Set( p_raw_write->dev_addr, *(p_raw_write->pdata) );
 
         break; 
+        
+        case UIF_TYPE_GPIO_CLK:
+             err = CS_GPIO_Write( *(p_raw_write->pdata), *(p_raw_write->pdata +1) );
+
+        break;
         
         default:
              err = UIF_TYPE_NOT_SUPPORT ;             

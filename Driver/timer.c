@@ -157,8 +157,8 @@ void  __ramfunc delay_us(CPU_INT32U delay_us)
       } 
         
     } else {
-        // MCK / (1000*1000) / ( DIV[timer_div] ) * delay_us ; = 48000000/1000000/2 *delay_us = 24*  *delay_us   
-        counter_top =  (delay_us - 2) * 24 ;               
+        // MCK / (1000*1000) / ( DIV[timer_div] ) * delay_us ; = 96000000/1000000/2 *delay_us = 24*  *delay_us   
+        counter_top =  (delay_us - 2) * 48 ;               
         if( counter_top & 0xFFFF0000 ) {
             counter_top = 0; // if exceeds TC_RC ...       
         }   
