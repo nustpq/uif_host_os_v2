@@ -1072,7 +1072,8 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
         } 
     }
     
-    if(  Global_VEC_Cfg.pdm_clk_off ) {    
+    if(  Global_VEC_Cfg.pdm_clk_off ) { 
+       OSTimeDly( 500 ); //for test
        I2C_Mixer(I2C_MIX_FM36_CODEC);
        FM36_PDMADC_CLK_Onoff(0); //disable PDM clock
        I2C_Mixer(I2C_MIX_UIF_S);          
