@@ -38,7 +38,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:H:V2.38]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:H:V2.39]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB01
 const CPU_CHAR hw_version[]  = "[HW:V1.0]"; 
@@ -941,6 +941,8 @@ void  BSP_Init (void)
     // Configure IIC    
     TWI_Init( TWCK ); //It seems that the TWI will auto desrease SCK if loading increase           
     //Init_CODEC_5620();
+    
+    SPI_Init( SPI_CLK, 0);
     
     // Init Internal Flash
     FLASHD_Initialize( MCK );

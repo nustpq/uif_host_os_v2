@@ -35,7 +35,7 @@
 #define  APP_CFG_MODULE_PRESENT
 
 
-#define  DBG_UART_METHOD_TASK_EN  //this define enable the DBG UART in task for speed up
+#define  DBG_UART_METHOD_TASK_EN  //this define enable the DBG UART in task for speed up, PQ
 
 /*
 *********************************************************************************************************
@@ -86,6 +86,7 @@
 /*
 *********************************************************************************************************
 *                                        TASK STACK SIZES
+*    task stack type is  OS_STK , a 32-bit width type
 *********************************************************************************************************
 */
 

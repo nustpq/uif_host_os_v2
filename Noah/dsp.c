@@ -231,7 +231,7 @@ static unsigned short int fm36_para_table_3[][2] =
   {0x229A, 0x0002}, //Aux-in From SP1
   {0x229B, 0x0008}, //Aux-in-L in SP1 slot0 
   {0x229C, 0x0009}, //Aux-in-R in SP1 slot1
-  
+
   //select output data source slot
   {0x22C1, 0x101A},
   {0x22C2, 0x101B},

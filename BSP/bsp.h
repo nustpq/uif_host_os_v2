@@ -125,6 +125,7 @@
 #include  <eefc.h>
 #include  <flashd.h>
 #include  <twid.h>
+#include  <spi.h>
 #include  <i2c_gpio.h>
 #include  <ruler.h>
 #include  <emb.h>

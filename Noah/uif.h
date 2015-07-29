@@ -26,12 +26,16 @@
 #define   UIF_TYPE_FM36_PDMCLK  7
 #define   UIF_TYPE_GPIO_CLK     8
 
-#define   ATTRI_IM501_LOAD_CODE_IRAM       52
-#define   ATTRI_IM501_LOAD_CODE_DRAM       51
-#define   ATTRI_IM401_LOAD_CODE            41
-#define   ATTRI_FM1388_LOAD_CODE           31
-#define   ATTRI_FM1388_LOAD_EEPROM         21
-#define   ATTRI_IM205                      11
+#define   ATTRI_I2C_IM501_LOAD_CODE_IRAM       52
+#define   ATTRI_I2C_IM501_LOAD_CODE_DRAM       51
+#define   ATTRI_I2C_IM401_LOAD_CODE            41
+#define   ATTRI_SPI_FM1388_LOAD_CODE           31
+#define   ATTRI_I2C_FM1388_LOAD_EEPROM         21
+#define   ATTRI_I2C_IM205                      11
+#define   ATTRI_SPI_IM501_CPHA0_CPOL0          0 //iM501_CPHA_CPOL
+#define   ATTRI_SPI_IM501_CPHA0_CPOL1          1
+#define   ATTRI_SPI_IM501_CPHA1_CPOL0          2
+#define   ATTRI_SPI_IM501_CPHA1_CPOL1          3
 
 #define   FM1388_ALLOWED_DATA_PACK_SIZE    (240+6)
 #define   EEPROM_ALLOWED_DATA_PACK_SIZE    (128+2)

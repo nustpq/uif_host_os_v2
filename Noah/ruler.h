@@ -151,7 +151,7 @@ typedef struct {
 typedef struct {    
     unsigned short   sr ;    //16000, 48000 
     unsigned char    type ;  //rec = 0,  play = 1
-    unsigned char    channels ; //1~6 
+    unsigned char    channels ; //mic num 1~6 
     unsigned char    lin_ch_mask;
     unsigned char    bit_length; //16, 24, 32
     unsigned char    gpio_rec_bit_mask;

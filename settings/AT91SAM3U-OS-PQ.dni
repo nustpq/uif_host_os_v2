@@ -33,7 +33,7 @@ Stop=1
 Freq=10000000
 MultiCoreRunAll=1
 [DebugChecksum]
-Checksum=-1340999944
+Checksum=-1362170144
 [JLinkDriver]
 CStepIntDis=_ 0
 [Exceptions]
@@ -54,6 +54,11 @@ Fmt1={W}0:mask	1	0
 Fmt2={W}0:pChar	4	0
 Fmt3={W}0:pRecvPtr	4	0
 Fmt4={W}0:temp	4	0
+[Disassemble mode]
+mode=0
+[Breakpoints2]
+Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Driver\spi.c}.534.12" 0 0 1 "" 0 "" 0
+Count=1
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -61,6 +66,12 @@ Category=_ 0
 [TermIOLog]
 LoggingEnabled=_ 0
 LogFile=_ ""
+[Aliases]
+A0=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Ports\ARM-Cortex-M3\Generic\IAR\os_cpu_c.c" ""
+A1=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Source\os_core.c" ""
+A2=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Source\os_task.c" ""
+Count=3
+SuppressDialog=1
 [CallStackLog]
 Enabled=0
 [DriverProfiling]
@@ -69,17 +80,3 @@ Mode=0
 Graph=0
 Symbiont=0
 Exclusions=
-[Disassemble mode]
-mode=0
-[Breakpoints2]
-Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.891.13" 0 0 1 "" 0 "" 0
-Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.515.13" 0 0 1 "" 0 "" 0
-Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.515.13" 0 0 1 "" 0 "" 0
-Bp3=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.198.13" 0 0 1 "" 0 "" 0
-Count=4
-[Aliases]
-A0=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Ports\ARM-Cortex-M3\Generic\IAR\os_cpu_c.c" ""
-A1=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Source\os_core.c" ""
-A2=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Source\os_task.c" ""
-Count=3
-SuppressDialog=1

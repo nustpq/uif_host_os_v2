@@ -609,20 +609,20 @@
 
 /// Dma channel number
 //#define BOARD_MCI_DMA_CHANNEL                         0
-#define BOARD_SPI_IN_DMA_CHANNEL                      0
-#define BOARD_SPI_OUT_DMA_CHANNEL                     1   
+#define BOARD_SPI_IN_DMA_CHANNEL                      0//1
+#define BOARD_SPI_OUT_DMA_CHANNEL                     1//5  
 #define BOARD_SSC_IN_DMA_CHANNEL                      2
 #define BOARD_SSC_OUT_DMA_CHANNEL                     3
                                             
-/// MCI0 DMA hardware handshaking ID
-#define DMA_HW_SRC_REQ_ID_MCI0      AT91C_HDMA_SRC_PER_0
-#define DMA_HW_DEST_REQ_ID_MCI0     AT91C_HDMA_DST_PER_0
-/// MCI1 DMA hardware handshaking ID
-#define DMA_HW_SRC_REQ_ID_MCI1      AT91C_HDMA_SRC_PER_13
-#define DMA_HW_DEST_REQ_ID_MCI1     AT91C_HDMA_DST_PER_13
-/// SD DMA hardware handshaking ID
-#define BOARD_SD_DMA_HW_SRC_REQ_ID      DMA_HW_SRC_REQ_ID_MCI0
-#define BOARD_SD_DMA_HW_DEST_REQ_ID     DMA_HW_DEST_REQ_ID_MCI0
+///// MCI0 DMA hardware handshaking ID
+//#define DMA_HW_SRC_REQ_ID_MCI0      AT91C_HDMA_SRC_PER_0
+//#define DMA_HW_DEST_REQ_ID_MCI0     AT91C_HDMA_DST_PER_0
+///// MCI1 DMA hardware handshaking ID
+//#define DMA_HW_SRC_REQ_ID_MCI1      AT91C_HDMA_SRC_PER_13
+//#define DMA_HW_DEST_REQ_ID_MCI1     AT91C_HDMA_DST_PER_13
+///// SD DMA hardware handshaking ID
+//#define BOARD_SD_DMA_HW_SRC_REQ_ID      DMA_HW_SRC_REQ_ID_MCI0
+//#define BOARD_SD_DMA_HW_DEST_REQ_ID     DMA_HW_DEST_REQ_ID_MCI0
 /// SSC DMA hardware handshaking ID    
 //#define BOARD_SSC_DMA_HW_SRC_REQ_ID      AT91C_HDMA_SRC_PER_3 // not use
 //#define BOARD_SSC_DMA_HW_DEST_REQ_ID     AT91C_HDMA_DST_PER_3  //not use
@@ -632,10 +632,10 @@
 #define BOARD_SSC_IN_DMA_HW_SRC_REQ_ID       AT91C_HDMA_SRC_PER_4
 #define BOARD_SSC_IN_DMA_HW_DEST_REQ_ID      AT91C_HDMA_DST_PER_4
    
-#define SPI_IN_DMA_HW_SRC_REQ_ID        AT91C_HDMA_SRC_PER_3
-#define SPI_IN_DMA_HW_DEST_REQ_ID       AT91C_HDMA_DST_PER_3 
+#define SPI_IN_DMA_HW_SRC_REQ_ID        AT91C_HDMA_SRC_PER_2
+#define SPI_IN_DMA_HW_DEST_REQ_ID       AT91C_HDMA_DST_PER_2
 #define SPI_OUT_DMA_HW_SRC_REQ_ID       AT91C_HDMA_SRC_PER_1
-#define SPI_OUT_DMA_HW_DEST_REQ_ID      AT91C_HDMA_DST_PER_1 
+#define SPI_OUT_DMA_HW_DEST_REQ_ID      AT91C_HDMA_DST_PER_1
                                             
 /// Rtc
 #define BOARD_RTC_ID                AT91C_ID_RTC
