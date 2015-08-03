@@ -609,8 +609,8 @@
 
 /// Dma channel number
 //#define BOARD_MCI_DMA_CHANNEL                         0
-#define BOARD_SPI_IN_DMA_CHANNEL                      0//1
-#define BOARD_SPI_OUT_DMA_CHANNEL                     1//5  
+#define BOARD_SPI_IN_DMA_CHANNEL                      0
+#define BOARD_SPI_OUT_DMA_CHANNEL                     1 
 #define BOARD_SSC_IN_DMA_CHANNEL                      2
 #define BOARD_SSC_OUT_DMA_CHANNEL                     3
                                             

@@ -510,7 +510,7 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
  
             state =  SPI_WriteReadBuffer_API(  pbuf, 
                                                p_raw_read->pdata_write, 
-                                               p_raw_read->data_len_read + 1, 
+                                               p_raw_read->data_len_read , 
                                                p_raw_read->data_len_write);// +1 fix SPI bug
              
               if (state != SUCCESS) {
@@ -519,8 +519,8 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
                   break;
               }    
               
-              pbuf = pbuf + (1 + p_raw_read->data_len_write); //fix bug
-              //Dump_Data(pbuf,p_raw_read->data_len_read);
+              pbuf = pbuf + 1; //fix bug
+             
         break;
         
         case UIF_TYPE_GPIO:

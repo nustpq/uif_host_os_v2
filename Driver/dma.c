@@ -120,12 +120,6 @@ void DMA_EnableChannel(unsigned int channel)
     AT91C_BASE_HDMA->HDMA_CHER = DMA_ENA << channel;
 }
 
-void DMA_EnableDualChannel(unsigned int channelA, unsigned int channelB)
-{
-    ASSERT(channelA < DMA_CHANNEL_NUM, "this channel does not exist");
-    ASSERT(channelB < DMA_CHANNEL_NUM, "this channel does not exist");
-    AT91C_BASE_HDMA->HDMA_CHER = (DMA_ENA << channelA) | (DMA_ENA << channelB);
-}
 
 //------------------------------------------------------------------------------
 /// Disables a DMAC channel 
