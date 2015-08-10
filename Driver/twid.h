@@ -97,5 +97,7 @@ extern   Twid twid;
 extern OS_EVENT *TWI_Sem_lock; //sem for TWI
 extern OS_EVENT *TWI_Sem_done; //sem for TWI
 
+extern void TWI_Init_Re( void );
+
 #endif //#ifndef TWID_H
 

@@ -84,6 +84,7 @@ void App_TaskCMDParse( void *p_arg )
             pNewCmd  = (pNEW_CMD)pTaskMsgIN ; //change to NOAH CMD type           
             err = EMB_Data_Parse( pNewCmd );           
             OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );  //release mem
+            Send_Report( pNewCmd->pkt_sn, err );
             LED_Clear( LED_DS2 );
             
         }

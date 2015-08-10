@@ -92,7 +92,7 @@ typedef struct _AsyncTwi {
 
 
 OS_EVENT *TWI_Sem_lock; //sem for TWI
-OS_EVENT *TWI_Sem_done; //sem for TWI
+//OS_EVENT *TWI_Sem_done; //sem for TWI
 
 //------------------------------------------------------------------------------
 //         Global functions
@@ -296,6 +296,7 @@ unsigned char TWID_Read      (
                 //TRACE_ERROR("TWID Timeout BR\n\r");
                  OSSemPost( TWI_Sem_lock );
                  state =  TWID_ERROR_TIMEOUT;
+                 TWI_Init_Re();
                  return state;
             }
             *pData++ = TWI_ReadByte(pTwi);
@@ -306,7 +307,8 @@ unsigned char TWID_Read      (
         while( !TWI_TransferComplete(pTwi) && (++timeout < TWITIMEOUTMAX) );
         if (timeout == TWITIMEOUTMAX) {
             //TRACE_ERROR("TWID Timeout TC\n\r");           
-            state =  TWID_ERROR_TIMEOUT2;           
+            state =  TWID_ERROR_TIMEOUT2; 
+            TWI_Init_Re();
         }
         OSSemPost( TWI_Sem_lock );
         
@@ -396,8 +398,10 @@ unsigned char TWID_Write    (
             timeout = 0;
             while( !TWI_ByteSent(pTwi) && (++timeout<TWITIMEOUTMAX) );
             if (timeout == TWITIMEOUTMAX) {
-                //TRACE_ERROR("TWID Timeout BS\n\r");             
+                //TRACE_ERROR("TWID Timeout BS\n\r"); 
+                 OSSemPost( TWI_Sem_lock );
                  state =  TWID_ERROR_TIMEOUT;
+                 TWI_Init_Re();
                  return state;
             }
             TWI_WriteByte(pTwi, *pData++);
@@ -416,7 +420,8 @@ unsigned char TWID_Write    (
         while( !TWI_TransferComplete(pTwi) && (++timeout<TWITIMEOUTMAX) );
         if (timeout == TWITIMEOUTMAX) {
             //TRACE_ERROR("TWID Timeout TC2\n\r");   
-            state =  TWID_ERROR_TIMEOUT2;         
+            state =  TWID_ERROR_TIMEOUT2;  
+            TWI_Init_Re();
         }
         OSSemPost( TWI_Sem_lock );
     }     
@@ -431,6 +436,8 @@ unsigned char TWID_Write    (
 // In IRQ mode: to avoid problems, the priority of the TWI IRQ must be max.
 // In polling mode: try to disable all IRQs if possible.
 // (in this example it does not matter, there is only the TWI IRQ active)
+static unsigned int twi_clock_save = 0;
+
 void TWI_Init( unsigned int twi_clock  )
 {
   
@@ -454,27 +461,35 @@ void TWI_Init( unsigned int twi_clock  )
    
 #ifdef TWI_ASYNC_MODE
         
-    TWI_Sem_done  = OSSemCreate(0); 
-    
-#if (OS_EVENT_NAME_EN > 0)
-   OSEventNameSet(TWI_Sem_done,         "TWI_Sem_done", &err);
-#endif
+//    TWI_Sem_done  = OSSemCreate(0); 
+//    
+//#if (OS_EVENT_NAME_EN > 0)
+//   OSEventNameSet(TWI_Sem_done,         "TWI_Sem_done", &err);
+//#endif
    
-    twi_async.callback  = 0 ;
+//    twi_async.callback  = 0 ;
     
-    BSP_IntVectSet( AT91C_ID_TWI,               
-                    (CPU_FNCT_VOID)TWID_Handler);  
-    IRQ_ConfigureIT(AT91C_ID_TWI, AT91C_AIC_PRIOR_HIGHEST, (IntFunc)0);
-    IRQ_EnableIT(AT91C_ID_TWI);
+//    BSP_IntVectSet( AT91C_ID_TWI,               
+//                    (CPU_FNCT_VOID)TWID_Handler);  
+//    IRQ_ConfigureIT(AT91C_ID_TWI, AT91C_AIC_PRIOR_HIGHEST, (IntFunc)0);
+//    IRQ_EnableIT(AT91C_ID_TWI);
                                    
 //    BSP_IntClr(AT91C_ID_TWI );     
 //    BSP_IntEn(AT91C_ID_TWI); 
     
 #endif
+    twi_rw_done = 0;
+    twi_clock_save = twi_clock ;
     
       
 }
 
+
+//reset TWI if failed in W/R operation
+void TWI_Init_Re( void )
+{
+    TWI_ConfigureMaster( AT91C_BASE_TWI, twi_clock_save, MCK  );
+}
 
 
 

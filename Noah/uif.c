@@ -387,7 +387,8 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                     state =  TWID_Write( p_raw_write->dev_addr>>1, 0, 0, p_raw_write->pdata, p_raw_write->data_len, NULL );       
                     if (state != SUCCESS) {
                         return I2C_BUS_ERR;                  
-                    } 
+                    }
+                    //delay_us(40);
                  break; 
             }
         break;
@@ -492,7 +493,7 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
                       err = I2C_BUS_ERR;
                       break;
                   } 
-                  
+              
                   state =  TWID_Read( p_raw_read->dev_addr>>1,
                                       0, 
                                       0, 
@@ -503,6 +504,7 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
                       err = I2C_BUS_ERR;
                       break;
                   } 
+                 
               }
         break;
         

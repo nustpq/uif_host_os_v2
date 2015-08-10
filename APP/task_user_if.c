@@ -64,7 +64,7 @@ void  App_TaskUserIF (void *p_arg)
   
     (void)p_arg;    
     
-    OSTimeDly(500); //wait for other tasks be ready , and time for power stable for ruler  
+    OSTimeDly(250); //wait for other tasks be ready , and time for power stable for ruler  
     Head_Info(); //Send header 
     //Ruler_Power_Switch(1);
     Init_Global_Var(); 
@@ -129,22 +129,22 @@ void  App_TaskUserIF (void *p_arg)
 //                          }
 //                    } 
                     
-                    // Switch 'SW0' used to control DEBUG port:
-                    //         0: ON :  UART1 used as debug port
-                    //         1: OFF:  DBG UART used as debug port
-                    if( (key_state>>(8 + 1)) & 0x01) {  //check if SW0 switch status changed  
-                        OSTaskDel( APP_CFG_TASK_SHELL_PRIO ); 
-                        OSSemSet (Bsp_Ser_Tx_Sem_lock, 1,  &err) ;
-                        OSSemSet (Bsp_Ser_Rx_Sem_lock, 1,  &err) ;
-                        Task_ReCreate_Shell();  
-                        if( ((key_state>>1)& 0x01 ) == 0 ) { //debug to UART1  
-                            Debug_COM_Sel = 1 ;
-                            BSP_Ser_Init(115200);  
-                        } else {                             //debug to DBG_UART                      
-                            Debug_COM_Sel = 0 ;               
-                            UART_Init(PC_UART, ISR_PC_UART, 115200 );    //To PC  ? Sem recreat issue
-                        }
-                    } 
+//                    // Switch 'SW0' used to control DEBUG port:
+//                    //         0: ON :  UART1 used as debug port
+//                    //         1: OFF:  DBG UART used as debug port
+//                    if( (key_state>>(8 + 1)) & 0x01) {  //check if SW0 switch status changed  
+//                        OSTaskDel( APP_CFG_TASK_SHELL_PRIO ); 
+//                        OSSemSet (Bsp_Ser_Tx_Sem_lock, 1,  &err) ;
+//                        OSSemSet (Bsp_Ser_Rx_Sem_lock, 1,  &err) ;
+//                        Task_ReCreate_Shell();  
+//                        if( ((key_state>>1)& 0x01 ) == 0 ) { //debug to UART1  
+//                            Debug_COM_Sel = 1 ;
+//                            BSP_Ser_Init(115200);  
+//                        } else {                             //debug to DBG_UART                      
+//                            Debug_COM_Sel = 0 ;               
+//                            UART_Init(PC_UART, ISR_PC_UART, 115200 );    //To PC  ? Sem recreat issue
+//                        }
+//                    } 
                 break;
                 
                 case MSG_TYPE_PORT_DET :   

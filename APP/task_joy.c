@@ -63,8 +63,8 @@ void  App_TaskJoy (void *p_arg)
     CPU_INT32U   i ;
     
     //avoid a fake trigger after POR
-//    switch_value_prev      =  Get_Switches()    & 0x3F; 
-    switch_value_prev      =  0x03;  //0x3F;  //make sure check switch 1st  
+    switch_value_prev      =  Get_Switches()  & 0x03; 
+    switch_value_prev      =  switch_value_prev ^ 0x01;  //make sure check Switch 'SW1' Buzzer 1st  
     ruler_port_value_prev  =  Get_Port_Detect() & 0xFF;  //GPIOs   
    
     //flash_test(); //debug use
@@ -103,13 +103,13 @@ void  App_TaskJoy (void *p_arg)
            
         switch_value = Get_Switches() & 0x03; //mask 0~1     
         if( switch_value != switch_value_prev ) {  
-            OSTimeDly(300); 
+            OSTimeDly(50); 
             if( switch_value == Get_Switches() & 0x03 ) { //jitter immune                         
                 data = switch_value ^ switch_value_prev ;   
                 switch_value_prev = switch_value ;
                 data = ( data << 8 ) | (switch_value & 0xFF) ;
                 data &= ~MSG_TYPE_MASK ;
-                data |= MSG_TYPE_SWITCH; 
+                data |= MSG_TYPE_SWITCH;                  
                 while ( OSMboxPost(App_UserIF_Mbox, &data) == OS_ERR_MBOX_FULL ) {
                     OSTimeDly(10);  //
                 };            
@@ -119,7 +119,7 @@ void  App_TaskJoy (void *p_arg)
         
         ruler_port_value = Get_Port_Detect() & 0xFF; //mask  0~7        
         if( ruler_port_value != ruler_port_value_prev ) {
-            //OSTimeDly(100); //for gpio detect, no need delay
+            OSTimeDly(1); //for gpio detect, no need delay
             if( ruler_port_value == Get_Port_Detect() & 0xFF ) {  //jitter immune
                 data = ruler_port_value ^ ruler_port_value_prev ;   
                 ruler_port_value_prev = ruler_port_value ;
@@ -128,7 +128,9 @@ void  App_TaskJoy (void *p_arg)
                 data |= MSG_TYPE_PORT_DET;                 
                 while ( OSMboxPost(App_UserIF_Mbox, &data) == OS_ERR_MBOX_FULL ) {
                     OSTimeDly(10);  //
-                };          
+                    
+                };  
+                
                 
             }
         }

@@ -1166,7 +1166,7 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         
     }
     
-    Send_Report( pkt_sn, err );
+    //Send_Report( pkt_sn, err ); //moved to : App_TaskCMDParse()
     
     return err;
 
