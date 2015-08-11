@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<userOverrides>
+  <override>
+    <path>E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2\Driver\gpio.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2\Driver\i2c_gpio.c</path>
+    <encoding>System</encoding>
+  </override>
+</userOverrides>
+
+

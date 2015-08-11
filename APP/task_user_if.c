@@ -64,7 +64,7 @@ void  App_TaskUserIF (void *p_arg)
   
     (void)p_arg;    
     
-    OSTimeDly(250); //wait for other tasks be ready , and time for power stable for ruler  
+    OSTimeDly(100); //wait for other tasks be ready , and time for power stable for ruler  
     Head_Info(); //Send header 
     //Ruler_Power_Switch(1);
     Init_Global_Var(); 

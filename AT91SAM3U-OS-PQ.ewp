@@ -2176,6 +2176,12 @@
       <name>$PROJ_DIR$\Noah\emb.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\Noah\im501_comm.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Noah\im501_comm.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\Noah\kfifo.c</name>
     </file>
     <file>

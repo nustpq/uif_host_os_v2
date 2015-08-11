@@ -752,12 +752,12 @@ typedef enum IRQn
 #define BUZZER            {1 << 30, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT}//uif2.2
 #define LED1              {1 << 5,  AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT}//host status LED//uif2.2
 #define LED2              {1 << 6,  AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT}////uif2.2
-#define SW0               {1 << 22, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_INPUT, PIO_DEFAULT} //switch: inquire
-#define SW1               {1 << 21, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_INPUT, PIO_DEFAULT}    
+#define SW0               {1 << 22, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_INPUT, PIO_PULLUP} //switch: inquire
+#define SW1               {1 << 21, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_INPUT, PIO_PULLUP}    
   
-#define GPIO_CODEC_RST    {1 << 1, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_PULLUP} //codec
-#define GPIO_AUDIO_RST    {1 << 3, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_PULLUP} //audio reset//uif2.2
-#define GPIO_FM_RST       {1 << 3, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_1, PIO_PULLUP} //FM36 reset//uif2.2
+#define GPIO_CODEC_RST    {1 << 1, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT} //codec
+#define GPIO_AUDIO_RST    {1 << 3, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT} //audio reset//uif2.2
+#define GPIO_FM_RST       {1 << 3, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_1, PIO_DEFAULT} //FM36 reset//uif2.2
 
 #define I2C_SELECT1       {1 << 8, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_1, PIO_DEFAULT}   //default disable all I2C bus                                 
 #define I2C_SELECT2       {1 << 7, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_OUTPUT_1, PIO_DEFAULT} 
@@ -772,7 +772,7 @@ typedef enum IRQn
 #define  UIF_GPIO_6   {1 << 0, AT91C_BASE_PIOB, AT91C_ID_PIOB, PIO_INPUT, PIO_PULLUP} 
 #define  UIF_GPIO_7   {1 << 31, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_PULLUP} 
 #define  UIF_GPIO_8   {1 << 29, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_PULLUP} 
-#define  UIF_GPIO_9   {1 << 28, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_PULLUP}     
+#define  UIF_GPIO_9   {1 << 28, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_PULLUP}  //100k pull up internal   
                                     
                                     
                                   

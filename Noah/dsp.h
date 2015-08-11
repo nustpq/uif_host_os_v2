@@ -20,8 +20,7 @@
 #define  FM36_ROM_ID_1    0x36D0
 #define  FM36_ROM_ID_2    0x600C
 
-#define  iM401_I2C_ADDR   0xAE
-#define  iM501_I2C_ADDR   0xC0
+
 
 extern unsigned char ReInit_FM36( unsigned short sr );
 

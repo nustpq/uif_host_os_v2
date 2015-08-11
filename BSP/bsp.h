@@ -132,6 +132,7 @@
 #include  <mem_basic.h>
 #include  <uif.h>
 #include  <dsp.h>
+#include  <im501_comm.h>
 #include  <noah_cmd.h>
 #include  <commands.h>
 #include  <codec.h>

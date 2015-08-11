@@ -42,7 +42,7 @@
 
 
 #define EMB_BUF_SIZE            (2048-8) //2048// 3072 //256*120=3072 //Be Careful to modify
-#define UART_CMD_DATA_LENGTH    255 
+//#define UART_CMD_DATA_LENGTH    255 
 
 /////////  UART Message Storage Area:  MemPartition_MsgUART   //////////////////
 #define MsgUARTQueue_SIZE       5//10                            //memory partition block numbers

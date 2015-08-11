@@ -145,13 +145,13 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         case UIF_TYPE_I2C_GPIO :
             scl_no = GET_I2C_GPIO_SCL(pInterface_Cfg->attribute);
             sda_no = GET_I2C_GPIO_SDA(pInterface_Cfg->attribute);
-            if( temp <= 400 && temp >= 10) { 
+            //if( temp <= 400 && temp >= 10) { 
                 I2C_GPIO_Init( temp * 1000, scl_no, sda_no  );     
                 APP_TRACE_INFO(("\r\nI2C port is set to GPIO simluated %d kHz\r\n",temp));        
-            }  else {
-                APP_TRACE_INFO(("\r\nERROR: I2C speed not support %d kHz\r\n",temp));
-                err = SET_I2C_ERR ;
-            }   
+            //}  else {
+            //    APP_TRACE_INFO(("\r\nERROR: I2C speed not support %d kHz\r\n",temp));
+            //    err = SET_I2C_ERR ;
+            //}   
         break ;
         
         case UIF_TYPE_SPI :
@@ -392,6 +392,15 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                  break; 
             }
         break;
+        
+        
+        case UIF_TYPE_I2C_GPIO :
+               state =  I2C_GPIO_Write (p_raw_write->dev_addr>>1, p_raw_write->pdata, p_raw_write->data_len) ;
+               if (state != SUCCESS) {
+                   APP_TRACE_INFO(("\r\nI2C_GPIO_WRITE write err = %d\r\n",state));
+                   return I2C_BUS_ERR;                  
+               }
+        break;
         //////////////////////////////////////////////////////////
         
         case UIF_TYPE_SPI:
@@ -506,6 +515,19 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
                   } 
                  
               }
+        break;
+        
+        case UIF_TYPE_I2C_GPIO :
+               state =  I2C_GPIO_Write (p_raw_read->dev_addr>>1, p_raw_read->pdata_write, p_raw_read->data_len_write) ;
+               if (state != SUCCESS) {
+                   APP_TRACE_INFO(("\r\nI2C_GPIO_READ write err = %d\r\n",state));
+                   return I2C_BUS_ERR;                  
+               }
+               state =  I2C_GPIO_Read (p_raw_read->dev_addr>>1, pbuf, p_raw_read->data_len_read) ;
+               if (state != SUCCESS) {
+                   APP_TRACE_INFO(("\r\nI2C_GPIO_READ read err = %d\r\n",state));
+                   return I2C_BUS_ERR;                  
+               }
         break;
         
         case UIF_TYPE_SPI:                   

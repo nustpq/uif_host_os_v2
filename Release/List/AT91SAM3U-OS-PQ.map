@@ -1,0 +1,1639 @@
+###############################################################################
+#
+# IAR ELF Linker V7.10.3.6832/W32 for ARM                 12/Aug/2015  11:11:43
+# Copyright 2007-2014 IAR Systems AB.
+#
+#    Output file  =  
+#        E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Exe\AT91SAM3U-OS-PQ.out
+#    Map file     =  
+#        E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\List\AT91SAM3U-OS-PQ.map
+#    Command line =  
+#        "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj\app.o" "E:\SVN
+#        Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj\app_hooks.o" "E:\SVN
+#        Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj\app_probe.o" "E:\SVN
+#        Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj\app_vect.o" "E:\SVN
+#        Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj\bsp.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\bsp_cpu.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\bsp_gpio.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\bsp_int.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\bsp_os.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\bsp_pmc.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\codec.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\commands.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\core_cm3.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\cpu_a.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\cpu_c.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\cpu_core.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\dma.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\dmad.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\dsp.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\eefc.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\emb.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\flashd_eefc.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\gpio.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\i2c_gpio.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\im501_comm.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\kfifo.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\led.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\lib_ascii.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\lib_math.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\lib_mem.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\lib_mem_a.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\lib_str.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\math.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\mem_basic.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\noah_cmd.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\nvic.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\os_core.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\os_cpu_a.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\os_cpu_c.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\os_dbg.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\os_flag.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\os_mbox.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\os_mem.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\os_mutex.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\os_probe.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\os_q.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\os_sem.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\os_task.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\os_time.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\os_tmr.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\pio.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\pio_it.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\probe_com_os.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\probe_demo_intro.o" "E:\SVN
+#        Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj\probe_rs232.o" "E:\SVN
+#        Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj\probe_rs232_os.o" "E:\SVN
+#        Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj\probe_rs232c.o" "E:\SVN
+#        Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj\queue.o" "E:\SVN
+#        Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj\ruler.o" "E:\SVN
+#        Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj\spi.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\task_cmd_parse.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\task_debug_info.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\task_joy.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\task_noah.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\task_noah_ruler.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\task_shell.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\task_uart_rx.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\task_uart_tx.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\task_uart_tx_ruler.o" "E:\SVN
+#        Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj\task_user_if.o" "E:\SVN
+#        Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj\timer.o" "E:\SVN
+#        Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj\twi.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\twid.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\uart.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\uif.o" "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Obj\Xmodem.o" -o "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\Release\Exe\AT91SAM3U-OS-PQ.out" --map "E:\SVN
+#        Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\List\AT91SAM3U-OS-PQ.map"
+#        --config "E:\SVN Dir\PQ\UIF
+#        Board\UIF_Host_OS_V2\BSP\AT91SAM3U_FLASH.icf" --entry
+#        __iar_program_start --inline --vfe
+#
+###############################################################################
+
+*******************************************************************************
+*** RUNTIME MODEL ATTRIBUTES
+***
+
+CppFlavor       = *
+__Heap_Handler  = DLMalloc
+__SystemLibrary = DLib
+
+
+*******************************************************************************
+*** PLACEMENT SUMMARY
+***
+
+"A1":  place at 0x00080000 { ro section .vectors };
+"P1":  place in [from 0x00080000 to 0x0009ffff] { ro };
+"P2":  place in [from 0x20078000 to 0x20083fff] { rw, block HEAP, block CSTACK };
+
+  Section            Kind        Address    Size  Object
+  -------            ----        -------    ----  ------
+"A1":                                       0xbc
+  .vectors                    0x00080000    0xbc  <Block>
+    .vectors         const    0x00080000    0xbc  app_vect.o [1]
+                            - 0x000800bc    0xbc
+
+"P1":                                     0xf55a
+  .text              ro code  0x000800bc   0xd86  xprintffull_nomb.o [3]
+  .text              ro code  0x00080e42    0x22  zero_init3.o [5]
+  .text              ro code  0x00080e64    0x16  strchr.o [5]
+  .text              ro code  0x00080e7a     0xa  xsprout.o [3]
+  .text              ro code  0x00080e84    0x36  strlen.o [5]
+  .rodata            const    0x00080eba     0x2  os_dbg.o [1]
+  .text              ro code  0x00080ebc    0x58  memchr.o [5]
+  .text              ro code  0x00080f14    0xee  I64DivMod.o [5]
+  .rodata            const    0x00081002     0x2  os_dbg.o [1]
+  .text              ro code  0x00081004    0x76  ABImemcpy_unaligned.o [5]
+  .text              ro code  0x0008107a    0x42  xdnorm.o [4]
+  .text              ro code  0x000810bc    0x2e  DblCmpLe.o [4]
+  .rodata            const    0x000810ea     0x2  os_dbg.o [1]
+  .text              ro code  0x000810ec    0x2e  DblCmpGe.o [4]
+  .rodata            const    0x0008111a     0x2  os_dbg.o [1]
+  .text              ro code  0x0008111c   0x10c  xdscale.o [4]
+  .text              ro code  0x00081228    0x58  DblToI32.o [4]
+  .text              ro code  0x00081280    0x30  I32ToDbl.o [4]
+  .text              ro code  0x000812b0   0x180  DblSub.o [4]
+  .text              ro code  0x00081430   0x1a2  DblMul.o [4]
+  .rodata            const    0x000815d2     0x2  os_dbg.o [1]
+  .text              ro code  0x000815d4   0x246  DblDiv.o [4]
+  .text              ro code  0x0008181a     0xe  div.o [3]
+  .text              ro code  0x00081828     0x2  I64DivZer.o [5]
+  .rodata            const    0x0008182a     0x2  os_dbg.o [1]
+  .text              ro code  0x0008182c    0xd4  DblAdd.o [4]
+  .text              ro code  0x00081900   0xc28  ruler.o [1]
+  .text              ro code  0x00082528   0x404  os_q.o [1]
+  .text              ro code  0x0008292c    0x78  os_time.o [1]
+  .text              ro code  0x000829a4   0xb28  bsp.o [1]
+  .text              ro code  0x000834cc   0x16a  queue.o [1]
+  .rodata            const    0x00083636     0x2  os_dbg.o [1]
+  .text              ro code  0x00083638   0x32c  codec.o [1]
+  Veneer             ro code  0x00083964     0x8  - Linker created -
+  Veneer             ro code  0x0008396c     0x8  - Linker created -
+  .text              ro code  0x00083974   0x8c8  uart.o [1]
+  .text              ro code  0x0008423c   0x2c0  gpio.o [1]
+  .text              ro code  0x000844fc   0x85c  dsp.o [1]
+  CODE               ro code  0x00084d58    0xa0  os_cpu_a.o [1]
+  .text              ro code  0x00084df8   0x31a  os_sem.o [1]
+  .rodata            const    0x00085112     0x2  os_dbg.o [1]
+  .text              ro code  0x00085114   0xaac  noah_cmd.o [1]
+  .text              ro code  0x00085bc0   0x104  flashd_eefc.o [1]
+  .text              ro code  0x00085cc4    0xfc  led.o [1]
+  .text              ro code  0x00085dc0    0x44  strcpy_unaligned.o [5]
+  .text              ro code  0x00085e04   0x1f8  im501_comm.o [1]
+  .text              ro code  0x00085ffc    0x14  memset.o [3]
+  .text              ro code  0x00086010   0x194  task_user_if.o [1]
+  .text              ro code  0x000861a4   0x278  Xmodem.o [1]
+  .text              ro code  0x0008641c   0xa2c  os_core.o [1]
+  .text              ro code  0x00086e48   0x110  bsp_pmc.o [1]
+  .text              ro code  0x00086f58   0x1a6  bsp_int.o [1]
+  .rodata            const    0x000870fe     0x2  os_dbg.o [1]
+  .text              ro code  0x00087100    0xec  bsp_gpio.o [1]
+  .text              ro code  0x000871ec   0x100  nvic.o [1]
+  .text              ro code  0x000872ec    0x1a  bsp_os.o [1]
+  .rodata            const    0x00087306     0x2  os_dbg.o [1]
+  .text              ro code  0x00087308   0x384  twid.o [1]
+  Veneer             ro code  0x0008768c     0x8  - Linker created -
+  Veneer             ro code  0x00087694     0x8  - Linker created -
+  .text              ro code  0x0008769c   0x464  spi.o [1]
+  .text              ro code  0x00087b00    0xf8  timer.o [1]
+  .text              ro code  0x00087bf8    0x2c  vsprintf.o [3]
+  .text              ro code  0x00087c24    0xb8  task_debug_info.o [1]
+  .text              ro code  0x00087cdc   0x1b2  pio.o [1]
+  .text              ro code  0x00087e8e    0xbc  kfifo.o [1]
+  .rodata            const    0x00087f4a     0x2  os_dbg.o [1]
+  .text              ro code  0x00087f4c   0x740  mem_basic.o [1]
+  .text              ro code  0x0008868c   0x1d0  os_mem.o [1]
+  .text              ro code  0x0008885c   0x596  emb.o [1]
+  .text              ro code  0x00088df2    0x1c  strcat.o [3]
+  .rodata            const    0x00088e0e     0x2  os_dbg.o [1]
+  .text              ro code  0x00088e10   0x864  uif.o [1]
+  .text              ro code  0x00089674    0xc6  eefc.o [1]
+  .text              ro code  0x0008973a    0x1e  math.o [1]
+  .text              ro code  0x00089758     0xc  memcpy.o [3]
+  .text              ro code  0x00089764    0x66  ABImemset.o [5]
+  .rodata            const    0x000897ca     0x2  os_dbg.o [1]
+  .text              ro code  0x000897cc   0x1ee  os_mbox.o [1]
+  .rodata            const    0x000899ba     0x2  os_dbg.o [1]
+  .text              ro code  0x000899bc   0x154  os_cpu_c.o [1]
+  .text              ro code  0x00089b10    0x86  os_flag.o [1]
+  .rodata            const    0x00089b96     0x2  os_dbg.o [1]
+  .text              ro code  0x00089b98   0x280  os_tmr.o [1]
+  .text              ro code  0x00089e18   0x1cc  os_dbg.o [1]
+  .text              ro code  0x00089fe4   0x4d8  os_task.o [1]
+  .text              ro code  0x0008a4bc   0x124  cpu_c.o [1]
+  CODE               ro code  0x0008a5e0    0x2a  cpu_a.o [1]
+  .rodata            const    0x0008a60a     0x2  os_dbg.o [1]
+  .text              ro code  0x0008a60c    0xf2  twi.o [1]
+  .rodata            const    0x0008a6fe     0x2  os_dbg.o [1]
+  .text              ro code  0x0008a700    0x5c  dma.o [1]
+  .text              ro code  0x0008a75c    0x38  dmad.o [1]
+  Veneer             ro code  0x0008a794     0x8  - Linker created -
+  .text              ro code  0x0008a79c   0x50c  i2c_gpio.o [1]
+  .text              ro code  0x0008aca8   0xb10  commands.o [1]
+  .text              ro code  0x0008b7b8   0x4e0  lib_str.o [1]
+  .text              ro code  0x0008bc98    0xe8  lib_ascii.o [1]
+  .text              ro code  0x0008bd80   0x46c  app.o [1]
+  .text              ro code  0x0008c1ec    0x6c  cpu_core.o [1]
+  .text              ro code  0x0008c258    0x28  lib_math.o [1]
+  .text              ro code  0x0008c280    0x94  lib_mem.o [1]
+  .text              ro code  0x0008c314   0x1e0  task_shell.o [1]
+  .text              ro code  0x0008c4f4   0x1c6  lz77_init.o [5]
+  .text              ro code  0x0008c6ba     0x6  abort.o [3]
+  .text              ro code  0x0008c6c0     0xc  XXexit.o [5]
+  .text              ro code  0x0008c6cc   0x178  task_joy.o [1]
+  .rodata            const    0x0008c844   0x100  os_core.o [1]
+  .text              ro code  0x0008c944    0xb4  task_uart_rx.o [1]
+  .rodata            const    0x0008c9f8    0x94  lib_str.o [1]
+  .rodata            const    0x0008ca8c    0x88  bsp.o [1]
+  .rodata            const    0x0008cb14    0x88  bsp.o [1]
+  .rodata            const    0x0008cb9c    0x88  bsp.o [1]
+  .rodata            const    0x0008cc24    0x88  bsp.o [1]
+  .rodata            const    0x0008ccac    0x88  bsp.o [1]
+  .rodata            const    0x0008cd34    0x88  bsp.o [1]
+  .text              ro code  0x0008cdbc    0x84  task_uart_tx.o [1]
+  .rodata            const    0x0008ce40    0x80  spi.o [1]
+  .rodata            const    0x0008cec0    0x80  uart.o [1]
+  .rodata            const    0x0008cf40    0x70  commands.o [1]
+  .rodata            const    0x0008cfb0    0x60  uart.o [1]
+  .rodata            const    0x0008d010    0x5c  commands.o [1]
+  .rodata            const    0x0008d06c    0x5c  commands.o [1]
+  .text              ro code  0x0008d0c8    0x5c  task_cmd_parse.o [1]
+  .rodata            const    0x0008d124    0x54  ruler.o [1]
+  .rodata            const    0x0008d178    0x50  bsp.o [1]
+  .rodata            const    0x0008d1c8    0x50  uif.o [1]
+  .rodata            const    0x0008d218    0x4c  bsp.o [1]
+  .rodata            const    0x0008d264    0x4c  bsp.o [1]
+  .rodata            const    0x0008d2b0    0x48  bsp.o [1]
+  .rodata            const    0x0008d2f8    0x48  task_user_if.o [1]
+  .rodata            const    0x0008d340    0x44  bsp.o [1]
+  .rodata            const    0x0008d384    0x44  commands.o [1]
+  .rodata            const    0x0008d3c8    0x40  bsp.o [1]
+  .rodata            const    0x0008d408    0x40  bsp.o [1]
+  .rodata            const    0x0008d448    0x40  bsp.o [1]
+  .rodata            const    0x0008d488    0x40  bsp.o [1]
+  .rodata            const    0x0008d4c8    0x40  bsp.o [1]
+  .rodata            const    0x0008d508    0x40  commands.o [1]
+  .rodata            const    0x0008d548    0x40  commands.o [1]
+  .rodata            const    0x0008d588    0x40  gpio.o [1]
+  .rodata            const    0x0008d5c8    0x40  led.o [1]
+  .rodata            const    0x0008d608    0x40  twid.o [1]
+  .rodata            const    0x0008d648    0x3c  commands.o [1]
+  .rodata            const    0x0008d684    0x3c  commands.o [1]
+  .rodata            const    0x0008d6c0    0x3c  commands.o [1]
+  .rodata            const    0x0008d6fc    0x3c  uif.o [1]
+  .rodata            const    0x0008d738    0x38  bsp.o [1]
+  .rodata            const    0x0008d770    0x38  bsp.o [1]
+  .rodata            const    0x0008d7a8    0x38  bsp.o [1]
+  .rodata            const    0x0008d7e0    0x38  bsp.o [1]
+  .rodata            const    0x0008d818    0x38  bsp.o [1]
+  .rodata            const    0x0008d850    0x38  bsp.o [1]
+  .rodata            const    0x0008d888    0x38  commands.o [1]
+  .rodata            const    0x0008d8c0    0x38  commands.o [1]
+  .rodata            const    0x0008d8f8    0x38  ruler.o [1]
+  .rodata            const    0x0008d930    0x38  ruler.o [1]
+  .rodata            const    0x0008d968    0x38  uif.o [1]
+  .rodata            const    0x0008d9a0    0x34  bsp.o [1]
+  .rodata            const    0x0008d9d4    0x34  bsp.o [1]
+  .rodata            const    0x0008da08    0x34  bsp.o [1]
+  .rodata            const    0x0008da3c    0x34  bsp.o [1]
+  .rodata            const    0x0008da70    0x34  bsp.o [1]
+  .rodata            const    0x0008daa4    0x34  bsp.o [1]
+  .rodata            const    0x0008dad8    0x34  commands.o [1]
+  .rodata            const    0x0008db0c    0x34  dsp.o [1]
+  .rodata            const    0x0008db40    0x34  dsp.o [1]
+  .rodata            const    0x0008db74    0x34  dsp.o [1]
+  .rodata            const    0x0008dba8    0x34  ruler.o [1]
+  .rodata            const    0x0008dbdc    0x34  ruler.o [1]
+  .rodata            const    0x0008dc10    0x34  ruler.o [1]
+  .rodata            const    0x0008dc44    0x34  task_shell.o [1]
+  .rodata            const    0x0008dc78    0x30  commands.o [1]
+  .rodata            const    0x0008dca8    0x30  commands.o [1]
+  .rodata            const    0x0008dcd8    0x30  commands.o [1]
+  .rodata            const    0x0008dd08    0x30  noah_cmd.o [1]
+  .rodata            const    0x0008dd38    0x30  ruler.o [1]
+  .rodata            const    0x0008dd68    0x30  ruler.o [1]
+  .rodata            const    0x0008dd98    0x30  ruler.o [1]
+  .rodata            const    0x0008ddc8    0x30  ruler.o [1]
+  .rodata            const    0x0008ddf8    0x30  ruler.o [1]
+  .rodata            const    0x0008de28    0x30  ruler.o [1]
+  .rodata            const    0x0008de58    0x30  ruler.o [1]
+  .rodata            const    0x0008de88    0x30  task_user_if.o [1]
+  .rodata            const    0x0008deb8    0x30  uif.o [1]
+  .rodata            const    0x0008dee8    0x2c  commands.o [1]
+  .rodata            const    0x0008df14    0x2c  dsp.o [1]
+  .rodata            const    0x0008df40    0x2c  i2c_gpio.o [1]
+  .rodata            const    0x0008df6c    0x2c  im501_comm.o [1]
+  .rodata            const    0x0008df98    0x2c  im501_comm.o [1]
+  .rodata            const    0x0008dfc4    0x2c  ruler.o [1]
+  .rodata            const    0x0008dff0    0x2c  spi.o [1]
+  .rodata            const    0x0008e01c    0x2c  spi.o [1]
+  .rodata            const    0x0008e048    0x2c  task_joy.o [1]
+  .rodata            const    0x0008e074    0x28  commands.o [1]
+  .rodata            const    0x0008e09c    0x28  dsp.o [1]
+  .rodata            const    0x0008e0c4    0x28  ruler.o [1]
+  .rodata            const    0x0008e0ec    0x28  ruler.o [1]
+  .rodata            const    0x0008e114    0x28  ruler.o [1]
+  .rodata            const    0x0008e13c    0x28  ruler.o [1]
+  .rodata            const    0x0008e164    0x28  task_shell.o [1]
+  .rodata            const    0x0008e18c    0x28  task_shell.o [1]
+  .rodata            const    0x0008e1b4    0x28  task_shell.o [1]
+  .rodata            const    0x0008e1dc    0x28  task_user_if.o [1]
+  .rodata            const    0x0008e204    0x28  uif.o [1]
+  .rodata            const    0x0008e22c    0x28  uif.o [1]
+  .text              ro code  0x0008e254    0x28  data_init.o [5]
+  .rodata            const    0x0008e27c    0x24  bsp.o [1]
+  .rodata            const    0x0008e2a0    0x24  commands.o [1]
+  .rodata            const    0x0008e2c4    0x24  commands.o [1]
+  .rodata            const    0x0008e2e8    0x24  dsp.o [1]
+  .rodata            const    0x0008e30c    0x24  dsp.o [1]
+  .rodata            const    0x0008e330    0x24  gpio.o [1]
+  .rodata            const    0x0008e354    0x24  i2c_gpio.o [1]
+  .rodata            const    0x0008e378    0x24  ruler.o [1]
+  .rodata            const    0x0008e39c    0x24  ruler.o [1]
+  .rodata            const    0x0008e3c0    0x24  ruler.o [1]
+  .rodata            const    0x0008e3e4    0x24  ruler.o [1]
+  .rodata            const    0x0008e408    0x24  ruler.o [1]
+  .rodata            const    0x0008e42c    0x24  ruler.o [1]
+  .rodata            const    0x0008e450    0x24  ruler.o [1]
+  .rodata            const    0x0008e474    0x24  task_joy.o [1]
+  .rodata            const    0x0008e498    0x24  uif.o [1]
+  .rodata            const    0x0008e4bc    0x24  uif.o [1]
+  .text              ro code  0x0008e4e0    0x24  app_vect.o [1]
+  .iar.init_table    const    0x0008e504    0x2c  - Linker created -
+  .rodata            const    0x0008e530    0x20  bsp.o [1]
+  .rodata            const    0x0008e550    0x20  commands.o [1]
+  .rodata            const    0x0008e570    0x20  commands.o [1]
+  .rodata            const    0x0008e590    0x20  commands.o [1]
+  .rodata            const    0x0008e5b0    0x20  commands.o [1]
+  .rodata            const    0x0008e5d0    0x20  commands.o [1]
+  .rodata            const    0x0008e5f0    0x20  dsp.o [1]
+  .rodata            const    0x0008e610    0x20  dsp.o [1]
+  .rodata            const    0x0008e630    0x20  im501_comm.o [1]
+  .rodata            const    0x0008e650    0x20  led.o [1]
+  .rodata            const    0x0008e670    0x20  ruler.o [1]
+  .rodata            const    0x0008e690    0x20  ruler.o [1]
+  .rodata            const    0x0008e6b0    0x20  ruler.o [1]
+  .rodata            const    0x0008e6d0    0x20  ruler.o [1]
+  .rodata            const    0x0008e6f0    0x20  ruler.o [1]
+  .rodata            const    0x0008e710    0x20  ruler.o [1]
+  .rodata            const    0x0008e730    0x20  task_shell.o [1]
+  .rodata            const    0x0008e750    0x20  uif.o [1]
+  .rodata            const    0x0008e770    0x20  uif.o [1]
+  .rodata            const    0x0008e790    0x20  uif.o [1]
+  .rodata            const    0x0008e7b0    0x20  uif.o [1]
+  .rodata            const    0x0008e7d0    0x1c  app.o [1]
+  .rodata            const    0x0008e7ec    0x1c  app.o [1]
+  .rodata            const    0x0008e808    0x1c  app.o [1]
+  .rodata            const    0x0008e824    0x1c  bsp.o [1]
+  .rodata            const    0x0008e840    0x1c  bsp.o [1]
+  .rodata            const    0x0008e85c    0x1c  commands.o [1]
+  .rodata            const    0x0008e878    0x1c  commands.o [1]
+  .rodata            const    0x0008e894    0x1c  commands.o [1]
+  .rodata            const    0x0008e8b0    0x1c  commands.o [1]
+  .rodata            const    0x0008e8cc    0x1c  commands.o [1]
+  .rodata            const    0x0008e8e8    0x1c  commands.o [1]
+  .rodata            const    0x0008e904    0x1c  commands.o [1]
+  .rodata            const    0x0008e920    0x1c  dsp.o [1]
+  .rodata            const    0x0008e93c    0x1c  dsp.o [1]
+  .rodata            const    0x0008e958    0x1c  gpio.o [1]
+  .rodata            const    0x0008e974    0x1c  im501_comm.o [1]
+  .rodata            const    0x0008e990    0x1c  im501_comm.o [1]
+  .rodata            const    0x0008e9ac    0x1c  ruler.o [1]
+  .rodata            const    0x0008e9c8    0x1c  ruler.o [1]
+  .rodata            const    0x0008e9e4    0x1c  ruler.o [1]
+  .rodata            const    0x0008ea00    0x1c  ruler.o [1]
+  .rodata            const    0x0008ea1c    0x1c  ruler.o [1]
+  .rodata            const    0x0008ea38    0x1c  ruler.o [1]
+  .rodata            const    0x0008ea54    0x1c  task_shell.o [1]
+  .rodata            const    0x0008ea70    0x1c  task_user_if.o [1]
+  .rodata            const    0x0008ea8c    0x1c  task_user_if.o [1]
+  .text              ro code  0x0008eaa8    0x1a  cmain.o [5]
+  .text              ro code  0x0008eac2     0x4  exit.o [3]
+  .rodata            const    0x0008eac6     0x2  os_dbg.o [1]
+  .text              ro code  0x0008eac8     0xa  cexit.o [5]
+  .rodata            const    0x0008ead2     0x2  os_dbg.o [1]
+  .rodata            const    0x0008ead4    0x18  app.o [1]
+  .rodata            const    0x0008eaec    0x18  app.o [1]
+  .rodata            const    0x0008eb04    0x18  app.o [1]
+  .rodata            const    0x0008eb1c    0x18  codec.o [1]
+  .rodata            const    0x0008eb34    0x18  commands.o [1]
+  .rodata            const    0x0008eb4c    0x18  commands.o [1]
+  .rodata            const    0x0008eb64    0x18  commands.o [1]
+  .rodata            const    0x0008eb7c    0x18  commands.o [1]
+  .rodata            const    0x0008eb94    0x18  commands.o [1]
+  .rodata            const    0x0008ebac    0x18  commands.o [1]
+  .rodata            const    0x0008ebc4    0x18  commands.o [1]
+  .rodata            const    0x0008ebdc    0x18  dsp.o [1]
+  .rodata            const    0x0008ebf4    0x18  ruler.o [1]
+  .rodata            const    0x0008ec0c    0x18  ruler.o [1]
+  .rodata            const    0x0008ec24    0x18  uif.o [1]
+  .rodata            const    0x0008ec3c    0x14  app.o [1]
+  .rodata            const    0x0008ec50    0x14  app.o [1]
+  .rodata            const    0x0008ec64    0x14  app.o [1]
+  .rodata            const    0x0008ec78    0x14  app.o [1]
+  .rodata            const    0x0008ec8c    0x14  app.o [1]
+  .rodata            const    0x0008eca0    0x14  app.o [1]
+  .rodata            const    0x0008ecb4    0x14  app.o [1]
+  .rodata            const    0x0008ecc8    0x14  app.o [1]
+  .rodata            const    0x0008ecdc    0x14  commands.o [1]
+  .rodata            const    0x0008ecf0    0x14  commands.o [1]
+  .rodata            const    0x0008ed04    0x14  commands.o [1]
+  .rodata            const    0x0008ed18    0x14  os_tmr.o [1]
+  .rodata            const    0x0008ed2c    0x14  os_tmr.o [1]
+  .rodata            const    0x0008ed40    0x14  ruler.o [1]
+  .rodata            const    0x0008ed54    0x14  ruler.o [1]
+  .rodata            const    0x0008ed68    0x14  ruler.o [1]
+  .rodata            const    0x0008ed7c    0x10  bsp.o [1]
+  .rodata            const    0x0008ed8c    0x10  codec.o [1]
+  .rodata            const    0x0008ed9c    0x10  commands.o [1]
+  .rodata            const    0x0008edac    0x10  dsp.o [1]
+  .rodata            const    0x0008edbc    0x10  dsp.o [1]
+  .rodata            const    0x0008edcc    0x10  dsp.o [1]
+  .rodata            const    0x0008eddc    0x10  noah_cmd.o [1]
+  .rodata            const    0x0008edec    0x10  os_core.o [1]
+  .rodata            const    0x0008edfc    0x10  os_core.o [1]
+  .rodata            const    0x0008ee0c    0x10  os_tmr.o [1]
+  .rodata            const    0x0008ee1c    0x10  ruler.o [1]
+  .rodata            const    0x0008ee2c    0x10  ruler.o [1]
+  .rodata            const    0x0008ee3c    0x10  ruler.o [1]
+  .rodata            const    0x0008ee4c    0x10  ruler.o [1]
+  .rodata            const    0x0008ee5c    0x10  ruler.o [1]
+  .rodata            const    0x0008ee6c    0x10  ruler.o [1]
+  .rodata            const    0x0008ee7c    0x10  ruler.o [1]
+  .rodata            const    0x0008ee8c    0x10  task_user_if.o [1]
+  .rodata            const    0x0008ee9c    0x10  twid.o [1]
+  .rodata            const    0x0008eeac     0xc  app.o [1]
+  .rodata            const    0x0008eeb8     0xc  app.o [1]
+  .rodata            const    0x0008eec4     0xc  app.o [1]
+  .rodata            const    0x0008eed0     0xc  app.o [1]
+  .rodata            const    0x0008eedc     0xc  app.o [1]
+  .rodata            const    0x0008eee8     0xc  app.o [1]
+  .rodata            const    0x0008eef4     0xc  bsp.o [1]
+  .rodata            const    0x0008ef00     0xc  bsp.o [1]
+  .rodata            const    0x0008ef0c     0xc  bsp.o [1]
+  .rodata            const    0x0008ef18     0xc  bsp.o [1]
+  .rodata            const    0x0008ef24     0xc  bsp.o [1]
+  .rodata            const    0x0008ef30     0xc  bsp.o [1]
+  .rodata            const    0x0008ef3c     0xc  commands.o [1]
+  .rodata            const    0x0008ef48     0xc  commands.o [1]
+  .rodata            const    0x0008ef54     0xc  commands.o [1]
+  .rodata            const    0x0008ef60     0xc  commands.o [1]
+  .rodata            const    0x0008ef6c     0xc  commands.o [1]
+  .rodata            const    0x0008ef78     0xc  ruler.o [1]
+  .rodata            const    0x0008ef84     0xc  ruler.o [1]
+  .rodata            const    0x0008ef90     0xc  task_user_if.o [1]
+  .rodata            const    0x0008ef9c     0xc  timer.o [1]
+  .rodata            const    0x0008efa8     0xc  uart.o [1]
+  .rodata            const    0x0008efb4     0xc  uart.o [1]
+  .rodata            const    0x0008efc0     0xc  uart.o [1]
+  .rodata            const    0x0008efcc     0xc  uart.o [1]
+  .rodata            const    0x0008efd8     0xc  uart.o [1]
+  .rodata            const    0x0008efe4     0xc  uart.o [1]
+  .rodata            const    0x0008eff0     0xc  uart.o [1]
+  .rodata            const    0x0008effc     0xc  uart.o [1]
+  .rodata            const    0x0008f008     0xc  uart.o [1]
+  .rodata            const    0x0008f014     0xc  Xmodem.o [1]
+  .text              ro code  0x0008f020     0xc  cstartup_M.o [5]
+  .rodata            const    0x0008f02c     0x8  app.o [1]
+  .rodata            const    0x0008f034     0x8  app.o [1]
+  .rodata            const    0x0008f03c     0x8  app.o [1]
+  .rodata            const    0x0008f044     0x8  bsp.o [1]
+  .rodata            const    0x0008f04c     0x8  bsp.o [1]
+  .rodata            const    0x0008f054     0x8  bsp.o [1]
+  .rodata            const    0x0008f05c     0x8  bsp.o [1]
+  .rodata            const    0x0008f064     0x8  bsp.o [1]
+  .rodata            const    0x0008f06c     0x8  bsp.o [1]
+  .rodata            const    0x0008f074     0x8  bsp.o [1]
+  .rodata            const    0x0008f07c     0x8  bsp.o [1]
+  .rodata            const    0x0008f084     0x8  bsp.o [1]
+  .rodata            const    0x0008f08c     0x8  bsp.o [1]
+  .rodata            const    0x0008f094     0x8  bsp.o [1]
+  .rodata            const    0x0008f09c     0x8  bsp.o [1]
+  .rodata            const    0x0008f0a4     0x8  bsp.o [1]
+  .rodata            const    0x0008f0ac     0x8  commands.o [1]
+  .rodata            const    0x0008f0b4     0x8  commands.o [1]
+  .rodata            const    0x0008f0bc     0x8  commands.o [1]
+  .rodata            const    0x0008f0c4     0x8  commands.o [1]
+  .rodata            const    0x0008f0cc     0x8  commands.o [1]
+  .rodata            const    0x0008f0d4     0x8  commands.o [1]
+  .rodata            const    0x0008f0dc     0x8  commands.o [1]
+  .rodata            const    0x0008f0e4     0x8  commands.o [1]
+  .rodata            const    0x0008f0ec     0x8  commands.o [1]
+  .rodata            const    0x0008f0f4     0x8  commands.o [1]
+  .rodata            const    0x0008f0fc     0x8  commands.o [1]
+  .rodata            const    0x0008f104     0x8  commands.o [1]
+  .rodata            const    0x0008f10c     0x8  commands.o [1]
+  .rodata            const    0x0008f114     0x8  commands.o [1]
+  .rodata            const    0x0008f11c     0x8  mem_basic.o [1]
+  .rodata            const    0x0008f124     0x8  mem_basic.o [1]
+  .rodata            const    0x0008f12c     0x8  mem_basic.o [1]
+  .rodata            const    0x0008f134     0x8  mem_basic.o [1]
+  .rodata            const    0x0008f13c     0x8  mem_basic.o [1]
+  .rodata            const    0x0008f144     0x8  mem_basic.o [1]
+  .rodata            const    0x0008f14c     0x8  mem_basic.o [1]
+  .rodata            const    0x0008f154     0x8  mem_basic.o [1]
+  .rodata            const    0x0008f15c     0x8  mem_basic.o [1]
+  .rodata            const    0x0008f164     0x8  mem_basic.o [1]
+  .rodata            const    0x0008f16c     0x8  ruler.o [1]
+  .rodata            const    0x0008f174     0x8  ruler.o [1]
+  .rodata            const    0x0008f17c     0x8  spi.o [1]
+  .rodata            const    0x0008f184     0x8  task_user_if.o [1]
+  .rodata            const    0x0008f18c     0x8  Xmodem.o [1]
+  .rodata            const    0x0008f194     0x8  Xmodem.o [1]
+  .rodata            const    0x0008f19c     0x4  gpio.o [1]
+  .rodata            const    0x0008f1a0     0x4  led.o [1]
+  .rodata            const    0x0008f1a4     0x4  mem_basic.o [1]
+  .rodata            const    0x0008f1a8     0x4  mem_basic.o [1]
+  .rodata            const    0x0008f1ac     0x4  os_dbg.o [1]
+  .rodata            const    0x0008f1b0     0x4  ruler.o [1]
+  .rodata            const    0x0008f1b4     0x4  ruler.o [1]
+  .rodata            const    0x0008f1b8     0x4  ruler.o [1]
+  .rodata            const    0x0008f1bc     0x4  uart.o [1]
+  .rodata            const    0x0008f1c0     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1c2     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1c4     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1c6     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1c8     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1ca     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1cc     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1ce     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1d0     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1d2     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1d4     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1d6     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1d8     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1da     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1dc     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1de     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1e0     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1e2     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1e4     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1e6     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1e8     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1ea     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1ec     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1ee     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1f0     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1f2     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1f4     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1f6     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1f8     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1fa     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1fc     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f1fe     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f200     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f202     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f204     0x2  os_dbg.o [1]
+  .rodata            const    0x0008f206     0x2  ruler.o [1]
+  .rodata            const    0x0008f208     0x0  zero_init3.o [5]
+  .rodata            const    0x0008f208     0x0  lz77_init.o [5]
+  Initializer bytes  ro data  0x0008f208   0x40e  <for P2 s0>
+                            - 0x0008f616  0xf55a
+
+"P2", part 1 of 3:                         0x888
+  P2 s0                       0x20078000   0x886  <Init block>
+    .data            inited   0x20078000   0x260  gpio.o [1]
+    .data            inited   0x20078260   0x24c  codec.o [1]
+    .data            inited   0x200784ac   0x12c  dsp.o [1]
+    .data            inited   0x200785d8    0xfc  dsp.o [1]
+    .textrw          inited   0x200786d4    0xac  gpio.o [1]
+    .textrw          inited   0x20078780    0x5c  timer.o [1]
+    .data            inited   0x200787dc    0x54  codec.o [1]
+    .data            inited   0x20078830    0x20  bsp.o [1]
+    .textrw          inited   0x20078850    0x14  kfifo.o [1]
+    .data            inited   0x20078864     0xc  timer.o [1]
+    .data            inited   0x20078870     0x8  codec.o [1]
+    .data            inited   0x20078878     0x4  spi.o [1]
+    .data            inited   0x2007887c     0x4  timer.o [1]
+    .data            inited   0x20078880     0x1  dsp.o [1]
+    .data            inited   0x20078881     0x1  i2c_gpio.o [1]
+    .data            inited   0x20078882     0x1  i2c_gpio.o [1]
+    .data            inited   0x20078883     0x1  i2c_gpio.o [1]
+    .data            inited   0x20078884     0x1  mem_basic.o [1]
+    .data            inited   0x20078885     0x1  task_user_if.o [1]
+                            - 0x20078886   0x886
+
+"P2", part 2 of 3:                        0x7970
+  .bss               zero     0x20078888  0x2800  task_uart_tx.o [1]
+  .bss               zero     0x2007b088  0x1000  task_debug_info.o [1]
+  .bss               zero     0x2007c088   0x7f8  uif.o [1]
+  .bss               zero     0x2007c880   0x5d8  os_core.o [1]
+  .bss               zero     0x2007ce58   0x400  app.o [1]
+  .bss               zero     0x2007d258   0x400  app.o [1]
+  .bss               zero     0x2007d658   0x400  app.o [1]
+  .bss               zero     0x2007da58   0x400  uart.o [1]
+  .bss               zero     0x2007de58   0x400  uart.o [1]
+  .bss               zero     0x2007e258   0x280  os_core.o [1]
+  .bss               zero     0x2007e4d8   0x258  os_core.o [1]
+  .bss               zero     0x2007e730   0x200  app.o [1]
+  .bss               zero     0x2007e930   0x200  app.o [1]
+  .bss               zero     0x2007eb30   0x200  app.o [1]
+  .bss               zero     0x2007ed30   0x200  app.o [1]
+  .bss               zero     0x2007ef30   0x200  app.o [1]
+  .bss               zero     0x2007f130   0x200  os_core.o [1]
+  .bss               zero     0x2007f330   0x200  os_core.o [1]
+  .bss               zero     0x2007f530   0x200  os_core.o [1]
+  .bss               zero     0x2007f730   0x200  task_uart_rx.o [1]
+  .bss               zero     0x2007f930   0x140  commands.o [1]
+  .bss               zero     0x2007fa70   0x100  flashd_eefc.o [1]
+  .bss               zero     0x2007fb70   0x100  os_core.o [1]
+  .bss               zero     0x2007fc70    0x90  os_core.o [1]
+  .bss               zero     0x2007fd00    0x78  bsp_int.o [1]
+  .bss               zero     0x2007fd78    0x54  bsp.o [1]
+  .bss               zero     0x2007fdcc    0x50  os_core.o [1]
+  .bss               zero     0x2007fe1c    0x40  os_core.o [1]
+  .bss               zero     0x2007fe5c    0x40  uart.o [1]
+  .bss               zero     0x2007fe9c    0x40  uart.o [1]
+  .bss               zero     0x2007fedc    0x30  uart.o [1]
+  .bss               zero     0x2007ff0c    0x30  uart.o [1]
+  .bss               zero     0x2007ff3c    0x20  uart.o [1]
+  .bss               zero     0x2007ff5c    0x20  uart.o [1]
+  .bss               zero     0x2007ff7c    0x20  uart.o [1]
+  .bss               zero     0x2007ff9c    0x20  uart.o [1]
+  .bss               zero     0x2007ffbc    0x20  uart.o [1]
+  .bss               zero     0x2007ffdc    0x20  uart.o [1]
+  .bss               zero     0x2007fffc    0x20  uif.o [1]
+  .bss               zero     0x2008001c    0x1c  os_core.o [1]
+  .bss               zero     0x20080038    0x14  task_cmd_parse.o [1]
+  .bss               zero     0x2008004c    0x14  task_uart_tx.o [1]
+  .bss               zero     0x20080060    0x14  task_uart_tx.o [1]
+  .bss               zero     0x20080074    0x14  task_uart_tx_ruler.o [1]
+  .bss               zero     0x20080088    0x14  task_uart_tx_ruler.o [1]
+  .bss               zero     0x2008009c    0x10  cpu_core.o [1]
+  .bss               zero     0x200800ac    0x10  ruler.o [1]
+  .bss               zero     0x200800bc    0x10  task_debug_info.o [1]
+  .bss               zero     0x200800cc     0xc  ruler.o [1]
+  .bss               zero     0x200800d8     0xc  ruler.o [1]
+  .bss               zero     0x200800e4     0xc  uart.o [1]
+  .bss               zero     0x200800f0     0x8  os_core.o [1]
+  .bss               zero     0x200800f8     0x8  twid.o [1]
+  .bss               zero     0x20080100     0x4  bsp.o [1]
+  .bss               zero     0x20080104     0x4  bsp.o [1]
+  .bss               zero     0x20080108     0x4  codec.o [1]
+  .bss               zero     0x2008010c     0x4  gpio.o [1]
+  .bss               zero     0x20080110     0x4  lib_math.o [1]
+  .bss               zero     0x20080114     0x4  os_core.o [1]
+  .bss               zero     0x20080118     0x4  os_core.o [1]
+  .bss               zero     0x2008011c     0x4  os_core.o [1]
+  .bss               zero     0x20080120     0x4  os_core.o [1]
+  .bss               zero     0x20080124     0x4  os_core.o [1]
+  .bss               zero     0x20080128     0x4  os_core.o [1]
+  .bss               zero     0x2008012c     0x4  os_core.o [1]
+  .bss               zero     0x20080130     0x4  os_core.o [1]
+  .bss               zero     0x20080134     0x4  os_core.o [1]
+  .bss               zero     0x20080138     0x4  os_core.o [1]
+  .bss               zero     0x2008013c     0x4  os_core.o [1]
+  .bss               zero     0x20080140     0x4  os_core.o [1]
+  .bss               zero     0x20080144     0x4  os_core.o [1]
+  .bss               zero     0x20080148     0x4  os_core.o [1]
+  .bss               zero     0x2008014c     0x4  os_core.o [1]
+  .bss               zero     0x20080150     0x4  os_core.o [1]
+  .bss               zero     0x20080154     0x4  os_core.o [1]
+  .bss               zero     0x20080158     0x4  ruler.o [1]
+  .bss               zero     0x2008015c     0x4  ruler.o [1]
+  .bss               zero     0x20080160     0x4  ruler.o [1]
+  .bss               zero     0x20080164     0x4  spi.o [1]
+  .bss               zero     0x20080168     0x4  spi.o [1]
+  .bss               zero     0x2008016c     0x4  spi.o [1]
+  .bss               zero     0x20080170     0x4  task_cmd_parse.o [1]
+  .bss               zero     0x20080174     0x4  task_noah.o [1]
+  .bss               zero     0x20080178     0x4  task_noah_ruler.o [1]
+  .bss               zero     0x2008017c     0x4  task_noah_ruler.o [1]
+  .bss               zero     0x20080180     0x4  task_noah_ruler.o [1]
+  .bss               zero     0x20080184     0x4  task_noah_ruler.o [1]
+  .bss               zero     0x20080188     0x4  task_noah_ruler.o [1]
+  .bss               zero     0x2008018c     0x4  task_noah_ruler.o [1]
+  .bss               zero     0x20080190     0x4  task_noah_ruler.o [1]
+  .bss               zero     0x20080194     0x4  task_noah_ruler.o [1]
+  .bss               zero     0x20080198     0x4  task_uart_tx.o [1]
+  .bss               zero     0x2008019c     0x4  task_uart_tx.o [1]
+  .bss               zero     0x200801a0     0x4  task_uart_tx.o [1]
+  .bss               zero     0x200801a4     0x4  task_uart_tx.o [1]
+  .bss               zero     0x200801a8     0x4  task_uart_tx_ruler.o [1]
+  .bss               zero     0x200801ac     0x4  task_uart_tx_ruler.o [1]
+  .bss               zero     0x200801b0     0x4  task_uart_tx_ruler.o [1]
+  .bss               zero     0x200801b4     0x4  task_user_if.o [1]
+  .bss               zero     0x200801b8     0x4  twid.o [1]
+  .bss               zero     0x200801bc     0x4  twid.o [1]
+  .bss               zero     0x200801c0     0x4  uart.o [1]
+  .bss               zero     0x200801c4     0x4  uart.o [1]
+  .bss               zero     0x200801c8     0x4  uart.o [1]
+  .bss               zero     0x200801cc     0x4  uart.o [1]
+  .bss               zero     0x200801d0     0x2  dsp.o [1]
+  .bss               zero     0x200801d2     0x2  os_core.o [1]
+  .bss               zero     0x200801d4     0x2  os_core.o [1]
+  .bss               zero     0x200801d6     0x2  os_cpu_c.o [1]
+  .bss               zero     0x200801d8     0x2  task_debug_info.o [1]
+  .bss               zero     0x200801da     0x2  task_debug_info.o [1]
+  .bss               zero     0x200801dc     0x1  bsp.o [1]
+  .bss               zero     0x200801dd     0x1  bsp.o [1]
+  .bss               zero     0x200801de     0x1  codec.o [1]
+  .bss               zero     0x200801df     0x1  dsp.o [1]
+  .bss               zero     0x200801e0     0x1  dsp.o [1]
+  .bss               zero     0x200801e1     0x1  dsp.o [1]
+  .bss               zero     0x200801e2     0x1  dsp.o [1]
+  .bss               zero     0x200801e3     0x1  gpio.o [1]
+  .bss               zero     0x200801e4     0x1  led.o [1]
+  .bss               zero     0x200801e5     0x1  os_core.o [1]
+  .bss               zero     0x200801e6     0x1  os_core.o [1]
+  .bss               zero     0x200801e7     0x1  os_core.o [1]
+  .bss               zero     0x200801e8     0x1  os_core.o [1]
+  .bss               zero     0x200801e9     0x1  os_core.o [1]
+  .bss               zero     0x200801ea     0x1  os_core.o [1]
+  .bss               zero     0x200801eb     0x1  os_core.o [1]
+  .bss               zero     0x200801ec     0x1  os_core.o [1]
+  .bss               zero     0x200801ed     0x1  os_core.o [1]
+  .bss               zero     0x200801ee     0x1  ruler.o [1]
+  .bss               zero     0x200801ef     0x1  ruler.o [1]
+  .bss               zero     0x200801f0     0x1  ruler.o [1]
+  .bss               zero     0x200801f1     0x1  task_uart_rx.o [1]
+  .bss               zero     0x200801f2     0x1  twid.o [1]
+  .bss               zero     0x200801f3     0x1  uart.o [1]
+                            - 0x200801f4  0x796c
+
+"P2", part 3 of 3:                         0x3e8
+  CSTACK                      0x200801f8   0x3e8  <Block>
+    CSTACK           uninit   0x200801f8   0x3e8  <Block tail>
+                            - 0x200805e0   0x3e8
+
+
+*******************************************************************************
+*** INIT TABLE
+***
+
+          Address     Size
+          -------     ----
+Zero (__iar_zero_init3)
+    1 destination range, total size 0x796c:
+          0x20078888  0x796c
+
+Copy/lz77 (__iar_lz77_init3)
+    1 source range, total size 0x40e (47% of destination):
+          0x0008f208   0x40e
+    1 destination range, total size 0x886:
+          0x20078000   0x886
+
+
+
+*******************************************************************************
+*** MODULE SUMMARY
+***
+
+    Module                 ro code  rw code  ro data  rw data
+    ------                 -------  -------  -------  -------
+E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj: [1]
+    Xmodem.o                   632                28
+    app.o                    1 132               412    5 632
+    app_vect.o                  36               188
+    bsp.o                    2 856             2 487      126
+    bsp_gpio.o                 236
+    bsp_int.o                  422                        120
+    bsp_os.o                    26
+    bsp_pmc.o                  272
+    codec.o                    812               363      685
+    commands.o               2 832             1 908      320
+    cpu_a.o                     42
+    cpu_c.o                    292
+    cpu_core.o                 108                         16
+    dma.o                       92
+    dmad.o                      56
+    dsp.o                    2 140               767      559
+    eefc.o                     198
+    emb.o                    1 430
+    flashd_eefc.o              260                        256
+    gpio.o                     704      172      503      613
+    i2c_gpio.o               1 292                82        3
+    im501_comm.o               504               176
+    kfifo.o                    188       20        9
+    led.o                      252               100        1
+    lib_ascii.o                232
+    lib_math.o                  40                          4
+    lib_mem.o                  148
+    lib_str.o                1 248               148
+    math.o                      30
+    mem_basic.o              1 856                88        1
+    noah_cmd.o               2 732                64
+    nvic.o                     256
+    os_core.o                2 604               288    4 933
+    os_cpu_a.o                 160
+    os_cpu_c.o                 340                          2
+    os_dbg.o                   460               112
+    os_flag.o                  134
+    os_mbox.o                  494
+    os_mem.o                   464
+    os_q.o                   1 028
+    os_sem.o                   794
+    os_task.o                1 240
+    os_time.o                  120
+    os_tmr.o                   640                56
+    pio.o                      434
+    queue.o                    362
+    ruler.o                  3 112             1 778       55
+    spi.o                    1 124               226       16
+    task_cmd_parse.o            92                         24
+    task_debug_info.o          184                      4 116
+    task_joy.o                 376                80
+    task_noah.o                                             4
+    task_noah_ruler.o                                      32
+    task_shell.o               480               232
+    task_uart_rx.o             180                        513
+    task_uart_tx.o             132                     10 296
+    task_uart_tx_ruler.o                                   52
+    task_user_if.o             404               253        5
+    timer.o                    248       92       64       16
+    twi.o                      242
+    twid.o                     900                80       17
+    uart.o                   2 248               336    2 493
+    uif.o                    2 148               548    2 072
+    ---------------------------------------------------------
+    Total:                  44 500      284   11 376   32 982
+
+command line: [2]
+    ---------------------------------------------------------
+    Total:
+
+dl7M_tln.a: [3]
+    abort.o                      6
+    div.o                       14
+    exit.o                       4
+    memcpy.o                    12
+    memset.o                    20
+    strcat.o                    28
+    vsprintf.o                  44
+    xprintffull_nomb.o       3 462
+    xsprout.o                   10
+    ---------------------------------------------------------
+    Total:                   3 600
+
+m7M_tl.a: [4]
+    DblAdd.o                   212
+    DblCmpGe.o                  46
+    DblCmpLe.o                  46
+    DblDiv.o                   582
+    DblMul.o                   418
+    DblSub.o                   384
+    DblToI32.o                  88
+    I32ToDbl.o                  48
+    xdnorm.o                    66
+    xdscale.o                  268
+    ---------------------------------------------------------
+    Total:                   2 158
+
+rt7M_tl.a: [5]
+    ABImemcpy_unaligned.o      118
+    ABImemset.o                102
+    I64DivMod.o                238
+    I64DivZer.o                  2
+    XXexit.o                    12
+    cexit.o                     10
+    cmain.o                     26
+    cstartup_M.o                12
+    data_init.o                 40
+    lz77_init.o                454
+    memchr.o                    88
+    strchr.o                    22
+    strcpy_unaligned.o          68
+    strlen.o                    54
+    zero_init3.o                34
+    ---------------------------------------------------------
+    Total:                   1 280
+
+    Linker created              40                44    1 000
+-------------------------------------------------------------
+    Grand Total:            51 578      284   11 420   33 982
+
+
+*******************************************************************************
+*** ENTRY LIST
+***
+
+Entry                      Address    Size  Type      Object
+-----                      -------    ----  ----      ------
+.vectors$$Base          0x00080000           --   Gb  - Linker created -
+.vectors$$Limit         0x000800bc           --   Gb  - Linker created -
+?main                   0x0008eaa9          Code  Gb  cmain.o [5]
+AB_POST                 0x000823cd    0xd0  Code  Gb  ruler.o [1]
+ACK_Sem_PCUART          0x20080174     0x4  Data  Gb  task_noah.o [1]
+ACK_Sem_RulerUART       0x2008017c     0x4  Data  Gb  task_noah_ruler.o [1]
+ASCII_IsAlphaNum        0x0008bc99    0x58  Code  Gb  lib_ascii.o [1]
+ASCII_IsDig             0x0008bd09    0x18  Code  Gb  lib_ascii.o [1]
+ASCII_IsDigHex          0x0008bd21    0x30  Code  Gb  lib_ascii.o [1]
+ASCII_IsLower           0x0008bcf1    0x18  Code  Gb  lib_ascii.o [1]
+ASCII_IsSpace           0x0008bd51    0x30  Code  Gb  lib_ascii.o [1]
+AT91_TC_Init            0x00087b01    0xcc  Code  Gb  timer.o [1]
+App_BufferCreate        0x0008be25    0x2c  Code  Gb  app.o [1]
+App_BusFault_ISR        0x0008e4fd     0x2  Code  Lc  app_vect.o [1]
+App_EventCreate         0x0008be51   0x156  Code  Lc  app.o [1]
+App_Fault_ISR           0x0008e4fb     0x2  Code  Lc  app_vect.o [1]
+App_MemFault_ISR        0x0008e501     0x2  Code  Lc  app_vect.o [1]
+App_NMI_ISR             0x0008e4f9     0x2  Code  Lc  app_vect.o [1]
+App_Spurious_ISR        0x0008e503     0x2  Code  Lc  app_vect.o [1]
+App_TaskCMDParse        0x0008d0c9    0x5c  Code  Gb  task_cmd_parse.o [1]
+App_TaskCMDParseStk     0x2007d658   0x400  Data  Lc  app.o [1]
+App_TaskCreate          0x0008bfa7   0x134  Code  Lc  app.o [1]
+App_TaskDebugInfo       0x00087c25    0x72  Code  Gb  task_debug_info.o [1]
+App_TaskDebugInfoStk    0x2007ef30   0x200  Data  Lc  app.o [1]
+App_TaskGenieShell      0x0008c315   0x1e0  Code  Gb  task_shell.o [1]
+App_TaskGenieShellStk   0x2007d258   0x400  Data  Lc  app.o [1]
+App_TaskJoy             0x0008c6cd   0x178  Code  Gb  task_joy.o [1]
+App_TaskJoyStk          0x2007e930   0x200  Data  Lc  app.o [1]
+App_TaskStart           0x0008bddd    0x48  Code  Lc  app.o [1]
+App_TaskStartStk        0x2007e730   0x200  Data  Lc  app.o [1]
+App_TaskUART_Rx         0x0008c945    0xb4  Code  Gb  task_uart_rx.o [1]
+App_TaskUART_RxStk      0x2007eb30   0x200  Data  Lc  app.o [1]
+App_TaskUART_Tx         0x0008cdbd    0x84  Code  Gb  task_uart_tx.o [1]
+App_TaskUART_TxStk      0x2007ed30   0x200  Data  Lc  app.o [1]
+App_TaskUserIF          0x00086011   0x14e  Code  Gb  task_user_if.o [1]
+App_TaskUserIF_Stk      0x2007ce58   0x400  Data  Lc  app.o [1]
+App_UsageFault_ISR      0x0008e4ff     0x2  Code  Lc  app_vect.o [1]
+App_UserIF_Mbox         0x200801b4     0x4  Data  Gb  task_user_if.o [1]
+Audio_Version           0x200800cc     0xc  Data  Gb  ruler.o [1]
+BCLK_SOURCE             0x20078870     0x8  Data  Gb  codec.o [1]
+BSP_BP_Init             0x00082bc9     0x2  Code  Lc  bsp.o [1]
+BSP_CPU_ClkFreq         0x00082c6d    0x50  Code  Gb  bsp.o [1]
+BSP_ClkInit             0x00082a0f   0x140  Code  Lc  bsp.o [1]
+BSP_GPIO_Cfg            0x00087101    0xa8  Code  Gb  bsp_gpio.o [1]
+BSP_GPIO_Set            0x000871a9    0x36  Code  Gb  bsp_gpio.o [1]
+BSP_Init                0x00082c13    0x5a  Code  Gb  bsp.o [1]
+BSP_IntEn               0x00086f59    0x14  Code  Gb  bsp_int.o [1]
+BSP_IntHandler          0x000870c9    0x30  Code  Lc  bsp_int.o [1]
+BSP_IntHandlerAD12B     0x000870a1     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerADC       0x000870ab     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerDMAC      0x000870b5     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerDummy     0x000870fd     0x2  Code  Lc  bsp_int.o [1]
+BSP_IntHandlerEEFC0     0x00086fe3     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerEEFC1     0x00086fed     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerHSMCI     0x00087047     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerPIOA      0x0008700b     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerPIOB      0x00087015     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerPIOC      0x0008701f     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerPMC       0x00086fd9     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerPWM       0x00087097     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerRSTC      0x00086fb1     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerRTC       0x00086fbb     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerRTT       0x00086fc5     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerSMC       0x00087001     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerSPI0      0x00087065     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerSSC0      0x0008706f     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerSUPC      0x00086fa7     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerTC0       0x00087079     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerTC1       0x00087083     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerTC2       0x0008708d     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerTWI0      0x00087051     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerTWI1      0x0008705b     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerUART      0x00086ff7     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerUDPHS     0x000870bf     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerUS0       0x00087029     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerUS1       0x00087033     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerUS2       0x0008703d     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntHandlerWDT       0x00086fcf     0xa  Code  Gb  bsp_int.o [1]
+BSP_IntInit             0x00086f8d    0x1a  Code  Gb  bsp_int.o [1]
+BSP_IntVectSet          0x00086f6d    0x20  Code  Gb  bsp_int.o [1]
+BSP_IntVectTbl          0x2007fd00    0x78  Data  Lc  bsp_int.o [1]
+BSP_LED_Init            0x00082b67    0x1a  Code  Lc  bsp.o [1]
+BSP_LED_Off             0x00082b81    0x32  Code  Gb  bsp.o [1]
+BSP_LowLevelInit        0x000829a5    0x6a  Code  Gb  bsp.o [1]
+BSP_OS_TmrTickInit      0x000872ed    0x1a  Code  Gb  bsp_os.o [1]
+BSP_PB_Init             0x00082bb3    0x16  Code  Lc  bsp.o [1]
+BSP_PLL_GetFreq         0x00082cbd    0x34  Code  Gb  bsp.o [1]
+BSP_PMC_MainOscFreqGet  0x00086ee3    0x3c  Code  Lc  bsp_pmc.o [1]
+BSP_PMC_SlowOscFreqGet  0x00086f1f    0x26  Code  Lc  bsp_pmc.o [1]
+BSP_PerClkEn            0x00086e49    0x16  Code  Gb  bsp_pmc.o [1]
+BSP_PostInit            0x00082b5f     0x8  Code  Gb  bsp.o [1]
+BSP_PreInit             0x00082b4f    0x10  Code  Gb  bsp.o [1]
+BSP_ResetInit           0x00082be5    0x2e  Code  Lc  bsp.o [1]
+BSP_Reset_ISR_Handler   0x00082bcb    0x1a  Code  Lc  bsp.o [1]
+BSP_Ser_Init            0x00082cf1    0xd2  Code  Gb  bsp.o [1]
+BSP_Ser_Printf          0x00082e89    0x24  Code  Gb  bsp.o [1]
+BSP_Ser_RdByte          0x00082e1d    0x6c  Code  Gb  bsp.o [1]
+BSP_Ser_WrByte          0x00082dc3    0x5a  Code  Gb  bsp.o [1]
+BSP_Ser_WrStr_To_Buffer
+                        0x00087c97    0x36  Code  Gb  task_debug_info.o [1]
+BSP_SysClkFreqGet       0x00086e5f    0x84  Code  Gb  bsp_pmc.o [1]
+BUZZER_MUTE             0x200801e4     0x1  Data  Gb  led.o [1]
+Beep                    0x00082ead    0x46  Code  Gb  bsp.o [1]
+Bsp_Ser_Rx_Sem_lock     0x20080104     0x4  Data  Gb  bsp.o [1]
+Bsp_Ser_Tx_Sem_lock     0x20080100     0x4  Data  Gb  bsp.o [1]
+Buzzer_OnOff            0x00085d69    0x22  Code  Gb  led.o [1]
+Buzzer_Toggle           0x00085d8b    0x24  Code  Gb  led.o [1]
+CM_LegacyRead           0x00088301    0xfc  Code  Gb  mem_basic.o [1]
+CM_SingleWrite          0x00088061    0x56  Code  Gb  mem_basic.o [1]
+CODEC_PARA_TABLE        0x20078260   0x24c  Data  Gb  codec.o [1]
+CPU_CntLeadZeros        0x0008a5f7          Code  Gb  cpu_a.o [1]
+CPU_Init                0x0008c1ed     0x8  Code  Gb  cpu_core.o [1]
+CPU_IntDis              0x0008a5e1          Code  Gb  cpu_a.o [1]
+CPU_IntEn               0x0008a5e5          Code  Gb  cpu_a.o [1]
+CPU_IntSrcEn            0x0008a4bd   0x114  Code  Gb  cpu_c.o [1]
+CPU_Name                0x2008009c    0x10  Data  Gb  cpu_core.o [1]
+CPU_NameClr             0x0008c1f5    0x1a  Code  Gb  cpu_core.o [1]
+CPU_NameInit            0x0008c251     0x8  Code  Lc  cpu_core.o [1]
+CPU_NameSet             0x0008c20f    0x3e  Code  Gb  cpu_core.o [1]
+CPU_RevBits             0x0008a5fd          Code  Gb  cpu_a.o [1]
+CPU_SR_Restore          0x0008a5f1          Code  Gb  cpu_a.o [1]
+CPU_SR_Save             0x0008a5e9          Code  Gb  cpu_a.o [1]
+CPU_WaitForExcept       0x0008a607          Code  Gb  cpu_a.o [1]
+CPU_WaitForInt          0x0008a603          Code  Gb  cpu_a.o [1]
+CSTACK$$Base            0x200801f8           --   Gb  - Linker created -
+CSTACK$$Limit           0x200805e0           --   Gb  - Linker created -
+CS_GPIO_Init            0x0008ac79    0x1c  Code  Gb  i2c_gpio.o [1]
+CS_GPIO_Write           0x0008abf3    0x86  Code  Gb  i2c_gpio.o [1]
+Check_SR_Support        0x00083925    0x20  Code  Gb  codec.o [1]
+Check_UART_Mixer_Ready  0x0008195b    0x62  Code  Gb  ruler.o [1]
+Clear_AT91C_SPI_CSAAT   0x000876db    0x18  Code  Gb  spi.o [1]
+Codec_Write             0x00083639    0x2c  Code  Gb  codec.o [1]
+CommandParse            0x0008b5b9    0xf2  Code  Gb  commands.o [1]
+Config_Lin              0x0008459d    0x7a  Code  Lc  dsp.o [1]
+Config_SP0_Out          0x00084617    0x72  Code  Lc  dsp.o [1]
+Config_SPx_Format       0x00084689    0x5e  Code  Lc  dsp.o [1]
+Config_SR               0x000846e7    0xb0  Code  Lc  dsp.o [1]
+DBGU_Configure          0x00084189    0x4a  Code  Gb  uart.o [1]
+DBGU_Rx_Sem_lock        0x200801c4     0x4  Data  Gb  uart.o [1]
+DBGU_Tx_Sem_lock        0x200801c0     0x4  Data  Gb  uart.o [1]
+DBG_UART_Send_Buffer    0x2007b088  0x1000  Data  Gb  task_debug_info.o [1]
+DBG_UART_Send_kFIFO     0x200800bc    0x10  Data  Gb  task_debug_info.o [1]
+DMAD_Initialize         0x0008a75d    0x34  Code  Gb  dmad.o [1]
+DMA_Disable             0x0008a709     0xa  Code  Gb  dma.o [1]
+DMA_DisableChannel      0x0008a729    0x14  Code  Gb  dma.o [1]
+DMA_DisableIt           0x0008a713     0x6  Code  Gb  dma.o [1]
+DMA_Enable              0x0008a701     0x8  Code  Gb  dma.o [1]
+DMA_EnableChannel       0x0008a71f     0xa  Code  Gb  dma.o [1]
+DMA_GetChannelStatus    0x0008a73d     0x6  Code  Gb  dma.o [1]
+DMA_GetStatus           0x0008a719     0x6  Code  Gb  dma.o [1]
+DMIC_PGA_Control        0x0008450b    0x92  Code  Gb  dsp.o [1]
+DM_LegacyRead           0x000880b7    0xf8  Code  Gb  mem_basic.o [1]
+DM_SingleWrite          0x00087fa1    0x54  Code  Gb  mem_basic.o [1]
+DM_Write                0x00087f4d    0x16  Code  Gb  mem_basic.o [1]
+DSP_LegacyRead          0x00088575    0xe4  Code  Gb  mem_basic.o [1]
+DSP_PM_Type             0x20078884     0x1  Data  Gb  mem_basic.o [1]
+DSP_SingleWrite_1       0x000884eb    0x40  Code  Gb  mem_basic.o [1]
+DSP_SingleWrite_2       0x0008852b    0x4a  Code  Gb  mem_basic.o [1]
+Debug_COM_Sel           0x200801dc     0x1  Data  Gb  bsp.o [1]
+Done_Sem_RulerUART      0x20080180     0x4  Data  Gb  task_noah_ruler.o [1]
+EFC_ComputeAddress      0x000896d7    0x36  Code  Gb  eefc.o [1]
+EFC_DisableFrdyIt       0x00089675     0xa  Code  Gb  eefc.o [1]
+EFC_PerformCommand      0x00089719    0x22  Code  Gb  eefc.o [1]
+EFC_TranslateAddress    0x0008967f    0x58  Code  Gb  eefc.o [1]
+EMB_Data_Build          0x0008549d   0x162  Code  Gb  noah_cmd.o [1]
+EMB_Data_Parse          0x000855ff   0x596  Code  Gb  noah_cmd.o [1]
+EVENT_MsgQ_Noah2CMDParse
+                        0x20080170     0x4  Data  Gb  task_cmd_parse.o [1]
+EVENT_MsgQ_Noah2PCUART  0x200801a0     0x4  Data  Gb  task_uart_tx.o [1]
+EVENT_MsgQ_Noah2RulerUART
+                        0x200801ac     0x4  Data  Gb  task_uart_tx_ruler.o [1]
+EVENT_MsgQ_PCUART2Noah  0x2008019c     0x4  Data  Gb  task_uart_tx.o [1]
+EVENT_MsgQ_RulerUART2Noah
+                        0x200801a8     0x4  Data  Gb  task_uart_tx_ruler.o [1]
+FLASHD_Initialize       0x00085bc1    0x12  Code  Gb  flashd_eefc.o [1]
+FLASHD_Write            0x00085bd3    0xe6  Code  Gb  flashd_eefc.o [1]
+FLASHD_Write_Safe       0x00081f6d    0x34  Code  Gb  ruler.o [1]
+FM36_PDMADC_CLK_Onoff   0x000847c1    0xba  Code  Gb  dsp.o [1]
+FM36_PDMADC_CLK_Set     0x0008487b   0x1a2  Code  Gb  dsp.o [1]
+FM36_PWD_Bypass         0x00084797    0x2a  Code  Gb  dsp.o [1]
+Flag_Reset_Pin_Trigger  0x200801dd     0x1  Data  Gb  bsp.o [1]
+Flash_Info              0x0008b581    0x38  Code  Gb  commands.o [1]
+GPIODIR_FLOAT           0x00084251    0x3e  Code  Gb  gpio.o [1]
+GPIOPIN_Get             0x00084317    0x1e  Code  Gb  gpio.o [1]
+GPIOPIN_Get_Fast        0x20078753    0x2a  Code  Gb  gpio.o [1]
+GPIOPIN_Init_Fast       0x00084335    0x52  Code  Gb  gpio.o [1]
+GPIOPIN_Set             0x0008428f    0x88  Code  Gb  gpio.o [1]
+GPIOPIN_Set_Fast        0x200786d5    0x7e  Code  Gb  gpio.o [1]
+GPIO_CS                 0x20078883     0x1  Data  Gb  i2c_gpio.o [1]
+GPIO_Init               0x0008423d    0x14  Code  Gb  gpio.o [1]
+GPIO_SCL                0x20078882     0x1  Data  Gb  i2c_gpio.o [1]
+GPIO_SDA                0x20078881     0x1  Data  Gb  i2c_gpio.o [1]
+GPIO_Sem_I2C_Mixer      0x2008010c     0x4  Data  Gb  gpio.o [1]
+Get_Audio_Version       0x00081d6d    0x54  Code  Gb  ruler.o [1]
+Get_Flash_Info          0x00083095    0x8e  Code  Gb  bsp.o [1]
+Get_Mask_Num            0x0008193b    0x20  Code  Gb  ruler.o [1]
+Get_Port_Detect         0x00084451    0x28  Code  Gb  gpio.o [1]
+Get_Switches            0x00084427    0x2a  Code  Gb  gpio.o [1]
+Get_Task_Info           0x00082f2b    0xf2  Code  Gb  bsp.o [1]
+Get_Uptime              0x0008301d    0x76  Code  Gb  bsp.o [1]
+Get_Ver_Info            0x0008b565    0x1a  Code  Gb  commands.o [1]
+Global_Bridge_POST      0x200801ef     0x1  Data  Gb  ruler.o [1]
+Global_Idle_Ready       0x200801f1     0x1  Data  Gb  task_uart_rx.o [1]
+Global_Mic_Mask         0x200800ac    0x10  Data  Gb  ruler.o [1]
+Global_Mic_State        0x20080160     0x4  Data  Gb  ruler.o [1]
+Global_Ruler_Index      0x200801ee     0x1  Data  Gb  ruler.o [1]
+Global_Ruler_State      0x20080158     0x4  Data  Gb  ruler.o [1]
+Global_Ruler_Type       0x2008015c     0x4  Data  Gb  ruler.o [1]
+Global_UIF_Setting      0x2007fffc    0x20  Data  Gb  uif.o [1]
+Global_VEC_Cfg          0x200800d8     0xc  Data  Gb  ruler.o [1]
+HOST_LegacyRead         0x00088487    0x64  Code  Gb  mem_basic.o [1]
+HOST_SingleWrite_1      0x000883fd    0x40  Code  Gb  mem_basic.o [1]
+HOST_SingleWrite_2      0x0008843d    0x4a  Code  Gb  mem_basic.o [1]
+Head_Info               0x00083175   0x1a2  Code  Gb  bsp.o [1]
+HelpFunc                0x0008af35    0x70  Code  Gb  commands.o [1]
+HostNameFunc            0x0008afa5    0x38  Code  Gb  commands.o [1]
+I2CWrite_Codec_AIC3204  0x00083665    0x1c  Code  Gb  codec.o [1]
+I2C_GPIO_Init           0x0008abbd    0x36  Code  Gb  i2c_gpio.o [1]
+I2C_GPIO_Read           0x0008a97b    0x64  Code  Gb  i2c_gpio.o [1]
+I2C_GPIO_Read_iM205     0x0008a9df    0xa6  Code  Gb  i2c_gpio.o [1]
+I2C_GPIO_Write          0x0008aa85    0x7a  Code  Gb  i2c_gpio.o [1]
+I2C_GPIO_Write_iM205    0x0008aaff    0xbe  Code  Gb  i2c_gpio.o [1]
+I2C_Mix_Index_Save      0x200801e3     0x1  Data  Lc  gpio.o [1]
+I2C_Mixer               0x00084387    0xa0  Code  Gb  gpio.o [1]
+IRQ_ConfigureIT         0x0008724f    0x6c  Code  Gb  nvic.o [1]
+IRQ_DisableIT           0x000872c9     0xe  Code  Gb  nvic.o [1]
+IRQ_EnableIT            0x000872bb     0xe  Code  Gb  nvic.o [1]
+ISR_PC_UART             0x00083c45   0x192  Code  Gb  uart.o [1]
+ISR_Ruler_UART          0x00083e57   0x122  Code  Gb  uart.o [1]
+InStream_Read           0x0008c4f5    0x22  Code  Lc  lz77_init.o [5]
+InitCommands            0x0008aca9   0x1e4  Code  Gb  commands.o [1]
+InitI2CFunc             0x0008b041    0x44  Code  Gb  commands.o [1]
+Init_CMD_Read           0x00085115    0x14  Code  Gb  noah_cmd.o [1]
+Init_CODEC              0x00083681   0x2a4  Code  Gb  codec.o [1]
+Init_FM36_AB03          0x00084a41   0x2b8  Code  Gb  dsp.o [1]
+Init_FM36_AB03_Preset   0x00084a1d    0x24  Code  Gb  dsp.o [1]
+Init_Global_Var         0x00081901    0x3a  Code  Gb  ruler.o [1]
+LED_Clear               0x00085cfb    0x36  Code  Gb  led.o [1]
+LED_Set                 0x00085cc5    0x36  Code  Gb  led.o [1]
+LED_Toggle              0x00085d31    0x38  Code  Gb  led.o [1]
+LsFunc                  0x0008ae8d    0x3e  Code  Gb  commands.o [1]
+MCU_Load_Vec            0x00085e05   0x1dc  Code  Gb  im501_comm.o [1]
+Math_Init               0x0008c259     0xa  Code  Gb  lib_math.o [1]
+Math_RandSeedCur        0x20080110     0x4  Data  Gb  lib_math.o [1]
+Math_RandSetSeed        0x0008c263    0x18  Code  Gb  lib_math.o [1]
+MemPartition_MsgUART    0x20078888  0x2800  Data  Gb  task_uart_tx.o [1]
+Mem_Clr                 0x0008c281    0x12  Code  Gb  lib_mem.o [1]
+Mem_Set                 0x0008c293    0x82  Code  Gb  lib_mem.o [1]
+MsgQ_Noah2CMDParse      0x20080038    0x14  Data  Gb  task_cmd_parse.o [1]
+MsgQ_Noah2PCUART        0x20080060    0x14  Data  Gb  task_uart_tx.o [1]
+MsgQ_Noah2RulerUART     0x20080088    0x14  Data  Gb  task_uart_tx_ruler.o [1]
+MsgQ_PCUART2Noah        0x2008004c    0x14  Data  Gb  task_uart_tx.o [1]
+MsgQ_RulerUART2Noah     0x20080074    0x14  Data  Gb  task_uart_tx_ruler.o [1]
+NVIC_ClearPendingIRQ    0x00087215    0x14  Code  Lc  nvic.o [1]
+NVIC_DisableIRQ         0x00087201    0x14  Code  Lc  nvic.o [1]
+NVIC_EnableIRQ          0x000871ed    0x14  Code  Lc  nvic.o [1]
+NVIC_SetPriority        0x00087229    0x26  Code  Lc  nvic.o [1]
+Noah_CMD_Read           0x00085129   0x148  Code  Gb  noah_cmd.o [1]
+OSCPUUsage              0x200801e5     0x1  Data  Gb  os_core.o [1]
+OSCtxSw                 0x00084d83          Code  Gb  os_cpu_a.o [1]
+OSCtxSwCtr              0x20080114     0x4  Data  Gb  os_core.o [1]
+OSDataSize              0x0008f204     0x2  Data  Gb  os_dbg.o [1]
+OSDebugEn               0x00080eba     0x2  Data  Gb  os_dbg.o [1]
+OSDebugInit             0x00089e19   0x1cc  Code  Gb  os_dbg.o [1]
+OSEndiannessTest        0x0008f1ac     0x4  Data  Gb  os_dbg.o [1]
+OSEventEn               0x00081002     0x2  Data  Gb  os_dbg.o [1]
+OSEventFreeList         0x20080118     0x4  Data  Gb  os_core.o [1]
+OSEventMax              0x000810ea     0x2  Data  Gb  os_dbg.o [1]
+OSEventMultiEn          0x00083636     0x2  Data  Gb  os_dbg.o [1]
+OSEventNameEn           0x0008111a     0x2  Data  Gb  os_dbg.o [1]
+OSEventNameSet          0x0008641d    0x54  Code  Gb  os_core.o [1]
+OSEventSize             0x000815d2     0x2  Data  Gb  os_dbg.o [1]
+OSEventTbl              0x2007e4d8   0x258  Data  Gb  os_core.o [1]
+OSEventTblSize          0x0008182a     0x2  Data  Gb  os_dbg.o [1]
+OSFlagEn                0x00085112     0x2  Data  Gb  os_dbg.o [1]
+OSFlagFreeList          0x2008011c     0x4  Data  Gb  os_core.o [1]
+OSFlagGrpSize           0x000870fe     0x2  Data  Gb  os_dbg.o [1]
+OSFlagMax               0x00088e0e     0x2  Data  Gb  os_dbg.o [1]
+OSFlagNameEn            0x000897ca     0x2  Data  Gb  os_dbg.o [1]
+OSFlagNodeSize          0x00087306     0x2  Data  Gb  os_dbg.o [1]
+OSFlagTbl               0x2007fdcc    0x50  Data  Gb  os_core.o [1]
+OSFlagWidth             0x00087f4a     0x2  Data  Gb  os_dbg.o [1]
+OSIdleCtr               0x20080128     0x4  Data  Gb  os_core.o [1]
+OSIdleCtrMax            0x20080120     0x4  Data  Gb  os_core.o [1]
+OSIdleCtrRun            0x20080124     0x4  Data  Gb  os_core.o [1]
+OSInit                  0x00086471    0x38  Code  Gb  os_core.o [1]
+OSInitHookBegin         0x000899bd     0x8  Code  Gb  os_cpu_c.o [1]
+OSIntCtxSw              0x00084d8b          Code  Gb  os_cpu_a.o [1]
+OSIntEnter              0x000864a9    0x24  Code  Gb  os_core.o [1]
+OSIntExit               0x000864cd    0x94  Code  Gb  os_core.o [1]
+OSIntNesting            0x200801e7     0x1  Data  Gb  os_core.o [1]
+OSLockNesting           0x200801e8     0x1  Data  Gb  os_core.o [1]
+OSLowestPrio            0x000899ba     0x2  Data  Gb  os_dbg.o [1]
+OSMboxCreate            0x000897cd    0x52  Code  Gb  os_mbox.o [1]
+OSMboxEn                0x00089b96     0x2  Data  Gb  os_dbg.o [1]
+OSMboxPend              0x0008981f   0x11e  Code  Gb  os_mbox.o [1]
+OSMboxPost              0x00089955    0x66  Code  Gb  os_mbox.o [1]
+OSMemCreate             0x0008868d    0xc6  Code  Gb  os_mem.o [1]
+OSMemEn                 0x0008a60a     0x2  Data  Gb  os_dbg.o [1]
+OSMemFreeList           0x2008013c     0x4  Data  Gb  os_core.o [1]
+OSMemGet                0x00088753    0x52  Code  Gb  os_mem.o [1]
+OSMemMax                0x0008a6fe     0x2  Data  Gb  os_dbg.o [1]
+OSMemNameEn             0x0008eac6     0x2  Data  Gb  os_dbg.o [1]
+OSMemNameSet            0x000887a5    0x44  Code  Gb  os_mem.o [1]
+OSMemPut                0x000887e9    0x46  Code  Gb  os_mem.o [1]
+OSMemSize               0x0008ead2     0x2  Data  Gb  os_dbg.o [1]
+OSMemTbl                0x2008001c    0x1c  Data  Gb  os_core.o [1]
+OSMemTblSize            0x0008f1c0     0x2  Data  Gb  os_dbg.o [1]
+OSMutexEn               0x0008f1c2     0x2  Data  Gb  os_dbg.o [1]
+OSPrioCur               0x200801e9     0x1  Data  Gb  os_core.o [1]
+OSPrioHighRdy           0x200801ea     0x1  Data  Gb  os_core.o [1]
+OSPtrSize               0x0008f1c4     0x2  Data  Gb  os_dbg.o [1]
+OSQCreate               0x00082587    0xb8  Code  Gb  os_q.o [1]
+OSQEn                   0x0008f1c6     0x2  Data  Gb  os_dbg.o [1]
+OSQFreeList             0x20080140     0x4  Data  Gb  os_core.o [1]
+OSQGet                  0x00082529    0x5e  Code  Gb  os_q.o [1]
+OSQMax                  0x0008f1c8     0x2  Data  Gb  os_dbg.o [1]
+OSQPend                 0x0008263f   0x15c  Code  Gb  os_q.o [1]
+OSQPost                 0x000827a1    0x80  Code  Gb  os_q.o [1]
+OSQPostOpt              0x00082821    0xba  Code  Gb  os_q.o [1]
+OSQSize                 0x0008f1ca     0x2  Data  Gb  os_dbg.o [1]
+OSQTbl                  0x2007fc70    0x90  Data  Gb  os_core.o [1]
+OSRdyGrp                0x200801eb     0x1  Data  Gb  os_core.o [1]
+OSRdyTbl                0x200800f0     0x8  Data  Gb  os_core.o [1]
+OSRdyTblSize            0x0008f1cc     0x2  Data  Gb  os_dbg.o [1]
+OSRunning               0x200801ec     0x1  Data  Gb  os_core.o [1]
+OSSchedLock             0x00086561    0x3e  Code  Gb  os_core.o [1]
+OSSchedUnlock           0x0008659f    0x64  Code  Gb  os_core.o [1]
+OSSemCreate             0x00084df9    0x52  Code  Gb  os_sem.o [1]
+OSSemDel                0x00084e4b   0x10e  Code  Gb  os_sem.o [1]
+OSSemEn                 0x0008f1ce     0x2  Data  Gb  os_dbg.o [1]
+OSSemPend               0x00084f59    0xf0  Code  Gb  os_sem.o [1]
+OSSemPost               0x00085061    0x64  Code  Gb  os_sem.o [1]
+OSSemSet                0x000850c5    0x4e  Code  Gb  os_sem.o [1]
+OSStart                 0x00086603    0x42  Code  Gb  os_core.o [1]
+OSStartHighRdy          0x00084d67          Code  Gb  os_cpu_a.o [1]
+OSStatInit              0x00086645    0x46  Code  Gb  os_core.o [1]
+OSStatRdy               0x200801e6     0x1  Data  Gb  os_core.o [1]
+OSStkWidth              0x0008f1d0     0x2  Data  Gb  os_dbg.o [1]
+OSTCBCur                0x2008012c     0x4  Data  Gb  os_core.o [1]
+OSTCBFreeList           0x20080130     0x4  Data  Gb  os_core.o [1]
+OSTCBHighRdy            0x20080134     0x4  Data  Gb  os_core.o [1]
+OSTCBInitHook           0x00089a7f     0xc  Code  Gb  os_cpu_c.o [1]
+OSTCBList               0x20080138     0x4  Data  Gb  os_core.o [1]
+OSTCBPrioTbl            0x2007fb70   0x100  Data  Gb  os_core.o [1]
+OSTCBPrioTblMax         0x0008f1e8     0x2  Data  Gb  os_dbg.o [1]
+OSTCBSize               0x0008f1ea     0x2  Data  Gb  os_dbg.o [1]
+OSTCBTbl                0x2007c880   0x5d8  Data  Gb  os_core.o [1]
+OSTaskCreateEn          0x0008f1d2     0x2  Data  Gb  os_dbg.o [1]
+OSTaskCreateExt         0x00089fe5    0xe2  Code  Gb  os_task.o [1]
+OSTaskCreateExtEn       0x0008f1d4     0x2  Data  Gb  os_dbg.o [1]
+OSTaskCreateHook        0x000899c5     0xc  Code  Gb  os_cpu_c.o [1]
+OSTaskCtr               0x200801ed     0x1  Data  Gb  os_core.o [1]
+OSTaskDel               0x0008a0c7   0x18e  Code  Gb  os_task.o [1]
+OSTaskDelEn             0x0008f1d6     0x2  Data  Gb  os_dbg.o [1]
+OSTaskDelHook           0x000899d1     0xc  Code  Gb  os_cpu_c.o [1]
+OSTaskIdleHook          0x000899dd     0x8  Code  Gb  os_cpu_c.o [1]
+OSTaskIdleStk           0x2007f330   0x200  Data  Gb  os_core.o [1]
+OSTaskIdleStkSize       0x0008f1d8     0x2  Data  Gb  os_dbg.o [1]
+OSTaskMax               0x0008f1dc     0x2  Data  Gb  os_dbg.o [1]
+OSTaskNameEn            0x0008f1de     0x2  Data  Gb  os_dbg.o [1]
+OSTaskNameSet           0x0008a255    0x92  Code  Gb  os_task.o [1]
+OSTaskProfileEn         0x0008f1da     0x2  Data  Gb  os_dbg.o [1]
+OSTaskReturnHook        0x000899e5     0xc  Code  Gb  os_cpu_c.o [1]
+OSTaskStatEn            0x0008f1e0     0x2  Data  Gb  os_dbg.o [1]
+OSTaskStatHook          0x000899f1     0x8  Code  Gb  os_cpu_c.o [1]
+OSTaskStatStk           0x2007f130   0x200  Data  Gb  os_core.o [1]
+OSTaskStatStkChkEn      0x0008f1e4     0x2  Data  Gb  os_dbg.o [1]
+OSTaskStatStkSize       0x0008f1e2     0x2  Data  Gb  os_dbg.o [1]
+OSTaskStkChk            0x0008a2ed    0xae  Code  Gb  os_task.o [1]
+OSTaskStkInit           0x000899f9    0x7e  Code  Gb  os_cpu_c.o [1]
+OSTaskSuspend           0x0008a39b    0xd0  Code  Gb  os_task.o [1]
+OSTaskSwHook            0x00089a77     0x8  Code  Gb  os_cpu_c.o [1]
+OSTaskSwHookEn          0x0008f1e6     0x2  Data  Gb  os_dbg.o [1]
+OSTicksPerSec           0x0008f1ec     0x2  Data  Gb  os_dbg.o [1]
+OSTime                  0x20080144     0x4  Data  Gb  os_core.o [1]
+OSTimeDly               0x0008292d    0x66  Code  Gb  os_time.o [1]
+OSTimeTick              0x0008668b    0xb8  Code  Gb  os_core.o [1]
+OSTimeTickHook          0x00089a8b    0x24  Code  Gb  os_cpu_c.o [1]
+OSTimeTickHookEn        0x0008f1ee     0x2  Data  Gb  os_dbg.o [1]
+OSTmrCfgMax             0x0008f1f4     0x2  Data  Gb  os_dbg.o [1]
+OSTmrCfgNameEn          0x0008f1f6     0x2  Data  Gb  os_dbg.o [1]
+OSTmrCfgTicksPerSec     0x0008f1fa     0x2  Data  Gb  os_dbg.o [1]
+OSTmrCfgWheelSize       0x0008f1f8     0x2  Data  Gb  os_dbg.o [1]
+OSTmrCtr                0x200801d6     0x2  Data  Lc  os_cpu_c.o [1]
+OSTmrEn                 0x0008f1f2     0x2  Data  Gb  os_dbg.o [1]
+OSTmrFree               0x200801d2     0x2  Data  Gb  os_core.o [1]
+OSTmrFreeList           0x20080154     0x4  Data  Gb  os_core.o [1]
+OSTmrSem                0x2008014c     0x4  Data  Gb  os_core.o [1]
+OSTmrSemSignal          0x20080150     0x4  Data  Gb  os_core.o [1]
+OSTmrSignal             0x00089b99    0x12  Code  Gb  os_tmr.o [1]
+OSTmrSize               0x0008f1fc     0x2  Data  Gb  os_dbg.o [1]
+OSTmrTaskStk            0x2007f530   0x200  Data  Gb  os_core.o [1]
+OSTmrTbl                0x2007e258   0x280  Data  Gb  os_core.o [1]
+OSTmrTblSize            0x0008f1fe     0x2  Data  Gb  os_dbg.o [1]
+OSTmrTime               0x20080148     0x4  Data  Gb  os_core.o [1]
+OSTmrUsed               0x200801d4     0x2  Data  Gb  os_core.o [1]
+OSTmrWheelSize          0x0008f200     0x2  Data  Gb  os_dbg.o [1]
+OSTmrWheelTbl           0x2007fe1c    0x40  Data  Gb  os_core.o [1]
+OSTmrWheelTblSize       0x0008f202     0x2  Data  Gb  os_dbg.o [1]
+OSTmr_Init              0x00089bab    0x9c  Code  Gb  os_tmr.o [1]
+OSTmr_InitTask          0x00089c47    0x38  Code  Lc  os_tmr.o [1]
+OSTmr_Link              0x00089c7f    0x78  Code  Lc  os_tmr.o [1]
+OSTmr_Task              0x00089d51    0x8c  Code  Lc  os_tmr.o [1]
+OSTmr_Unlink            0x00089cf7    0x58  Code  Lc  os_tmr.o [1]
+OSUnMapTbl              0x0008c844   0x100  Data  Gb  os_core.o [1]
+OSVersionNbr            0x0008f1f0     0x2  Data  Gb  os_dbg.o [1]
+OS_CPU_PendSVHandler    0x00084d93          Code  Gb  os_cpu_a.o [1]
+OS_CPU_SR_Restore       0x00084d61          Code  Gb  os_cpu_a.o [1]
+OS_CPU_SR_Save          0x00084d59          Code  Gb  os_cpu_a.o [1]
+OS_CPU_SysTickHandler   0x00089aaf    0x22  Code  Gb  os_cpu_c.o [1]
+OS_CPU_SysTickInit      0x00089ad1    0x26  Code  Gb  os_cpu_c.o [1]
+OS_EventTaskRdy         0x00086743    0xba  Code  Gb  os_core.o [1]
+OS_EventTaskRemove      0x0008688b    0x32  Code  Gb  os_core.o [1]
+OS_EventTaskRemoveMulti
+                        0x000868bd    0x4c  Code  Gb  os_core.o [1]
+OS_EventTaskWait        0x000867fd    0x8e  Code  Gb  os_core.o [1]
+OS_EventWaitListInit    0x00086909    0x20  Code  Gb  os_core.o [1]
+OS_FlagInit             0x00089b11    0x42  Code  Gb  os_flag.o [1]
+OS_FlagUnlink           0x00089b65    0x32  Code  Gb  os_flag.o [1]
+OS_InitEventList        0x00086929    0x4e  Code  Lc  os_core.o [1]
+OS_InitMisc             0x00086977    0x4e  Code  Lc  os_core.o [1]
+OS_InitRdyList          0x000869c5    0x44  Code  Lc  os_core.o [1]
+OS_InitTCBList          0x00086a85    0x58  Code  Lc  os_core.o [1]
+OS_InitTaskIdle         0x00086a09    0x3e  Code  Lc  os_core.o [1]
+OS_InitTaskStat         0x00086a47    0x3e  Code  Lc  os_core.o [1]
+OS_MemClr               0x00086add    0x12  Code  Gb  os_core.o [1]
+OS_MemInit              0x0008882f    0x1a  Code  Gb  os_mem.o [1]
+OS_QInit                0x000828db    0x32  Code  Gb  os_q.o [1]
+OS_Sched                0x00086aef    0x5c  Code  Gb  os_core.o [1]
+OS_SchedNew             0x00086b4b    0x20  Code  Lc  os_core.o [1]
+OS_TCBInit              0x00086c59   0x174  Code  Gb  os_core.o [1]
+OS_TaskIdle             0x00086b6d    0x22  Code  Gb  os_core.o [1]
+OS_TaskReturn           0x0008a46b    0x12  Code  Gb  os_task.o [1]
+OS_TaskStat             0x00086b95    0x76  Code  Gb  os_core.o [1]
+OS_TaskStatStkChk       0x00086c0b    0x44  Code  Gb  os_core.o [1]
+OS_TaskStkClr           0x0008a4a5    0x18  Code  Gb  os_task.o [1]
+OutStream_Write         0x0008c517    0x40  Code  Lc  lz77_init.o [5]
+PIO_Clear               0x00087e49     0x8  Code  Gb  pio.o [1]
+PIO_Configure           0x00087d87    0xb4  Code  Gb  pio.o [1]
+PIO_Get                 0x00087e51    0x2a  Code  Gb  pio.o [1]
+PIO_GetOutputDataStatus
+                        0x00087e7b    0x14  Code  Gb  pio.o [1]
+PIO_Set                 0x00087e41     0x8  Code  Gb  pio.o [1]
+PIO_SetFilter           0x00087d21    0x14  Code  Lc  pio.o [1]
+PIO_SetInput            0x00087d35    0x20  Code  Lc  pio.o [1]
+PIO_SetOutput           0x00087d55    0x32  Code  Lc  pio.o [1]
+PIO_SetPeripheralA      0x00087cdd    0x24  Code  Lc  pio.o [1]
+PIO_SetPeripheralB      0x00087d01    0x20  Code  Lc  pio.o [1]
+PM_LegacyRead           0x000881af   0x152  Code  Gb  mem_basic.o [1]
+PM_SingleWrite          0x00087ff5    0x6c  Code  Gb  mem_basic.o [1]
+PinBuzzer               0x20078830    0x20  Data  Lc  bsp.o [1]
+Pin_Reset_Audio_MCU     0x000844b1    0x1c  Code  Gb  gpio.o [1]
+Pin_Reset_Codec         0x00084479    0x1c  Code  Gb  gpio.o [1]
+Pin_Reset_FM36          0x00084495    0x1c  Code  Gb  gpio.o [1]
+Port_Detect_Enable      0x0008615f    0x16  Code  Gb  task_user_if.o [1]
+Queue_NData             0x00083613    0x24  Code  Gb  queue.o [1]
+Queue_ReadBuf           0x000834cd    0xb6  Code  Gb  queue.o [1]
+Queue_WriteBuf          0x00083583    0x90  Code  Gb  queue.o [1]
+Raw_Read                0x000894dd   0x15a  Code  Gb  uif.o [1]
+Raw_Write               0x00088fc9   0x514  Code  Gb  uif.o [1]
+ReadCMFunc              0x0008b191    0x5c  Code  Gb  commands.o [1]
+ReadDMFunc              0x0008b0b9    0x5c  Code  Gb  commands.o [1]
+ReadDSPREGFunc          0x0008b33d    0x60  Code  Gb  commands.o [1]
+ReadHostREGFunc         0x0008b431    0x5e  Code  Gb  commands.o [1]
+ReadPMFunc              0x0008b265    0x5e  Code  Gb  commands.o [1]
+Read_Flash_State        0x00081fa1    0x12  Code  Gb  ruler.o [1]
+RebootFunc              0x0008b085    0x32  Code  Gb  commands.o [1]
+Reg_RW_Data             0x2007c088   0x7f8  Data  Gb  uif.o [1]
+Region$$Table$$Base     0x0008e504           --   Gb  - Linker created -
+Region$$Table$$Limit    0x0008e530           --   Gb  - Linker created -
+Reset_Audio             0x00081cff    0x6e  Code  Gb  ruler.o [1]
+Revert_patch_Endien     0x000844fd     0xe  Code  Lc  dsp.o [1]
+Ruler_Active_Control    0x00081e39   0x112  Code  Gb  ruler.o [1]
+Ruler_CMD_Result        0x200801f0     0x1  Data  Gb  ruler.o [1]
+SPI_Configure           0x0008769d    0x1e  Code  Gb  spi.o [1]
+SPI_ConfigureNPCS       0x000876bb     0x8  Code  Gb  spi.o [1]
+SPI_Init                0x000879f5    0xa0  Code  Gb  spi.o [1]
+SPI_Initialize          0x00087979    0x7c  Code  Gb  spi.o [1]
+SPI_ReadBuffer          0x0008773d    0x84  Code  Gb  spi.o [1]
+SPI_Sem                 0x20080164     0x4  Data  Gb  spi.o [1]
+SPI_WriteBuffer         0x000876f3    0x4a  Code  Gb  spi.o [1]
+SPI_WriteBuffer_API     0x000877c1    0x86  Code  Gb  spi.o [1]
+SPI_WriteReadBuffer_API
+                        0x00087847   0x132  Code  Gb  spi.o [1]
+Save_DSP_VEC            0x00081fed    0xde  Code  Gb  ruler.o [1]
+Send_Report             0x00085485    0x18  Code  Gb  noah_cmd.o [1]
+Set_AT91C_SPI_CSAAT     0x000876c3    0x18  Code  Gb  spi.o [1]
+Set_DSP_VEC             0x000820cd    0x96  Code  Gb  ruler.o [1]
+Set_Volume              0x000822d5    0xee  Code  Gb  ruler.o [1]
+Setup_Audio             0x000819bd   0x1da  Code  Gb  ruler.o [1]
+Setup_Interface         0x00088e11   0x1b8  Code  Gb  uif.o [1]
+ShellComms              0x2007f930   0x140  Data  Gb  commands.o [1]
+Start_Audio             0x00081b97    0xc8  Code  Gb  ruler.o [1]
+Stop_Audio              0x00081c5f    0xa0  Code  Gb  ruler.o [1]
+Str_CmpIgnoreCase       0x0008b851    0x1a  Code  Gb  lib_str.o [1]
+Str_CmpIgnoreCase_N     0x0008b86b   0x1d8  Code  Gb  lib_str.o [1]
+Str_Copy                0x0008b7e9    0x18  Code  Gb  lib_str.o [1]
+Str_Copy_N              0x0008b801    0x50  Code  Gb  lib_str.o [1]
+Str_Len                 0x0008b7b9    0x14  Code  Gb  lib_str.o [1]
+Str_Len_N               0x0008b7cd    0x1c  Code  Gb  lib_str.o [1]
+Str_MultOvfThTbl_Int32U
+                        0x0008c9f8    0x94  Data  Lc  lib_str.o [1]
+Str_ParseNbr_Int32      0x0008ba63   0x230  Code  Lc  lib_str.o [1]
+Str_ParseNbr_Int32U     0x0008ba43    0x20  Code  Gb  lib_str.o [1]
+TWID_Initialize         0x00087309     0x8  Code  Gb  twid.o [1]
+TWID_Read               0x00087311   0x182  Code  Gb  twid.o [1]
+TWID_Write              0x00087493   0x176  Code  Gb  twid.o [1]
+TWI_ByteReceived        0x0008a6d3     0xc  Code  Gb  twi.o [1]
+TWI_ByteSent            0x0008a6df     0xc  Code  Gb  twi.o [1]
+TWI_ConfigureMaster     0x0008a60d    0x6e  Code  Gb  twi.o [1]
+TWI_Init                0x00087609    0x4a  Code  Gb  twid.o [1]
+TWI_Init_Re             0x00087653    0x10  Code  Gb  twid.o [1]
+TWI_Sem_lock            0x200801b8     0x4  Data  Gb  twid.o [1]
+TWI_SendSTOPCondition   0x0008a6f5     0xa  Code  Gb  twi.o [1]
+TWI_StartRead           0x0008a67b    0x24  Code  Gb  twi.o [1]
+TWI_StartWrite          0x0008a69f    0x34  Code  Gb  twi.o [1]
+TWI_TransferComplete    0x0008a6eb     0xa  Code  Gb  twi.o [1]
+TaskFunc                0x0008aed1    0x64  Code  Gb  commands.o [1]
+Timer_Init              0x00087bdd    0x1c  Code  Gb  timer.o [1]
+Tx_ReSend_Happens       0x200801a4     0x4  Data  Gb  task_uart_tx.o [1]
+Tx_ReSend_Happens_Ruler
+                        0x200801b0     0x4  Data  Gb  task_uart_tx_ruler.o [1]
+UART0_Rece_Buf          0x2007fe9c    0x40  Data  Gb  uart.o [1]
+UART0_Rece_Buf_PDC      0x2007ff5c    0x20  Data  Gb  uart.o [1]
+UART0_Send_Buf          0x2007fe5c    0x40  Data  Gb  uart.o [1]
+UART0_Send_Buf_PDC      0x2007ff3c    0x20  Data  Gb  uart.o [1]
+UART1_PINS              0x0008cec0    0x80  Data  Lc  uart.o [1]
+UART1_Rece_Buf          0x2007de58   0x400  Data  Gb  uart.o [1]
+UART1_Rece_Buf_PDC      0x2007ff9c    0x20  Data  Gb  uart.o [1]
+UART1_Send_Buf          0x2007da58   0x400  Data  Gb  uart.o [1]
+UART1_Send_Buf_PDC      0x2007ff7c    0x20  Data  Gb  uart.o [1]
+UART2_Rece_Buf          0x200801cc     0x4  Data  Gb  uart.o [1]
+UART2_Rece_Buf_PDC      0x2007ffdc    0x20  Data  Gb  uart.o [1]
+UART2_Send_Buf          0x200801c8     0x4  Data  Gb  uart.o [1]
+UART2_Send_Buf_PDC      0x2007ffbc    0x20  Data  Gb  uart.o [1]
+UART_Init               0x00083975   0x1fa  Code  Gb  uart.o [1]
+UART_MUX_Sem_lock       0x20080178     0x4  Data  Gb  task_noah_ruler.o [1]
+UART_PID                0x0008f1bc     0x4  Data  Lc  uart.o [1]
+UART_PINS               0x0008cfb0    0x60  Data  Lc  uart.o [1]
+UART_Rece_Buf_Size      0x0008f008     0xc  Data  Lc  uart.o [1]
+UART_Rx_ReStart         0x00083dd7    0x80  Code  Gb  uart.o [1]
+UART_Send_Buf_Size      0x0008effc     0xc  Data  Lc  uart.o [1]
+UART_WriteStart         0x00083b6f    0xd6  Code  Gb  uart.o [1]
+USART_Configure         0x00083f79    0x1c  Code  Gb  uart.o [1]
+USART_ReadBuffer        0x00083ff7    0x3c  Code  Lc  uart.o [1]
+USART_Read_Timeout      0x00084033    0xbe  Code  Gb  uart.o [1]
+USART_Sem               0x200800e4     0xc  Data  Lc  uart.o [1]
+USART_SendBuf           0x00084137    0x52  Code  Gb  uart.o [1]
+USART_SendByte          0x000840f1    0x46  Code  Gb  uart.o [1]
+USART_SetReceiverEnabled
+                        0x00083fa7    0x12  Code  Gb  uart.o [1]
+USART_SetTransmitterEnabled
+                        0x00083f95    0x12  Code  Gb  uart.o [1]
+USART_WriteBuffer       0x00083fb9    0x3e  Code  Lc  uart.o [1]
+Unlock_PM               0x00087f63    0x3e  Code  Lc  mem_basic.o [1]
+Update_Ruler_FW         0x00082165   0x170  Code  Gb  ruler.o [1]
+WriteCMFunc             0x0008b1ed    0x76  Code  Gb  commands.o [1]
+WriteDMFunc             0x0008b119    0x78  Code  Gb  commands.o [1]
+WriteDSPREGFunc         0x0008b39d    0x92  Code  Gb  commands.o [1]
+WriteGPIOFunc           0x0008afdd    0x62  Code  Gb  commands.o [1]
+WriteHostREGFunc        0x0008b491    0x92  Code  Gb  commands.o [1]
+WritePMFunc             0x0008b2c9    0x74  Code  Gb  commands.o [1]
+Write_Flash_State       0x00081fb3    0x2e  Code  Gb  ruler.o [1]
+Write_Ruler_FW          0x0008b525    0x40  Code  Gb  commands.o [1]
+Xmodem_Transmit         0x000861e7   0x224  Code  Gb  Xmodem.o [1]
+_GenldFullNoMb          0x00080b99   0x262  Code  Lc  xprintffull_nomb.o [3]
+_LdtobFullNoMb          0x000807ad   0x3e6  Code  Lc  xprintffull_nomb.o [3]
+_LitobFullNoMb          0x000806a5   0x106  Code  Lc  xprintffull_nomb.o [3]
+_PrintfFullNoMb         0x000800bd   0x5e2  Code  Gb  xprintffull_nomb.o [3]
+_PutcharsFullNoMb       0x00080dfb    0x2e  Code  Lc  xprintffull_nomb.o [3]
+_SProut                 0x00080e7b     0xa  Code  Gb  xsprout.o [3]
+__ICFEDIT_vector_start__ {Abs}
+                        0x00080000           --   Gb  command line/config [2]
+__aeabi_cdcmple         0x000810bd          Code  Gb  DblCmpLe.o [4]
+__aeabi_cdrcmple        0x000810ed          Code  Gb  DblCmpGe.o [4]
+__aeabi_d2iz            0x00081229          Code  Gb  DblToI32.o [4]
+__aeabi_d2uiz           0x00081255          Code  Gb  DblToI32.o [4]
+__aeabi_ddiv            0x000815d5          Code  Gb  DblDiv.o [4]
+__aeabi_dmul            0x00081431          Code  Gb  DblMul.o [4]
+__aeabi_dsub            0x000812b1          Code  Gb  DblSub.o [4]
+__aeabi_i2d             0x00081281          Code  Gb  I32ToDbl.o [4]
+__aeabi_ldiv0           0x00081829          Code  Gb  I64DivZer.o [5]
+__aeabi_memset          0x00089765          Code  Gb  ABImemset.o [5]
+__aeabi_ui2d            0x00081295          Code  Gb  I32ToDbl.o [4]
+__aeabi_uldivmod        0x00080f15          Code  Gb  I64DivMod.o [5]
+__cmain                 0x0008eaa9          Code  Gb  cmain.o [5]
+__exit                  0x0008c6c1          Code  Gb  XXexit.o [5]
+__iar_Dnorm             0x0008107b    0x42  Code  Gb  xdnorm.o [4]
+__iar_Dscale            0x0008111d   0x10c  Code  Gb  xdscale.o [4]
+__iar_Memchr            0x00080ebd          Code  Gb  memchr.o [5]
+__iar_Memset            0x00089765          Code  Gb  ABImemset.o [5]
+__iar_Memset_word       0x0008976d          Code  Gb  ABImemset.o [5]
+__iar_Strchr            0x00080e65          Code  Gb  strchr.o [5]
+__iar_d2uiz             0x00081261          Code  Gb  DblToI32.o [4]
+__iar_dadd              0x0008182d          Code  Gb  DblAdd.o [4]
+__iar_data_init3        0x0008e255    0x28  Code  Gb  data_init.o [5]
+__iar_dsub              0x000812c5          Code  Gb  DblSub.o [4]
+__iar_dsubStart         0x000812d7          Code  Gb  DblSub.o [4]
+__iar_lz77_init3        0x0008c557   0x164  Code  Gb  lz77_init.o [5]
+__iar_program_start     0x0008f021          Code  Gb  cstartup_M.o [5]
+__iar_ui2d              0x00081299          Code  Gb  I32ToDbl.o [4]
+__iar_unaligned___aeabi_memcpy
+                        0x00081005          Code  Gb  ABImemcpy_unaligned.o [5]
+__iar_unaligned___aeabi_memcpy4
+                        0x00081025          Code  Gb  ABImemcpy_unaligned.o [5]
+__iar_unaligned___aeabi_memcpy8
+                        0x00081025          Code  Gb  ABImemcpy_unaligned.o [5]
+__iar_unaligned_strcpy  0x00085dc1          Code  Gb  strcpy_unaligned.o [5]
+__iar_zero_init3        0x00080e43    0x22  Code  Gb  zero_init3.o [5]
+__low_level_init        0x0008e4e1    0x10  Code  Gb  app_vect.o [1]
+__vector_table          0x00080000    0xbc  Data  Gb  app_vect.o [1]
+_call_main              0x0008eab5          Code  Gb  cmain.o [5]
+_exit                   0x0008eac9          Code  Gb  cexit.o [5]
+_main                   0x0008eabf          Code  Gb  cmain.o [5]
+abort                   0x0008c6bb     0x6  Code  Gb  abort.o [3]
+bit_length_saved        0x200801e2     0x1  Data  Lc  dsp.o [1]
+calc_crc                0x000861a5    0x40  Code  Lc  Xmodem.o [1]
+codec_saved_sample_length
+                        0x200801de     0x1  Data  Lc  codec.o [1]
+codec_saved_sr          0x20080108     0x4  Data  Lc  codec.o [1]
+config_aic3204          0x200787dc    0x54  Data  Gb  codec.o [1]
+debug_uart_fifo_data_max
+                        0x200801d8     0x2  Data  Gb  task_debug_info.o [1]
+debug_uart_fifo_oveflow_counter
+                        0x200801da     0x2  Data  Gb  task_debug_info.o [1]
+delay                   0x0008a79d     0x2  Code  Lc  i2c_gpio.o [1]
+delay_us                0x20078781    0x5c  Code  Gb  timer.o [1]
+div                     0x0008181b     0xe  Code  Gb  div.o [3]
+emb_append_attr_binary  0x00088d7f    0x52  Code  Gb  emb.o [1]
+emb_append_attr_string  0x00088d3f    0x40  Code  Gb  emb.o [1]
+emb_append_attr_uint    0x00088cff    0x40  Code  Gb  emb.o [1]
+emb_append_end          0x00088dd1    0x22  Code  Gb  emb.o [1]
+emb_attach              0x0008885d     0xa  Code  Gb  emb.o [1]
+emb_encode_binary       0x00088ca1    0x3e  Code  Lc  emb.o [1]
+emb_encode_fixed        0x00088c61    0x24  Code  Lc  emb.o [1]
+emb_encode_header       0x00088c15    0x4c  Code  Lc  emb.o [1]
+emb_encode_string       0x00088c85    0x1c  Code  Lc  emb.o [1]
+emb_encode_uint         0x00088be5    0x30  Code  Lc  emb.o [1]
+emb_get_attr_binary     0x00088bbd    0x28  Code  Gb  emb.o [1]
+emb_get_attr_int        0x00088b99    0x24  Code  Gb  emb.o [1]
+emb_get_binary          0x00088b5b    0x3e  Code  Gb  emb.o [1]
+emb_get_id              0x00088aef    0x1e  Code  Gb  emb.o [1]
+emb_get_int             0x00088b0d    0x4e  Code  Gb  emb.o [1]
+emb_get_node            0x00088a7f    0x70  Code  Lc  emb.o [1]
+emb_init_builder        0x00088cdf    0x20  Code  Gb  emb.o [1]
+emb_parse_binary        0x000888d5    0x2c  Code  Lc  emb.o [1]
+emb_parse_id_type       0x00088901    0x52  Code  Lc  emb.o [1]
+emb_parse_sint          0x00088897    0x3e  Code  Lc  emb.o [1]
+emb_parse_uint          0x00088867    0x30  Code  Lc  emb.o [1]
+emb_skip_binary         0x000889b1    0x26  Code  Lc  emb.o [1]
+emb_skip_element        0x000889d7    0x44  Code  Lc  emb.o [1]
+emb_skip_fixed          0x00088989    0x10  Code  Lc  emb.o [1]
+emb_skip_header         0x0008896b    0x1e  Code  Lc  emb.o [1]
+emb_skip_int            0x00088953    0x18  Code  Lc  emb.o [1]
+emb_skip_node           0x00088a1b    0x64  Code  Lc  emb.o [1]
+emb_skip_string         0x00088999    0x18  Code  Lc  emb.o [1]
+exit                    0x0008eac3     0x4  Code  Gb  exit.o [3]
+flag_power_lose         0x20078880     0x1  Data  Lc  dsp.o [1]
+flushinput              0x000861e5     0x2  Code  Lc  Xmodem.o [1]
+fm36_para_table_3       0x200785d8    0xfc  Data  Lc  dsp.o [1]
+fm36_patch_code_3       0x200784ac   0x12c  Data  Lc  dsp.o [1]
+fw_version              0x0008ed7c    0x10  Data  Gb  bsp.o [1]
+get_os_state            0x00082ef3    0x38  Code  Gb  bsp.o [1]
+hw_model                0x0008ef30     0xc  Data  Gb  bsp.o [1]
+hw_version              0x0008ef24     0xc  Data  Gb  bsp.o [1]
+i2c_read_ack            0x0008a84f    0x46  Code  Lc  i2c_gpio.o [1]
+i2c_read_byte           0x0008a91f    0x5c  Code  Lc  i2c_gpio.o [1]
+i2c_restart             0x0008a7cf    0x40  Code  Lc  i2c_gpio.o [1]
+i2c_send_ack            0x0008a895    0x30  Code  Lc  i2c_gpio.o [1]
+i2c_start               0x0008a79f    0x30  Code  Lc  i2c_gpio.o [1]
+i2c_stop                0x0008a80f    0x40  Code  Lc  i2c_gpio.o [1]
+i2c_write_byte          0x0008a8c5    0x5a  Code  Lc  i2c_gpio.o [1]
+kfifo_get               0x00087ef9    0x52  Code  Gb  kfifo.o [1]
+kfifo_get_data_size     0x2007885d     0x8  Code  Gb  kfifo.o [1]
+kfifo_get_free_space    0x20078851     0xc  Code  Gb  kfifo.o [1]
+kfifo_init_static       0x00087e97     0xc  Code  Gb  kfifo.o [1]
+kfifo_put               0x00087ea3    0x56  Code  Gb  kfifo.o [1]
+lin_sp_index_saved      0x200801e0     0x1  Data  Lc  dsp.o [1]
+main                    0x0008bd81    0x5c  Code  Gb  app.o [1]
+memchr                  0x00080ebd          Code  Gb  memchr.o [5]
+memcpy                  0x00089759     0xc  Code  Gb  memcpy.o [3]
+memset                  0x00085ffd    0x14  Code  Gb  memset.o [3]
+mic_num_saved           0x200801df     0x1  Data  Lc  dsp.o [1]
+min                     0x0008973b     0xe  Code  Gb  math.o [1]
+min_kfifo               0x00087e8f     0x8  Code  Gb  kfifo.o [1]
+numGpios                0x0008f19c     0x4  Data  Lc  gpio.o [1]
+numLeds                 0x0008f1a0     0x4  Data  Lc  led.o [1]
+os_stat_desp            0x0008d850    0x38  Data  Gb  bsp.o [1]
+pMEM_Part_MsgUART       0x20080198     0x4  Data  Gb  task_uart_tx.o [1]
+pPageBuffer             0x2007fa70   0x100  Data  Lc  flashd_eefc.o [1]
+pTCREG                  0x20078864     0xc  Data  Lc  timer.o [1]
+pUARTREG                0x0008efc0     0xc  Data  Lc  uart.o [1]
+pUART_Rece_Buf          0x0008efd8     0xc  Data  Gb  uart.o [1]
+pUART_Rece_Buf_PDC      0x0008eff0     0xc  Data  Gb  uart.o [1]
+pUART_Rece_kfifo        0x0008efb4     0xc  Data  Gb  uart.o [1]
+pUART_Send_Buf          0x0008efcc     0xc  Data  Gb  uart.o [1]
+pUART_Send_Buf_PDC      0x0008efe4     0xc  Data  Gb  uart.o [1]
+pUART_Send_kfifo        0x0008efa8     0xc  Data  Gb  uart.o [1]
+pcSendDateToBuf         0x00085271   0x146  Code  Gb  noah_cmd.o [1]
+pcSendDateToBuffer      0x000853b7    0xce  Code  Gb  noah_cmd.o [1]
+pinsBuzzer              0x0008e650    0x20  Data  Lc  led.o [1]
+pinsGpios               0x20078000   0x260  Data  Lc  gpio.o [1]
+pinsLeds                0x0008d5c8    0x40  Data  Lc  led.o [1]
+pinsSwitches            0x0008d588    0x40  Data  Lc  gpio.o [1]
+port_enable             0x20078885     0x1  Data  Lc  task_user_if.o [1]
+power                   0x00089749    0x10  Code  Gb  math.o [1]
+ppcer_offset            0x2007887c     0x4  Data  Lc  timer.o [1]
+rx_data                 0x2007f730   0x200  Data  Gb  task_uart_rx.o [1]
+spi_if                  0x20078878     0x4  Data  Gb  spi.o [1]
+spi_pins                0x0008ce40    0x80  Data  Lc  spi.o [1]
+sr_saved                0x200801d0     0x2  Data  Lc  dsp.o [1]
+start_slot_index_saved  0x200801e1     0x1  Data  Lc  dsp.o [1]
+strcat                  0x00088df3    0x1c  Code  Gb  strcat.o [3]
+strchr                  0x00080e65          Code  Gb  strchr.o [5]
+strlen                  0x00080e85          Code  Gb  strlen.o [5]
+test_counter1           0x20080184     0x4  Data  Gb  task_noah_ruler.o [1]
+test_counter2           0x20080188     0x4  Data  Gb  task_noah_ruler.o [1]
+test_counter3           0x2008018c     0x4  Data  Gb  task_noah_ruler.o [1]
+test_counter4           0x20080190     0x4  Data  Gb  task_noah_ruler.o [1]
+test_counter5           0x20080194     0x4  Data  Gb  task_noah_ruler.o [1]
+twi_clock_save          0x200801bc     0x4  Data  Lc  twid.o [1]
+twi_pins                0x0008d608    0x40  Data  Lc  twid.o [1]
+twi_rw_done             0x200801f2     0x1  Data  Gb  twid.o [1]
+twid                    0x200800f8     0x8  Data  Gb  twid.o [1]
+uart_rx_fifo            0x2007ff0c    0x30  Data  Gb  uart.o [1]
+uart_tx_fifo            0x2007fedc    0x30  Data  Gb  uart.o [1]
+uartin_start_cmd        0x200801f3     0x1  Data  Gb  uart.o [1]
+vsprintf                0x00087bf9    0x2c  Code  Gb  vsprintf.o [3]
+
+
+[1] = E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2\Release\Obj
+[2] = command line
+[3] = dl7M_tln.a
+[4] = m7M_tl.a
+[5] = rt7M_tl.a
+
+  51 578 bytes of readonly  code memory
+     284 bytes of readwrite code memory
+  11 420 bytes of readonly  data memory
+  33 982 bytes of readwrite data memory
+
+Errors: none
+Warnings: none

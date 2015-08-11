@@ -26,6 +26,7 @@
 #define   UIF_TYPE_FM36_PDMCLK  7
 #define   UIF_TYPE_GPIO_CLK     8
 
+
 #define   ATTRI_I2C_IM501_LOAD_CODE_IRAM       52
 #define   ATTRI_I2C_IM501_LOAD_CODE_DRAM       51
 #define   ATTRI_I2C_IM401_LOAD_CODE            41

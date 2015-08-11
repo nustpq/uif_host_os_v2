@@ -353,7 +353,7 @@ unsigned char SPI_ReadBuffer( AT91S_SPI *spi,
                                         | AT91C_HDMA_SRC_WIDTH_BYTE \
                                         | AT91C_HDMA_DST_WIDTH_BYTE \
                                         | AT91C_HDMA_SCSIZE_1 \
-                                        | AT91C_HDMA_DCSIZE_1) ; 
+                                        | AT91C_HDMA_DCSIZE_1) ; //Add 1+ byte length to fix last byte lost bug //PQ
     
     AT91C_BASE_HDMA->HDMA_CH[BOARD_SPI_IN_DMA_CHANNEL].HDMA_CTRLB = \
                                           AT91C_HDMA_SRC_DSCR_FETCH_DISABLE \

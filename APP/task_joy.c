@@ -62,6 +62,8 @@ void  App_TaskJoy (void *p_arg)
     CPU_INT32U   data ;
     CPU_INT32U   i ;
     
+    OSTimeDly(1000); //wait for App_TaskUserIF() be ready, incase of MBox lost to cause buzzer error
+    
     //avoid a fake trigger after POR
     switch_value_prev      =  Get_Switches()  & 0x03; 
     switch_value_prev      =  switch_value_prev ^ 0x01;  //make sure check Switch 'SW1' Buzzer 1st  
@@ -103,13 +105,14 @@ void  App_TaskJoy (void *p_arg)
            
         switch_value = Get_Switches() & 0x03; //mask 0~1     
         if( switch_value != switch_value_prev ) {  
-            OSTimeDly(50); 
+            OSTimeDly(100); 
             if( switch_value == Get_Switches() & 0x03 ) { //jitter immune                         
                 data = switch_value ^ switch_value_prev ;   
                 switch_value_prev = switch_value ;
                 data = ( data << 8 ) | (switch_value & 0xFF) ;
                 data &= ~MSG_TYPE_MASK ;
-                data |= MSG_TYPE_SWITCH;                  
+                data |= MSG_TYPE_SWITCH; 
+                //APP_TRACE_INFO(("\r\n\r\n>>>>>>>>>>>>>>>>>>>>  mute _ Trigger: %d",switch_value ));
                 while ( OSMboxPost(App_UserIF_Mbox, &data) == OS_ERR_MBOX_FULL ) {
                     OSTimeDly(10);  //
                 };            

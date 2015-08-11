@@ -398,7 +398,7 @@ unsigned char I2C_Mixer( unsigned char index )
 //        GPIOPIN_Set_Fast(12+index, 0);//enable index I2C channels 
 //    }
     for( unsigned char i = 1; i <= 3; i++ ) {
-        pinsGpios[12+i].type = (index == i) ? PIO_OUTPUT_0 : PIO_OUTPUT_1 ;
+        pinsGpios[12+i].type = (index == i) ? PIO_OUTPUT_0 : PIO_OUTPUT_1 ; ////lowe level truned to high after NPN to control switch OE pin
     }
     PIO_Configure(&pinsGpios[13], 3);     
     APP_TRACE_INFO(("\r\nI2C_Mixer switch to: %d ", index ));  

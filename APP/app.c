@@ -166,7 +166,10 @@ static  void  App_TaskStart (void *p_arg)
 {
     (void)p_arg;
     CPU_INT32U counter;
- 
+    
+    BSP_Ser_Init(115200);                        
+    //APP_TRACE_INFO(("\n\r\n\r"));
+   
     BSP_Init();
    //BSP_PostInit();                                             /* Initialize BSP functions                             */
      
@@ -177,10 +180,7 @@ static  void  App_TaskStart (void *p_arg)
     
     Mem_Init();                                                 /* Initialize the Memory Managment module               */
     Math_Init();                                                /* Initialize the Mathematical module                   */
-
-    BSP_Ser_Init(115200);                        
-    //APP_TRACE_INFO(("\n\r\n\r"));
-
+   
 #if (APP_CFG_PROBE_COM_MODULE_EN == DEF_ENABLED) || \
     (APP_CFG_PROBE_OS_PLUGIN_EN  == DEF_ENABLED)
     App_ProbeInit();
@@ -347,17 +347,14 @@ static  void  App_EventCreate (void)
 
 static  void  App_TaskCreate (void)
 {
-        
-#ifndef DBG_UART_METHOD_TASK_EN    
-    
-    APP_TRACE_INFO(("Creating Application Tasks...\r\n"));
-    
-#else
-    
+         
 #if (OS_TASK_NAME_EN > 0)
     CPU_INT08U  err;
 #endif
- 
+    
+#ifndef DBG_UART_METHOD_TASK_EN        
+    APP_TRACE_INFO(("Creating Application Tasks...\r\n"));    
+#else
     OSTaskCreateExt((void (*)(void *)) App_TaskDebugInfo,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskDebugInfoStk[APP_CFG_TASK_DBG_INFO_STK_SIZE - 1],
@@ -370,8 +367,7 @@ static  void  App_TaskCreate (void)
 
 #if (OS_TASK_NAME_EN > 0)
     OSTaskNameSet(APP_CFG_TASK_DBG_INFO_PRIO, "Debug_Info", &err);
-#endif     
-
+#endif  
 #endif
 ////////////////////////////////////////////////////////////////////////////// 
     
