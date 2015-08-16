@@ -69,7 +69,8 @@ CPU_INT08U UART2_Send_Buf_PDC[UART_PDC_LENGTH];
 CPU_INT08U UART2_Rece_Buf_PDC[UART_PDC_LENGTH];
 #endif
 
-volatile bool uartin_start_cmd     = false;
+volatile bool uartin_start_cmd      = false;
+volatile bool uartout_start_cmd     = false;
 
 static  OS_EVENT *USART_Sem[3];
 
@@ -277,14 +278,15 @@ CPU_INT08U UART_WriteStart( CPU_INT08U uart_index )
     
     error = 0;
     
-    OS_ENTER_CRITICAL();      
+    OS_ENTER_CRITICAL();    
     
+   
     if ((pUARTREG[uart_index]->US_TCR == 0) && (pUARTREG[uart_index]->US_TNCR == 0)) {
       
 //        if( Queue_ReadBuf(  pUART_Send_Buf_PDC[uart_index], 
 //                            pUART_Send_Buf[uart_index], 
 //                            UART_PDC_LENGTH, 
-//                            &byte_send) == QUEUE_OK ) {  
+//                            &byte_send) == QUEUE_OK ) {
         counter  = kfifo_get_data_size(pUART_Send_kfifo[uart_index]); 
         if( counter ) { 
             counter = counter < UART_PDC_LENGTH ? counter : UART_PDC_LENGTH ;
@@ -306,6 +308,46 @@ CPU_INT08U UART_WriteStart( CPU_INT08U uart_index )
     return error;
 }
 
+
+CPU_INT08U UART_ReWriteStart( CPU_INT08U uart_index )
+{
+    CPU_INT16U byte_send,counter ;
+    CPU_INT08U error;
+    
+#if OS_CRITICAL_METHOD == 3u   /* Allocate storage for CPU status register   */
+    OS_CPU_SR  cpu_sr = 0u;
+#endif
+    
+    error = 0;
+    
+    OS_ENTER_CRITICAL();    
+       
+    if ((pUARTREG[uart_index]->US_TCR == 0) && (pUARTREG[uart_index]->US_TNCR == 0)) {
+      
+//        if( Queue_ReadBuf(  pUART_Send_Buf_PDC[uart_index], 
+//                            pUART_Send_Buf[uart_index], 
+//                            UART_PDC_LENGTH, 
+//                            &byte_send) == QUEUE_OK ) {
+        counter  = kfifo_get_data_size(pUART_Send_kfifo[uart_index]); 
+        if( counter ) { 
+            counter = counter < UART_PDC_LENGTH ? counter : UART_PDC_LENGTH ;
+            kfifo_get(pUART_Send_kfifo[uart_index], pUART_Send_Buf_PDC[uart_index], counter) ;    
+                            
+            pUARTREG[uart_index]->US_TPR      =  (unsigned int) pUART_Send_Buf_PDC[uart_index];
+            pUARTREG[uart_index]->US_TCR      =  counter;                  
+            pUARTREG[uart_index]->US_PTCR     =  AT91C_PDC_TXTEN ; //start PDC
+            pUARTREG[uart_index]->US_IER      =  AT91C_US_ENDTX  ; //enable PDC tx INT
+            
+        } else {
+            error = 1;  
+            test_counter5++;            
+        } 
+    }
+    
+    OS_EXIT_CRITICAL();
+    
+    return error;
+}
 
 /*
 *********************************************************************************************************
@@ -440,6 +482,7 @@ void ISR_PC_UART( void )
             pUARTREG[PC_UART]->US_PTCR = AT91C_PDC_TXTEN; //start PDC
                     
         } else {
+            uartout_start_cmd = true;
             pUARTREG[PC_UART]->US_IDR      =  AT91C_US_ENDTX  ; //disable PDC tx INT
             //pUARTREG[PC_UART]->US_PTCR  =   AT91C_PDC_TXTDIS; //stop PDC
             

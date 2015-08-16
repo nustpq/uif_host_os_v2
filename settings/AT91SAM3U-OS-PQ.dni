@@ -33,7 +33,7 @@ Stop=1
 Freq=10000000
 MultiCoreRunAll=1
 [DebugChecksum]
-Checksum=845516883
+Checksum=1914917438
 [JLinkDriver]
 CStepIntDis=_ 0
 [Exceptions]
@@ -48,20 +48,22 @@ Fmt0=CPU_INT08U[64]	4	0
 Fmt1=CPU_INT32U[256]	4	0
 Fmt2=unsigned char[1016]	4	0
 Fmt3=unsigned char[1024]	4	0
+Fmt4=unsigned char[6]	4	0
 [watch_formats]
 Fmt0={W}0:key_state	4	0
 Fmt1={W}0:mask	1	0
-Fmt2={W}0:pChar	4	0
-Fmt3={W}0:pRecvPtr	4	0
-Fmt4={W}0:temp	4	0
+Fmt2={W}0:mem_addr	4	0
+Fmt3={W}0:pChar	4	0
+Fmt4={W}0:pRecvPtr	4	0
+Fmt5={W}0:temp	4	0
 [Disassemble mode]
 mode=0
 [Breakpoints2]
 Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\APP\task_cmd_parse.c}.85.13" 0 0 1 "" 0 "" 0
 Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\twid.c}.448.5" 0 0 1 "" 0 "" 0
-Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\APP\task_uart_rx.c}.118.18" 0 0 1 "" 0 "" 0
-Bp3=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.521.16" 0 0 1 "" 0 "" 0
-Bp4=_ 1 "EMUL_CODE" "{$PROJ_DIR$\APP\app.c}.189.6" 0 0 1 "" 0 "" 0
+Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.201.13" 0 0 1 "" 0 "" 0
+Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\spi.c}.583.5" 0 0 1 "" 0 "" 0
+Bp4=_ 1 "EMUL_CODE" "{$PROJ_DIR$\APP\task_uart_tx.c}.115.13" 0 0 1 "" 0 "" 0
 Count=5
 [Log file]
 LoggingEnabled=_ 0

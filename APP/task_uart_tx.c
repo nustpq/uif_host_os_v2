@@ -69,6 +69,7 @@ void App_TaskUART_Tx( void *p_arg )
     pNEW_CMD         pPcCmd ;    
     CPU_INT32U       counter ;
     CPU_INT32U       size ;
+    CPU_INT32U       times ;
     CPU_INT08U       *pChar ;
 
     pTaskMsgIN  = NULL;
@@ -125,16 +126,37 @@ void App_TaskUART_Tx( void *p_arg )
                 }                
              }
             APP_TRACE_INFO(("\r\n##########################################\r\n"));
-#endif  
-            while(1) {           
-                size = kfifo_get_free_space( pUART_Send_kfifo[PC_UART] );                    
-                if( size >= counter ) {
-                    kfifo_put(pUART_Send_kfifo[PC_UART], pTaskMsgIN, counter) ;
-                    break;                    
-                }
-                OSTimeDly(1);
+#endif      
+            times   = counter / UART1_SEND_QUEUE_LENGTH ;
+            counter = counter % UART1_SEND_QUEUE_LENGTH ;            
+            if( times ) {
+                for(unsigned int i = 0; i<times; i++ ) {
+                    while(1) {                  
+                        size = kfifo_get_free_space( pUART_Send_kfifo[PC_UART] );                    
+                        if( size >= UART1_SEND_QUEUE_LENGTH ) {
+                            kfifo_put(pUART_Send_kfifo[PC_UART], pChar, UART1_SEND_QUEUE_LENGTH) ;
+                            pChar += UART1_SEND_QUEUE_LENGTH;
+                            break;                    
+                        }
+                        //OSTimeDly(1);
+                    }
+                    UART_WriteStart( PC_UART ); //send data
+                   
+                }                
             }
-            UART_WriteStart( PC_UART ); //send data                  
+            
+            if( counter ) {                
+                while(1) {                     
+                    size = kfifo_get_free_space( pUART_Send_kfifo[PC_UART] );                    
+                    if( size >= counter ) {
+                        kfifo_put(pUART_Send_kfifo[PC_UART], pChar, counter) ;
+                        break;                    
+                    }
+                    //OSTimeDly(1);
+                }
+                UART_WriteStart( PC_UART ); //send data 
+             
+            }            
             OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );
         }  
         

@@ -70,7 +70,10 @@ void  App_TaskUserIF (void *p_arg)
     Init_Global_Var(); 
     iM401_Ctrl_Enable = 1;
     AB_POST();
-  
+    
+    //OSTimeDly(500);
+    
+
 #ifndef BOARD_TYPE_AB01  
     APP_TRACE_INFO(( "\r\nWARNING: NOT AB01, NO MCU CRT UART SWITCH\r\n"));
 #endif
@@ -129,10 +132,10 @@ void  App_TaskUserIF (void *p_arg)
 //                          }
 //                    } 
                     
-//                    // Switch 'SW0' used to control DEBUG port:
-//                    //         0: ON :  UART1 used as debug port
-//                    //         1: OFF:  DBG UART used as debug port
-//                    if( (key_state>>(8 + 1)) & 0x01) {  //check if SW0 switch status changed  
+                    // Switch 'SW0' used to control DEBUG port:
+                    //         0: ON :  UART1 used as debug port
+                    //         1: OFF:  DBG UART used as debug port
+                    if( (key_state>>(8 + 1)) & 0x01) {  //check if SW0 switch status changed  
 //                        OSTaskDel( APP_CFG_TASK_SHELL_PRIO ); 
 //                        OSSemSet (Bsp_Ser_Tx_Sem_lock, 1,  &err) ;
 //                        OSSemSet (Bsp_Ser_Rx_Sem_lock, 1,  &err) ;
@@ -144,7 +147,8 @@ void  App_TaskUserIF (void *p_arg)
 //                            Debug_COM_Sel = 0 ;               
 //                            UART_Init(PC_UART, ISR_PC_UART, 115200 );    //To PC  ? Sem recreat issue
 //                        }
-//                    } 
+                          send_cmd_to_im501();
+                    } 
                 break;
                 
                 case MSG_TYPE_PORT_DET :   
@@ -162,48 +166,7 @@ void  App_TaskUserIF (void *p_arg)
                             if( ( (key_state>>(7 - ruler_id)) & 0x01 ) == 0 ) { // ruler attached, setup ruler                              
                                 //LED_Clear( LED_P0 + ruler_id );
                                 APP_TRACE_INFO(("GPIO[%d] is Low Level.\r\n", ruler_id ));                            
-//                                Global_Ruler_State[ruler_id] = RULER_STATE_ATTACHED; 
-//                                err = Init_Ruler( ruler_id ); 
-//                                if( OS_ERR_NONE != err ) {
-//                                    //LED_Clear( LED_P0 + ruler_id );
-//                                    continue;
-//                                }                         
-//                                err = Setup_Ruler( ruler_id ); 
-//                                if( OS_ERR_NONE != err ) {
-//                                    //LED_Clear( LED_P0 + ruler_id );
-//                                    continue;
-//                                }
-//////                                err = Ruler_Setup_Sync(  ruler_id );
-//////                                if( OS_ERR_NONE != err ) {
-//////                                    //LED_Clear( LED_P0 + ruler_id );
-//////                                    continue;
-//////                                }                                
-//                                err = Get_Ruler_Type( ruler_id ); 
-//                                if( OS_ERR_NONE != err ) {
-//                                    //LED_Clear( LED_P0 + ruler_id );
-//                                    continue;
-//                                }
-//                                err = Get_Ruler_Version( ruler_id ); 
-//                                if( OS_ERR_NONE != err ) {
-//                                    //LED_Clear( LED_P0 + ruler_id );
-//                                    continue;
-//                                }                                  
-//                                err = Ruler_POST( ruler_id ); 
-//                                if( OS_ERR_NONE != err ) {
-//                                    //LED_Clear( LED_P0 + ruler_id );
-//                                    continue;
-//                                }                     
-//                                Global_Ruler_State[ruler_id] = RULER_STATE_CONFIGURED ;                              
-////                                mic_mask = Global_Mic_Mask[ruler_id];
-////                                err = Update_Mic_Mask( ruler_id, mic_mask );
-////                                if( OS_ERR_NONE != err ) {                              
-////                                    continue;
-////                                }   
-////                                if( mic_mask ) {
-////                                    Global_Ruler_State[ruler_id]= RULER_STATE_SELECTED;                                   
-////                                } 
-//                                //OSTimeDly(500);
-//                                //simple_test_use();//test for Dr.Yang and use USBApp0815.exe
+
 //                                                                           
                             } else { // ruler detached
                                 //LED_Set( LED_P0 + ruler_id );
@@ -218,6 +181,10 @@ void  App_TaskUserIF (void *p_arg)
                                     //iM401_Standby(); 
                                     //iM401_Load_Vec();
                                     MCU_Load_Vec( 0 );
+                                }
+                                
+                                if( Global_Read_VoiceBuffer_En ) {
+                                    Fetch_Voice_Buffer_Data();
                                 }
                                 
                             } 

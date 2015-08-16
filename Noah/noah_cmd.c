@@ -940,13 +940,18 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
            
         case PC_CMD_RAED_AB_INFO : 
              
-             err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
+            err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
                                       &PCCmd.raw_read,
                                       pkt_sn, 
                                       DATA_AB_INFO ) ;           
         break ; 
         
         
+        case PC_CMD_READ_VOICE_BUFFER:
+            Global_Read_VoiceBuffer_En = true;
+              
+              
+        break;
         
 /***************************************************************************
         

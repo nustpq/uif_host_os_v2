@@ -67,6 +67,7 @@ extern CPU_INT32U UART2_Rece_Buf[UART2_RECE_QUEUE_LENGTH/sizeof(CPU_INT32U)];
 #endif
 
 extern volatile bool uartin_start_cmd;
+extern volatile bool uartout_start_cmd;
 
 extern CPU_INT32U * const pUART_Send_Buf[];
 extern CPU_INT32U * const pUART_Rece_Buf[];

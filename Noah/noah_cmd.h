@@ -49,6 +49,7 @@
 #define PROTOCOL_ERR             173u
 #define MCU_FLASH_OP_ERR         174u
 
+#define PARA_SET_ERR             176u
 #define SET_GPIO_ERR             177u
 #define SET_SPI_ERR              178u
 #define SPI_BUS_ERR              179u
@@ -230,6 +231,7 @@
 #define  PC_CMD_DELAY                36
 #define  PC_CMD_MCU_FLASH_WRITE      40
 #define  PC_CMD_SET_VEC_CFG          41
+#define  PC_CMD_READ_VOICE_BUFFER    42
 
 #define  PC_CMD_DOWNLOAD_RULER_FW    100
 #define  PC_CMD_UPDATE_RULER_FW      101
@@ -270,10 +272,10 @@
 *********************************************************************************************************
 */
 typedef struct {
-    unsigned char head ;                               
-    unsigned char DataLen ;    
-    unsigned char Data[256] ;
-    unsigned char checkSum ;  
+    unsigned char head ;
+    unsigned char DataLen ;
+    unsigned char Data[256];
+    unsigned char checkSum ;
 }NOAH_CMD ;
 
 typedef struct {

@@ -113,7 +113,7 @@
 *********************************************************************************************************
 */
 
-#define  OS_PROBE_TASK                                     1    /* Task will be created for uC/Probe OS Plug-In             */
+#define  OS_PROBE_TASK                                     0    /* Task will be created for uC/Probe OS Plug-In             */
 #define  OS_PROBE_TMR_32_BITS                              0    /* uC/Probe OS Plug-In timer is a 32-bit timer              */
 #define  OS_PROBE_TMR_SEL                                  2    /* Select timer 2 for uC/Probe OS Plug-In timer             */
 #define  OS_PROBE_HOOKS_EN                                 1    /* Hooks to update OS_TCB profiling members will be included*/

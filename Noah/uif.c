@@ -197,7 +197,9 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         case UIF_TYPE_GPIO_CLK :       
             CS_GPIO_Init( pInterface_Cfg->attribute );
         break ;   
-        
+        case 100 :
+            send_cmd_to_im501( );
+        break;
         default:
             err = UIF_TYPE_NOT_SUPPORT;
         break;
@@ -236,10 +238,10 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
     unsigned char *pChar;
     unsigned int   i, size;
     
-    APP_TRACE_INFO(("\r\nRaw_Write: if_type=%d, dev_addr=0x%02X, data_len=%d ",\
-                         p_raw_write->if_type,p_raw_write->dev_addr,p_raw_write->data_len));    
-    Dump_Data( p_raw_write->pdata,  p_raw_write->data_len );    
-    
+//    APP_TRACE_INFO(("\r\nRaw_Write: if_type=%d, dev_addr=0x%02X, data_len=%d ",\
+//                         p_raw_write->if_type,p_raw_write->dev_addr,p_raw_write->data_len));    
+//    Dump_Data( p_raw_write->pdata,  p_raw_write->data_len );    
+//    
     err    = NO_ERR;
     pChar  = p_raw_write->pdata ;
     
@@ -475,10 +477,10 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
     err  = NO_ERR;
     pbuf = (unsigned char *)Reg_RW_Data; //global usage
     
-    APP_TRACE_INFO(("\r\nRaw_Read:  if_type=%d, dev_addr=0x%02X, data_len_read=%d, data_len_write=%d ",\
-                         p_raw_read->if_type,p_raw_read->dev_addr,p_raw_read->data_len_read,p_raw_read->data_len_write ));
-    
-    Dump_Data( p_raw_read->pdata_write,  p_raw_read->data_len_write );
+//    APP_TRACE_INFO(("\r\nRaw_Read:  if_type=%d, dev_addr=0x%02X, data_len_read=%d, data_len_write=%d ",\
+//                         p_raw_read->if_type,p_raw_read->dev_addr,p_raw_read->data_len_read,p_raw_read->data_len_write ));
+//    
+//    Dump_Data( p_raw_read->pdata_write,  p_raw_read->data_len_write );
     
     switch( p_raw_read->if_type ) {
         
@@ -544,9 +546,12 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
               }    
               
               pbuf = pbuf + 1; //fix bug
-             
+//              for(unsigned int i=0; i<p_raw_read->data_len_read;i++){
+//                  *(pbuf+i)= i/64;
+//              }
+    
         break;
-        
+               
         case UIF_TYPE_GPIO:
               err = GPIOPIN_Get( p_raw_read->dev_addr, pbuf );
         break;
@@ -562,7 +567,7 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
         
     } else {
         p_raw_read->pdata_read = pbuf ; //save data pointer
-        Dump_Data( pbuf,  p_raw_read->data_len_read ); 
+        //Dump_Data( pbuf,  p_raw_read->data_len_read ); 
         
     }
     

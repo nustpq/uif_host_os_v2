@@ -153,7 +153,10 @@ unsigned char SPI_WriteBuffer(AT91S_SPI *spi,
                                      void *buffer,
                                      unsigned int length)
 {
-   
+  
+    if( length > 4096 ) { //single DMA tranfer length
+        return 0;
+    }
 #if !defined(CHIP_SPI_DMA)
     
     // Check if first bank is free
@@ -279,6 +282,10 @@ unsigned char SPI_ReadBuffer( AT91S_SPI *spi,
                                     unsigned int length )
 {
     
+    if( length > 4095 ) { //single DMA tranfer length
+        return 0;
+    }
+    
 #if !defined(CHIP_SPI_DMA)
     // Check if the first bank is free
     if (spi->SPI_RCR == 0) {
@@ -373,6 +380,7 @@ unsigned char SPI_ReadBuffer( AT91S_SPI *spi,
     DMA_EnableChannel(BOARD_SPI_IN_DMA_CHANNEL);
     DMA_EnableChannel(BOARD_SPI_OUT_DMA_CHANNEL);
     
+    
     return 1;
     
 #endif
@@ -450,7 +458,7 @@ unsigned char SPI_ReadBuffer_API(  void *buffer,  unsigned int length )
         state = SPI_ReadBuffer( spi_if, buffer,length );     
         if( state == 1 ) {
             //while( ! SPI_IsReadFinished( spi_if ) ) {
-            while( !((AT91C_BASE_HDMA->HDMA_EBCISR) & (DMA_BTC<<BOARD_SPI_IN_DMA_CHANNEL) ) ) {      
+            while( !((AT91C_BASE_HDMA->HDMA_EBCISR) & (DMA_BTC<<BOARD_SPI_OUT_DMA_CHANNEL) ) ) {      
                 if( couter_ms >  0 ) {
                     OSTimeDly(1);  
                     if( couter_ms++ > SPI_TIME_OUT ) { //timeout : 2s
@@ -483,10 +491,11 @@ unsigned char SPI_WriteReadBuffer_API(  void *buffer_r,  void *buffer_w, unsigne
 {      
     unsigned char state;
     unsigned char err = 0; 
-    unsigned int  couter_ms  = 0 ; 
+    unsigned int  couter_ms  = 1 ; 
     unsigned int  couter_us  = 0 ; 
    
     //GPIOPIN_Set_Fast(7,0);
+      
     if( length_w != 0 ) {
         if( length_r != 0 ) {
             Set_AT91C_SPI_CSAAT( spi_if, 0 );
@@ -519,19 +528,21 @@ unsigned char SPI_WriteReadBuffer_API(  void *buffer_r,  void *buffer_w, unsigne
         if( length_r != 0 ) {
             Clear_AT91C_SPI_CSAAT( spi_if, 0 ); 
         }
+                    
+        if( err != 0 ) {
+            return err;
+        }
+        
     }
+
     
-    if( err != 0 ) {
-        return err;
-    }
-    
-    couter_ms  = 0 ; 
+    couter_ms  = 1 ; 
     couter_us  = 0 ; 
     //GPIOPIN_Set_Fast(7,0);
     if( length_r != 0 ) { 
        
         state = SPI_ReadBuffer( spi_if, buffer_r, length_r );
-        
+         
         if( state == 1 ) {
             //while( ! SPI_IsReadFinished( spi_if ) ) {
             while( !((AT91C_BASE_HDMA->HDMA_EBCISR) & (DMA_BTC<<BOARD_SPI_IN_DMA_CHANNEL) ) ) {      

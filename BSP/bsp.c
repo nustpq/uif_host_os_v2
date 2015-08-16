@@ -38,7 +38,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:H:V2.43]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:H:V2.44]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB01
 const CPU_CHAR hw_version[]  = "[HW:V1.0]"; 
@@ -952,7 +952,7 @@ void  BSP_Init (void)
 //    FLASHD_Erase(0x100000);
     
     // Config USART
-    UART_Init(PC_UART,       ISR_PC_UART,  6000000 );    //To PC (via Audio MCU)
+    UART_Init(PC_UART,       ISR_PC_UART,  3000000 );    //To PC (via Audio MCU)
     //UART_Init(SIGNAL_POWER_UART, NULL,         9600   );    //To Power Supply  & Signal Generator    
     UART_Init(AUDIO_UART,    NULL,         115200 );    //To Audio_DP and Audio_DC  
           
