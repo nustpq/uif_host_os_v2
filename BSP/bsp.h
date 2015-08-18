@@ -284,32 +284,35 @@ void         BSP_Ser_Printf          (CPU_CHAR      *format, ...);
 *                                             MODULE END
 *********************************************************************************************************
 */
+
 extern CPU_INT08U Debug_COM_Sel;
 extern OS_EVENT *Bsp_Ser_Tx_Sem_lock;  
 extern OS_EVENT *Bsp_Ser_Rx_Sem_lock;
+extern volatile CPU_INT08U  Flag_Reset_Pin_Trigger;
+extern volatile CPU_INT08U  Flag_Reset_Pin_Trigger  ;
 
 extern const CPU_CHAR fw_version[];
 extern const CPU_CHAR hw_version[];
 extern const CPU_CHAR hw_model[];
 
-extern void Head_Info( void );
-extern void Beep( INT32U beep_cycles);
-extern void Head_Info( void );
-extern void Beep( INT32U beep_cycles);
-extern volatile CPU_INT08U  Flag_Reset_Pin_Trigger;
-//extern void PDM_Pattern_Gen( INT8U type );
-extern void Time_Stamp( void );
-extern void  Get_Flash_Info (void);
+void Head_Info( void );
+void Beep( INT32U beep_cycles);
+void Head_Info( void );
+void Beep( INT32U beep_cycles);
+//void PDM_Pattern_Gen( INT8U type );
+void Time_Stamp( void );
+void Get_Flash_Info (void);
+void BSP_Init (void);
 
 
-
-extern volatile CPU_INT08U  Flag_Reset_Pin_Trigger  ;
 
 #define AT91C_BASE_TWI      AT91C_BASE_TWI0
 #define AT91C_ID_TWI        AT91C_ID_TWI0
 #define AT91C_IFLASH        AT91C_IFLASH0
 #define AT91C_AIC_PRIOR_LOWEST               (15) // (AIC) Lowest priority level
 #define AT91C_AIC_PRIOR_HIGHEST              (0) // (AIC) Highest priority level
+
+
 typedef void( *IntFunc )( void );
 
 

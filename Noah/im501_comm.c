@@ -32,9 +32,9 @@
 #include <includes.h>
 
 
-unsigned int Global_Read_VoiceBuffer_En = false;
-
-
+static unsigned int im501_irq_counter;
+static unsigned int im501_irq_gpio;
+static unsigned char voice_data_pkt_sn;
 /**********************************   For iM401 control **********************/
 /*
 static unsigned char iM401_Standby_Cmd[][3]=
@@ -277,7 +277,8 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
         } 
     }
     
-    if(  Global_VEC_Cfg.pdm_clk_off ) {    
+    if(  Global_VEC_Cfg.pdm_clk_off ) { 
+       OSTimeDly(30);//delay for iM501 test
        I2C_Mixer(I2C_MIX_FM36_CODEC);
        FM36_PDMADC_CLK_Onoff(0); //disable PDM clock
        I2C_Mixer(I2C_MIX_UIF_S);          
@@ -588,7 +589,7 @@ unsigned char im501_burst_read_dram_spi( unsigned int mem_addr, unsigned char **
     err   =  NO_ERR;
     pbuf = (unsigned char *)Reg_RW_Data; //global usage
     
-    if( data_len > 2039 ) {
+    if( data_len > (EMB_BUF_SIZE-1-13) ) {
         return PARA_SET_ERR;
     }
     
@@ -596,8 +597,8 @@ unsigned char im501_burst_read_dram_spi( unsigned int mem_addr, unsigned char **
     buf[1] =  mem_addr & 0xFF;
     buf[2] =  (mem_addr>>8) & 0xFF;
     buf[3] =  (mem_addr>>16) & 0xFF;
-    buf[4] =  (data_len>>1) & 0xFF;
-    buf[5] =  (data_len>>(1+8)) & 0xFF;    
+    buf[4] =  (data_len>>1)   & 0xFF;
+    buf[5] =  (data_len>>(1+8))& 0xFF;    
 
     state =  SPI_WriteReadBuffer_API(  pbuf, 
                                        buf, 
@@ -733,10 +734,7 @@ unsigned char im501_switch_i2c_spi( unsigned char if_type, unsigned char spi_mod
 }
 
 
-
-
-
-unsigned char send_cmd_to_im501( void )
+unsigned char test_send_cmd_to_im501( void )
 {
    
     unsigned char err;
@@ -773,113 +771,185 @@ unsigned char send_cmd_to_im501( void )
     
 }
 
+
+
+
+
 //this routine is called by iM501 IRQ service
 
+VOICE_BUF  voice_buf_data;
 
-
-DSP_COMM_CMD   Cmd_DSP_Comm;
-DPS_DATA_PACK  Data_DSP_Pack;
-
-
-
-unsigned char Fetch_Voice_Buffer_Data( void )
+unsigned char parse_to_host_command( To_Host_CMD cmd )
 {
     unsigned char err;
     unsigned char *pbuf;
+         
+    switch( cmd.cmd_byte ) {
+        
+        case 0x81 : //Reuest host to read To-Host Buffer 1st package
+            voice_buf_data.length   = cmd.attri & 0x7FFF;
+            voice_buf_data.index    = 1;
+            voice_buf_data.done     = (cmd.attri>>15) & 0x01;
+            err = im501_burst_read_dram_spi( HW_BUF_RX_L,  &pbuf,  voice_buf_data.length );
+            if( err != NO_ERR ){ 
+                return err;
+            }
+        break;
+        
+        case 0x82 : //Reuest host to read To-Host Buffer  
+            voice_buf_data.index    =  cmd.attri & 0x7FFF;
+            voice_buf_data.done     = (cmd.attri>>15) & 0x01;
+            err = im501_burst_read_dram_spi( HW_BUF_RX_L,  &pbuf,  voice_buf_data.length );
+            if( err != NO_ERR ){ 
+                return err;
+            }
+        break;
+        
+        case 0x83 : //Reuest host to turn PDM CLKI (PDMADC CLK for FM36)
+            I2C_Mixer(I2C_MIX_FM36_CODEC);
+            err = FM36_PDMADC_CLK_Onoff(1); //Enable PDM clock
+            I2C_Mixer(I2C_MIX_UIF_S); 
+            if( err != NO_ERR ){ 
+                return err;
+            }
+        break;
+        
+        default:
+            err = MODE_NOT_SUPPORT;           
+        break;
+        
+    }
+        
+    if( err != NO_ERR ) {
+        voice_buf_data.pdata = pbuf ;
+        err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
+                                      (pPCCMDDAT)&voice_buf_data,
+                                      voice_data_pkt_sn, 
+                                      PC_CMD_READ_VOICE_BUFFER ) ;  
+        
+    }
     
-    IM501_CMD cmd;     
+    return err;
+    
+}
+
+
+
+unsigned char send_to_dsp_command( To_501_CMD cmd )
+{
+    unsigned char err;
+    
+    err = im501_write_dram_spi( TO_DSP_CMD_ADDR, (unsigned char *)&cmd );
+    if( err != NO_ERR ){ 
+        return err;
+    }
+    err = im501_write_reg_spi( 0x01, cmd.cmd_byte );
+    if( err != NO_ERR ){ 
+        return err;
+    }
+    
+    OSTimeDly(1); //wait for DSP execute the cmd
+    
+    err = im501_read_dram_spi( TO_DSP_CMD_ADDR, (unsigned char *)&cmd );
+    if( err != NO_ERR ){ 
+        return err;
+    }
+    if( cmd.status != 0 ) {
+        err = cmd.status;
+    }
+    return err;
+    
+}
+
+
+
+unsigned char resp_to_host_command( void )
+{
+    unsigned char err;
+    To_Host_CMD   cmd;
     
     err = im501_read_dram_spi( TO_HOST_CMD_ADDR, (unsigned char *)&cmd );
     if( err != NO_ERR ){ 
         return err;
     }
-     
-    switch( cmd.cmd_byte ) {
-        
-        case 0x81 :
-            Data_DSP_Pack.length   = cmd.attri & 0x7FFF;
-            Data_DSP_Pack.index    = 1;
-            Data_DSP_Pack.done     = (cmd.attri>>15) & 0x01;
-            err = im501_burst_read_dram_spi( HW_BUF_RX_L,  &pbuf,  Data_DSP_Pack.length );
-            if( err != NO_ERR ){ 
-                return err;
-            }
-            cmd.status = 0;
-            err = im501_write_dram_spi( TO_HOST_CMD_ADDR, (unsigned char *)&cmd );
-            if( err != NO_ERR ){ 
-                return err;
-            }
-        break;
-        
-        case 0x82 :
-            Data_DSP_Pack.index    =  cmd.attri & 0x7FFF;
-            Data_DSP_Pack.done     = (cmd.attri>>15) & 0x01;
-            err = im501_burst_read_dram_spi( HW_BUF_RX_L,  &pbuf,  Data_DSP_Pack.length );
-            if( err != NO_ERR ){ 
-                return err;
-            }
-            cmd.status = 0;
-            err = im501_write_dram_spi( TO_HOST_CMD_ADDR, (unsigned char *)&cmd );
-            if( err != NO_ERR ){ 
-                return err;
-            }
-        break;
-        
-        default:
-            err = MODE_NOT_SOPORT;
-        break;
-        
-    }
     
-//    err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
-//                                      &PCCmd.raw_read,
-//                                      pkt_sn, 
-//                                      DATA_UIF_RAW_RD ) ; 
-    
-  
-    
-    
-}
-
-
-/*
-unsigned char fetch_voice_buffer_data( void )
-{
-    unsigned int data;
-    unsigned char err;
-    
-    static unsigned int pack_len;
-    static unsigned int pack_index;
-    
-    err = im501_read_dram_spi( TO_HOST_CMD_ADDR, &data );
+    err = parse_to_host_command( cmd );
     if( err != NO_ERR ){ 
         return err;
     }
-     
-    switch( GET_HOST_CMD_OFFSET_CMD( data ) ) {
-        
-        case 0x81 :
-            pack_len = GET_PACK_LEN( data );
-            pack_index = 1;
-            err = im501_burst_read_dram_spi( 0x0ffe0000,  pdata, 2000 );
-            if( CHECK_LAST_PACK ) {
-                
-            }
-        break;
-        
-        case 0x82 :
-            
-        break;
-        
-        default:
-        break;
+    
+    cmd.status = 0;
+    err = im501_write_dram_spi( TO_HOST_CMD_ADDR, (unsigned char *)&cmd );
+    if( err != NO_ERR ){ 
+        return err;
     }
     
-    
+    return err;
     
 }
-*/
 
 
 
+unsigned char Write_CMD_To_iM501( unsigned char cmd_index, unsigned int para )
+{
+    unsigned char err;
+    To_501_CMD cmd;
+    
+    cmd.cmd_byte = cmd_index;
+    cmd.attri    = para & 0xFFFF ;
+    
+    err = send_to_dsp_command( cmd );
+    
+    return err;
+    
+}
+
+
+void ISR_iM501_IRQ( void )
+{
+    if( Check_GPIO_Intrrupt( im501_irq_gpio ) ) {                       
+        im501_irq_counter++;        
+    }
+}
+
+
+
+unsigned char Read_iM501_Voice_Buffer( unsigned char gpio_irq, unsigned int timeout_ms, unsigned char pkt_sn )
+{
+    unsigned char err;
+    unsigned int time_start;
+    
+    err = NO_ERR;    
+    im501_irq_counter = 0;
+    im501_irq_gpio = gpio_irq ;
+    voice_data_pkt_sn = pkt_sn ;
+    time_start = OSTimeGet(); //save start time
+    
+    //set gpio interruption
+    Config_GPIO_Interrupt( gpio_irq, ISR_iM501_IRQ );     
+  
+    //
+    while(1) {     
+        if ( im501_irq_counter ) {
+            //APP_TRACE_INFO(("::ISR_iM501_IRQ : %d\r\n",im501_irq_counter)); //for test
+            im501_irq_counter--;
+            err = resp_to_host_command();             
+            if( err != NO_ERR ){ 
+                break;
+            }
+            if( voice_buf_data.done ) {
+                break;
+            }
+        }
+        if( (OSTimeGet() - time_start) >= timeout_ms ) { //timeout hit
+            break;  
+        }
+        //OSTimeDly(5); //for test 
+    }
+    
+    Disable_GPIO_Interrupt( gpio_irq );
+    
+    return err;
+    
+}
 

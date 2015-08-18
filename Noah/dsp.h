@@ -47,4 +47,6 @@ extern unsigned char Init_FM36_AB03_Preset( void );
 
 extern unsigned char Init_FM36_AB03_temp(void );
 
+extern unsigned char FM36_PDMADC_CLK_Onoff( unsigned char onoff );
+
 #endif

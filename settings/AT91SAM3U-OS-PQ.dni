@@ -33,7 +33,7 @@ Stop=1
 Freq=10000000
 MultiCoreRunAll=1
 [DebugChecksum]
-Checksum=1914917438
+Checksum=296725899
 [JLinkDriver]
 CStepIntDis=_ 0
 [Exceptions]
@@ -61,10 +61,12 @@ mode=0
 [Breakpoints2]
 Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\APP\task_cmd_parse.c}.85.13" 0 0 1 "" 0 "" 0
 Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\twid.c}.448.5" 0 0 1 "" 0 "" 0
-Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.201.13" 0 0 1 "" 0 "" 0
+Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.202.13" 0 0 1 "" 0 "" 0
 Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\spi.c}.583.5" 0 0 1 "" 0 "" 0
-Bp4=_ 1 "EMUL_CODE" "{$PROJ_DIR$\APP\task_uart_tx.c}.115.13" 0 0 1 "" 0 "" 0
-Count=5
+Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\APP\task_uart_tx.c}.115.13" 0 0 1 "" 0 "" 0
+Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\APP\task_uart_rx.c}.103.14" 0 0 1 "" 0 "" 0
+Bp6=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.680.13" 0 0 1 "" 0 "" 0
+Count=7
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

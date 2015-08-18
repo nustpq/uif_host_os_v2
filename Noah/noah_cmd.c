@@ -179,14 +179,10 @@ void  Noah_CMD_Read (CMDREAD    *pCMD_Read,
                    OSMemPut( pMEM_Part_MsgUART, pRecvPtr );              
                }
 //                Time_Stamp();
-//                APP_TRACE_INFO(("\r\n::::: Noah_CMD_Read post data "));
-              
+//                APP_TRACE_INFO(("\r\n::::: Noah_CMD_Read post data "));              
                
-//            err = EMB_Data_Parse( pRecvPtr );
-//            
-//            OSMemPut( pMEM_Part_MsgUART, pRecvPtr );  //release mem
-            
-            
+//            err = EMB_Data_Parse( pRecvPtr );      
+//            OSMemPut( pMEM_Part_MsgUART, pRecvPtr );  //release mem            
             }
         break ;        
         
@@ -263,7 +259,7 @@ CPU_INT08U  CheckSum (CPU_INT08U   init_data,
 * Note(s)     : None.
 *********************************************************************************************************
 */
-CPU_INT08U  pcSendDateToBuf (OS_EVENT    *pOS_EVENT, 
+CPU_INT08U  pcSendDateToBuf( OS_EVENT    *pOS_EVENT,
                              CPU_INT08U   frame_head, 
                              CPU_INT08U  *pdat, 
                              CPU_INT08U   data_length, 
@@ -337,8 +333,9 @@ CPU_INT08U  pcSendDateToBuf (OS_EVENT    *pOS_EVENT,
 }
 
 
-CPU_INT08U  pcSendDateToBuffer ( OS_EVENT    *pOS_EVENT,                               
-                                 RAW_READ    *p_raw_read,
+
+CPU_INT08U  pcSendDateToBuffer ( OS_EVENT    *pOS_EVENT,  
+                                 PCCMDDAT    *pPcCmdData,
                                  CPU_INT08U   pkt_index,
                                  CPU_INT16U   cmd_id                                 
                                )
@@ -359,17 +356,17 @@ CPU_INT08U  pcSendDateToBuffer ( OS_EVENT    *pOS_EVENT,
             break;
         }
         while(1){
-               APP_TRACE_INFO(("\r\n::::: error"));
+               APP_TRACE_INFO(("\r\n:::::OSMemGet error"));
         };
-        OSTimeDly(5); //wait for free MemoryPart
+        OSTimeDly(1); //wait for free MemoryPart
     }
     pSendPtr = (pNEW_CMD)pMemPtr;
  
-    if( cmd_id != 0 ) { 
-        err = EMB_Data_Build( cmd_id, pSendPtr->data, p_raw_read, &data_length );  
+    if( cmd_id != 0 ) {//data package   
+        err = EMB_Data_Build( cmd_id, pSendPtr->data, pPcCmdData, &data_length );  
         
     } else { //report package
-        pSendPtr->data[0] = *(unsigned char *)p_raw_read;
+        pSendPtr->data[0] = *(unsigned char *)pPcCmdData;
         data_length = 1;
         
     }
@@ -633,7 +630,7 @@ void  Send_Report (CPU_INT08U pkt_sn, CPU_INT08U error_id)
 {
     
     APP_TRACE_DBG(("Error: %2x ",error_id));
-    pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, (RAW_READ*)&error_id, pkt_sn, 0 ) ; 
+    pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, (pPCCMDDAT)&error_id, pkt_sn, 0 ) ; 
 
     
 }
@@ -654,17 +651,19 @@ void  Send_Report (CPU_INT08U pkt_sn, CPU_INT08U error_id)
 */
 CPU_INT08U  EMB_Data_Build (  CPU_INT16U   cmd_type, 
                               CPU_INT08U  *pChar,                          
-                              RAW_READ    *pRawRead,
+                              PCCMDDAT    *pPcCmdData,
                               CPU_INT32U  *p_emb_length)
 {
     
     CPU_INT08U   err;
     CPU_INT32S   pos;     
     emb_builder  builder;
-    CPU_INT08U   ver_buf[25];  //sizeof(Audio_Version) + szieof(fw_version)    
+    CPU_INT08U   ver_buf[28];  //sizeof(Audio_Version) + szieof(fw_version)    
+    CPU_INT08U   endchar;
     
     err      =  NO_ERR ; 
     pos      =  0;
+    endchar  = '\0';
     
     switch( cmd_type ){      
 
@@ -683,6 +682,7 @@ CPU_INT08U  EMB_Data_Build (  CPU_INT16U   cmd_type,
             pos = emb_append_attr_string(&builder, pos, 2, hw_version); 
             strcpy( (char*)ver_buf, (char*)fw_version );  
             strcat( (char*)ver_buf, (char*)Audio_Version ); 
+            strcat( (char*)ver_buf, (char*)endchar);
             pos = emb_append_attr_string(&builder, pos, 3, (const char*)ver_buf);    
             pos = emb_append_end(&builder, pos);
             *p_emb_length = pos;           
@@ -690,13 +690,23 @@ CPU_INT08U  EMB_Data_Build (  CPU_INT16U   cmd_type,
         
         case DATA_UIF_RAW_RD :
             pos = emb_init_builder(pChar, EMB_BUF_SIZE, cmd_type, &builder);
-            pos = emb_append_attr_uint(&builder, pos, 1, pRawRead->if_type);
-            pos = emb_append_attr_uint(&builder, pos, 2, pRawRead->dev_addr); 
-            pos = emb_append_attr_uint(&builder, pos, 3, pRawRead->data_len_read);            
-            pos = emb_append_attr_binary(&builder, pos, 4, pRawRead->pdata_read, pRawRead->data_len_read);
+            pos = emb_append_attr_uint(&builder, pos, 1, pPcCmdData->raw_read.if_type);
+            pos = emb_append_attr_uint(&builder, pos, 2, pPcCmdData->raw_read.dev_addr); 
+            pos = emb_append_attr_uint(&builder, pos, 3, pPcCmdData->raw_read.data_len_read);            
+            pos = emb_append_attr_binary(&builder, pos, 4, pPcCmdData->raw_read.pdata_read, pPcCmdData->raw_read.data_len_read);
             pos = emb_append_end(&builder, pos);
             *p_emb_length = pos;   
         break;
+        
+        case PC_CMD_READ_VOICE_BUFFER :
+            pos = emb_init_builder(pChar, EMB_BUF_SIZE, cmd_type, &builder);
+            pos = emb_append_attr_uint(&builder, pos, 1, pPcCmdData->voice_buf_data.done); //package status is finished?
+            pos = emb_append_attr_uint(&builder, pos, 2, pPcCmdData->voice_buf_data.index); //package index               
+            pos = emb_append_attr_binary(&builder, pos, 3, pPcCmdData->voice_buf_data.pdata, pPcCmdData->voice_buf_data.length);
+            pos = emb_append_end(&builder, pos);
+            *p_emb_length = pos;   
+        break;
+        
         
         default:
             err = CMD_NOT_SURRPORT ;    
@@ -870,7 +880,7 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             if( err != NO_ERR ) { /*err = EMB_CMD_ERR; */ break; } 
             
             err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
-                                      &PCCmd.raw_read,
+                                      &PCCmd,
                                       pkt_sn, 
                                       DATA_UIF_RAW_RD ) ;  
             
@@ -941,17 +951,30 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         case PC_CMD_RAED_AB_INFO : 
              
             err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
-                                      &PCCmd.raw_read,
+                                      &PCCmd,
                                       pkt_sn, 
                                       DATA_AB_INFO ) ;           
         break ; 
         
         
         case PC_CMD_READ_VOICE_BUFFER:
-            Global_Read_VoiceBuffer_En = true;
-              
+            temp = emb_get_attr_int(&root, 1, -1); //irq gpio index
+            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }           
+            temp2 = emb_get_attr_int(&root, 2, -1); //timeout ms
+            if(temp2 == -1 ) { Send_GACK(EMB_CMD_ERR); break; }         
+            err = Read_iM501_Voice_Buffer( (CPU_INT32U)temp, (CPU_INT32U)temp2, pkt_sn );              
               
         break;
+        
+        case PC_CMD_TO_IM501_CMD:
+            temp = emb_get_attr_int(&root, 1, -1); //To iM501 cmd id
+            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }           
+            temp2 = emb_get_attr_int(&root, 2, -1);//cmd attribute, 2 bytes
+            if(temp2 == -1 ) { Send_GACK(EMB_CMD_ERR); break; }         
+            err = Write_CMD_To_iM501( (CPU_INT08U)temp, (CPU_INT32U)temp2 );              
+              
+        break;
+        
         
 /***************************************************************************
         

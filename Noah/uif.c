@@ -49,7 +49,7 @@ void Reverse_Endian( unsigned char *pdata, unsigned char size )
       *( pdata+i ) = *( pdata + size -1 - i );
       *( pdata + size -1 - i ) = temp;
       
-    }      
+    }     
     
 }
 
@@ -197,9 +197,7 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         case UIF_TYPE_GPIO_CLK :       
             CS_GPIO_Init( pInterface_Cfg->attribute );
         break ;   
-        case 100 :
-            send_cmd_to_im501( );
-        break;
+
         default:
             err = UIF_TYPE_NOT_SUPPORT;
         break;

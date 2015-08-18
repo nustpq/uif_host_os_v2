@@ -70,9 +70,7 @@ void  App_TaskUserIF (void *p_arg)
     Init_Global_Var(); 
     iM401_Ctrl_Enable = 1;
     AB_POST();
-    
-    //OSTimeDly(500);
-    
+
 
 #ifndef BOARD_TYPE_AB01  
     APP_TRACE_INFO(( "\r\nWARNING: NOT AB01, NO MCU CRT UART SWITCH\r\n"));
@@ -102,9 +100,9 @@ void  App_TaskUserIF (void *p_arg)
                     //         1: OFF:  Buzzer unmuted
                     if( (key_state>>(8 + 0)) & 0x01) {  //check if SW1 switch status changed                         
                         if( ((key_state>>0)& 0x01 ) == 0 ) { 
-                            BUZZER_MUTE =  1;   //mute buzzer                         
+                            BUZZER_MUTE =  1;   //mute buzzer                           
                         } else {                                                 
-                            BUZZER_MUTE =  0;   //unmute buzzer
+                            BUZZER_MUTE =  0;   //unmute buzzer                        
                         }
                     }
                     
@@ -147,7 +145,8 @@ void  App_TaskUserIF (void *p_arg)
 //                            Debug_COM_Sel = 0 ;               
 //                            UART_Init(PC_UART, ISR_PC_UART, 115200 );    //To PC  ? Sem recreat issue
 //                        }
-                          send_cmd_to_im501();
+                          //test_send_cmd_to_im501();
+                          //Read_iM501_Voice_Buffer(2,15000);
                     } 
                 break;
                 
@@ -181,10 +180,6 @@ void  App_TaskUserIF (void *p_arg)
                                     //iM401_Standby(); 
                                     //iM401_Load_Vec();
                                     MCU_Load_Vec( 0 );
-                                }
-                                
-                                if( Global_Read_VoiceBuffer_En ) {
-                                    Fetch_Voice_Buffer_Data();
                                 }
                                 
                             } 

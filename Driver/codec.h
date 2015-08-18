@@ -38,18 +38,18 @@
  
 
 /****************************************/
-extern unsigned char Set_Codec(unsigned char codec_control_type, unsigned char size_para, unsigned char *pdata);
-extern unsigned char Get_Codec(unsigned char codec_control_type, unsigned char reg, unsigned char *pdata);
+unsigned char Set_Codec(unsigned char codec_control_type, unsigned char size_para, unsigned char *pdata);
+unsigned char Get_Codec(unsigned char codec_control_type, unsigned char reg, unsigned char *pdata);
 
-extern unsigned char Codec_Mixer(unsigned char i2c_channel );
-//extern unsigned char Init_CODEC( unsigned int sample_rate );
-extern unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length ) ;
+unsigned char Codec_Mixer(unsigned char i2c_channel );
+//unsigned char Init_CODEC( unsigned int sample_rate );
+unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length ) ;
 
-extern unsigned char Set_AIC3204_DSP_Offset( unsigned char slot_index ) ;
-extern unsigned char Init_CODEC_AIC3204( unsigned int sample_rate ) ;
+unsigned char Set_AIC3204_DSP_Offset( unsigned char slot_index ) ;
+unsigned char Init_CODEC_AIC3204( unsigned int sample_rate ) ;
 
-extern unsigned char CODEC_LOUT_Small_Gain_En( bool small_gain );
-extern unsigned char CODEC_Set_Volume( unsigned int vol_spk,  unsigned int vol_lin );
-extern unsigned char Check_SR_Support( unsigned int sample_rate );
+unsigned char CODEC_LOUT_Small_Gain_En( bool small_gain );
+unsigned char CODEC_Set_Volume( unsigned int vol_spk,  unsigned int vol_lin );
+unsigned char Check_SR_Support( unsigned int sample_rate );
 
 #endif

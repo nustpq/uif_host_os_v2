@@ -41,15 +41,16 @@
 #define  MCU_SW_RESET_PATTERN   0xA5000005
 
 
-#define EMB_BUF_SIZE            (2048-8) //2048// 3072 //256*120=3072 //Be Careful to modify
+
 //#define UART_CMD_DATA_LENGTH    255 
 
 /////////  UART Message Storage Area:  MemPartition_MsgUART   //////////////////
 #define MsgUARTQueue_SIZE       5//10                            //memory partition block numbers
-#define MsgUARTBody_SIZE        (2048) //length of each message == length per frame: head+ datalength +data( MUST be 4 X )
-#define MAX_RESEND_TIMES        3  
+#define MsgUARTBody_SIZE        (4096) //length of each message == length per frame: head+ datalength +data( MUST be 4 X )
+#define EMB_BUF_SIZE            (MsgUARTBody_SIZE-8)// 8 bytes are for package header reserved
 
-#define DBG_UART_Send_Buf_Size 4096
+#define MAX_RESEND_TIMES        3
+#define DBG_UART_Send_Buf_Size  4096
 
 extern OS_MEM       *pMEM_Part_MsgUART;
 extern CPU_INT08U    MemPartition_MsgUART[MsgUARTQueue_SIZE][MsgUARTBody_SIZE];
@@ -80,19 +81,6 @@ extern OS_EVENT *UART_MUX_Sem_lock;
 
 extern CPU_INT08U DBG_UART_Send_Buffer[];
 
-extern void App_TaskUART_Tx      ( void *pdata ) ;
-extern void App_TaskUART_Tx_Ruler( void *pdata ) ;
-extern void App_TaskUART_Rx      ( void *pdata ) ;
-extern void App_TaskNoah         ( void *p_arg ) ;
-extern void App_TaskNoah_Ruler   ( void *p_arg ) ;
-extern void App_TaskGenieShell   ( void *p_arg ) ;
-extern void App_TaskUserIF       ( void *p_arg ) ;
-extern void App_TaskJoy          ( void *p_arg ) ;
-extern void App_TaskCMDParse     ( void *p_arg ) ;
-extern void App_TaskDebugInfo    ( void *p_arg ) ;
-
-extern void Task_ReCreate_Shell( void );
-
 
 extern CPU_INT08U       PcCmdTxID;
 extern CPU_INT08U       PcCmdTxID_Ruler[];
@@ -105,7 +93,25 @@ extern unsigned int         test_counter1, test_counter2,test_counter3, test_cou
 extern CPU_INT16U debug_uart_fifo_data_max ;
 extern CPU_INT16U debug_uart_fifo_oveflow_counter ;
 
-extern void Port_Detect_Enable( unsigned char on_off );
+
+
+void App_TaskUART_Tx      ( void *pdata ) ;
+void App_TaskUART_Tx_Ruler( void *pdata ) ;
+void App_TaskUART_Rx      ( void *pdata ) ;
+void App_TaskNoah         ( void *p_arg ) ;
+void App_TaskNoah_Ruler   ( void *p_arg ) ;
+void App_TaskGenieShell   ( void *p_arg ) ;
+void App_TaskUserIF       ( void *p_arg ) ;
+void App_TaskJoy          ( void *p_arg ) ;
+void App_TaskCMDParse     ( void *p_arg ) ;
+void App_TaskDebugInfo    ( void *p_arg ) ;
+
+void Task_ReCreate_Shell( void );
+void Port_Detect_Enable( unsigned char on_off );
+
+
+
+
 
 #endif
 

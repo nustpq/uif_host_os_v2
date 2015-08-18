@@ -59,7 +59,7 @@
 #define POWER_MODULE_NOT_EXIST   183u
 #define FRQ_MODULE_NOT_EXIST     184u
 #define CHIP_UART_NOT_CONNECT    185u
-#define MODE_NOT_SOPORT          186u
+#define MODE_NOT_SUPPORT         186u
 #define SET_I2C_ERR              187u
 #define ADDR_PARA_ERR            188u
 #define UART_RD_TIMEOUT_ERR      189u     
@@ -232,6 +232,7 @@
 #define  PC_CMD_MCU_FLASH_WRITE      40
 #define  PC_CMD_SET_VEC_CFG          41
 #define  PC_CMD_READ_VOICE_BUFFER    42
+#define  PC_CMD_TO_IM501_CMD         43
 
 #define  PC_CMD_DOWNLOAD_RULER_FW    100
 #define  PC_CMD_UPDATE_RULER_FW      101
@@ -256,7 +257,7 @@
 #define SET_FRAME_HEAD( frame_id, frame_type )    ((frame_type & 0x3F)|(frame_id & 0xC0))
 
 #define NOAH_CMD_DATA_MLEN     255  // max 255 cmd data per package
-#define NEW_CMD_DATA_MLEN      (2048-8) //KFIFO size is 1024, EMB = 1024 - Header
+#define NEW_CMD_DATA_MLEN      (EMB_BUF_SIZE) //(2048-8) //KFIFO size is 1024, EMB = 1024 - Header
 
 /*
 *********************************************************************************************************
@@ -318,7 +319,8 @@ typedef union  {
     BURST_READ            burst_read;
     MCU_FLASH             mcu_flash;
     SET_VEC_CFG           set_vec_cfg;
-}PCCMDDAT ;
+    VOICE_BUF             voice_buf_data;
+}PCCMDDAT, *pPCCMDDAT ;
 
 //#pragma pack()
 typedef struct {
@@ -350,13 +352,13 @@ extern CPU_INT08U pcSendDateToBuf(  OS_EVENT   *pOS_EVENT,
                                     CPU_INT08U   ex_data_length 
                                  ) ;
 extern CPU_INT08U  pcSendDateToBuffer ( OS_EVENT    *pOS_EVENT,                               
-                                 RAW_READ    *p_raw_read,
+                                 PCCMDDAT    *pPcCmdData,
                                  CPU_INT08U   pkt_index,
                                  CPU_INT16U   cmd_id                                 
                                );
 extern CPU_INT08U  EMB_Data_Build (  CPU_INT16U   cmd_type, 
-                              CPU_INT08U  *pChar,                          
-                              RAW_READ     *pRawRead,
+                              CPU_INT08U  *pChar, 
+                              PCCMDDAT    *pPcCmdData,
                               CPU_INT32U  *p_emb_length);
 
 extern CPU_INT08U CheckSum(     CPU_INT08U init_data, 

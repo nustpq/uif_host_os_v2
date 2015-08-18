@@ -297,7 +297,7 @@ typedef struct {
 }SET_VEC_CFG ;    
    
 
-extern unsigned char Audio_Version[12];
+extern unsigned char Audio_Version[];
 extern unsigned char Ruler_CMD_Result;
 
 

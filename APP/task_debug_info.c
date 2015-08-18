@@ -33,7 +33,7 @@
 
 #define DBG_UART_BUF_SIZE    256
 
-CPU_INT08U DBG_UART_Send_Buffer[DBG_UART_Send_Buf_Size ];
+CPU_INT08U DBG_UART_Send_Buffer[ DBG_UART_Send_Buf_Size ];
 
 CPU_INT16U debug_uart_fifo_data_max ;
 CPU_INT16U debug_uart_fifo_oveflow_counter ;

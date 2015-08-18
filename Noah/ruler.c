@@ -37,7 +37,7 @@ volatile unsigned char  Global_Bridge_POST = 0 ;  //audio bridge POST status
 volatile unsigned char  Global_Ruler_State[4];    //ruler status
 volatile unsigned char  Global_Ruler_Type[4];     //ruler type
 volatile unsigned char  Global_Mic_State[4];      //MIC (8*4=32) status(calib info error or not)
-unsigned char           Audio_Version[12];        //fixed size
+unsigned char           Audio_Version[20];        //fixed size
 unsigned char           Ruler_CMD_Result;
 volatile unsigned char  Ruler_Setup_Sync_Data;
 

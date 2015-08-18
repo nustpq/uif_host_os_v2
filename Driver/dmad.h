@@ -130,27 +130,27 @@ typedef struct _PictureInPicture {
 //------------------------------------------------------------------------------
 //         Global functions
 //------------------------------------------------------------------------------
-extern void DMAD_Initialize(unsigned char channel);
-extern void DMAD_Handler(void);                    
-extern unsigned char DMAD_Configure_Buffer(unsigned char channel, 
+void DMAD_Initialize(unsigned char channel);
+void DMAD_Handler(void);                    
+unsigned char DMAD_Configure_Buffer(unsigned char channel, 
                              unsigned char sourceTransferMode,
                              unsigned char destTransferMode,
                              DmaLinkList *lli,
                              PictureInPicture *pip);
 
-extern unsigned char DMAD_Configure_TransferController(unsigned char channel,
+unsigned char DMAD_Configure_TransferController(unsigned char channel,
                                              unsigned int bufSize,
                                              unsigned char sourceWidth,
                                              unsigned char destWidth,
                                              unsigned int sourceAddress,
                                              unsigned int destAddress);
                                  
-extern unsigned char DMAD_BufferTransfer(unsigned char channel, 
+unsigned char DMAD_BufferTransfer(unsigned char channel, 
                                          unsigned int size, 
                                          DmaCallback callback, 
                                          unsigned char polling);
 
-extern unsigned char DMAD_IsFinished(unsigned char channel);
+unsigned char DMAD_IsFinished(unsigned char channel);
 
 
 #endif //#ifndef DMAD_H

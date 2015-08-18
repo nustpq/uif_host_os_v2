@@ -63,6 +63,10 @@ extern void GPIOPIN_Set_Fast( unsigned char pin , unsigned char data );
 
 extern OS_EVENT *GPIO_Sem_I2C_Mixer;
 
+extern void Config_GPIO_Interrupt( unsigned char gpio_index, CPU_FNCT_VOID isr_handler );
+extern void Disable_GPIO_Interrupt( unsigned char gpio_index );
+extern unsigned char Check_GPIO_Intrrupt( unsigned char gpio_index );
+
 #endif
 
 

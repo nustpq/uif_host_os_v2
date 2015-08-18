@@ -65,22 +65,24 @@ typedef struct {
     unsigned short attri;
     unsigned char  cmd_byte;
     unsigned char  status;
-}IM501_CMD ;
+}To_Host_CMD ;
 
-typedef union {
-    unsigned int cmd;
-    IM501_CMD    im501_cmd; 
-}DSP_COMM_CMD ;
+typedef struct {
+    unsigned short attri;
+    unsigned char  cmd_byte_ext;
+    unsigned char  status;
+    unsigned char  cmd_byte;
+}To_501_CMD ;
 
 typedef struct {
     unsigned int   length;
     unsigned int   index;
+    unsigned char *pdata;
     unsigned char  done;
-}DPS_DATA_PACK ;
+}VOICE_BUF ;
 
 
 
-extern unsigned int Global_Read_VoiceBuffer_En;
 
 //extern unsigned char iM401_Bypass( void );
 //extern unsigned char iM401_Standby( void );
@@ -105,8 +107,10 @@ unsigned char im501_write_dram_spi( unsigned int mem_addr, unsigned char *pdata 
 
 unsigned char im501_switch_i2c_spi( unsigned char if_type, unsigned char spi_mode );
 
-unsigned char send_cmd_to_im501( void );
+unsigned char test_send_cmd_to_im501( void );
 
-unsigned char Fetch_Voice_Buffer_Data( void );
+unsigned char Read_iM501_Voice_Buffer( unsigned char gpio_irq, unsigned int timeout_ms, unsigned char pkt_sn );
+
+unsigned char Write_CMD_To_iM501( unsigned char cmd_index, unsigned int para );
 
 #endif
