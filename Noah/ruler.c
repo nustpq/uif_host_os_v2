@@ -1433,6 +1433,7 @@ unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
     Global_VEC_Cfg.flag        = 0x55; //means cfg ok    
     Global_VEC_Cfg.trigger_en  = p_dsp_vec_cfg->trigger_en; 
     Global_VEC_Cfg.pdm_clk_off = p_dsp_vec_cfg->pdm_clk_off; 
+    Global_VEC_Cfg.if_type     = p_dsp_vec_cfg->if_type; 
     
     if( Global_VEC_Cfg.trigger_en ) {
         err = MCU_Load_Vec(1);

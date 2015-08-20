@@ -32,10 +32,16 @@
 #include <includes.h>
 
 
+VOICE_BUF  voice_buf_data;
+
 static unsigned int im501_irq_counter;
 static unsigned int im501_irq_gpio;
 static unsigned char voice_data_pkt_sn;
-/**********************************   For iM401 control **********************/
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+/**********************************   For iM401 control test  **********************/
 /*
 static unsigned char iM401_Standby_Cmd[][3]=
 {
@@ -139,73 +145,33 @@ unsigned char iM401_Bypass( void )
     
 }
 */
+
 ////////////////////////////////////////////////////////////////////////////////
 
 
 
 
-unsigned char iM401_Load_Vec( void )
-{     
-    unsigned char err;
-    unsigned char i, index, *pChar;  
-    FLASH_INFO    flash_info;   
-    
-    err = NO_ERR;
-    APP_TRACE_INFO(("\r\nLoad iM401 vec stored in MCU flash...\r\n"));    
-   
-    if( Global_VEC_Cfg.flag != 0x55 ) {
-        APP_TRACE_INFO(("\r\nvec conf data error!\r\n")); 
-        err = FW_VEC_SET_CFG_ERR;
-        return err;
-    }
-        
-    index = Global_VEC_Cfg.vec_index_a ;
-    if( index != 0 ) {        
-        Read_Flash_State(&flash_info, FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * index  );
-        if( flash_info.f_w_state != FW_DOWNLAD_STATE_FINISHED ) {
-          err = FW_VEC_SAVE_STATE_ERR;
-          APP_TRACE_INFO(("\r\nvec data state error...\r\n"));
-          return err;
-        }       
-        APP_TRACE_INFO(("Load vec[%d] (%d Bytes) ...\r\n",index,flash_info.bin_size));
-        pChar = (unsigned char *)FLASH_ADDR_FW_VEC + index * FLASH_ADDR_FW_VEC_SIZE;
-        for( i = 0; i < flash_info.bin_size / 3; i++ ) { 
-            err =  TWID_Write(  iM401_I2C_ADDR>>1, 0, 0, pChar + i*3 , 3, NULL);     
-            if ( err != SUCCESS )  {
-                return(I2C_BUS_ERR) ;
-            }
-        } 
-    } 
-    
-    OSTimeDly( Global_VEC_Cfg.delay );
-
-    index = Global_VEC_Cfg.vec_index_b ;
-    if( index != 0 ) {        
-        Read_Flash_State(&flash_info, FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * index );
-        if( flash_info.f_w_state != FW_DOWNLAD_STATE_FINISHED ) {
-          err = FW_VEC_SAVE_STATE_ERR;
-          APP_TRACE_INFO(("\r\nvec data state error...\r\n"));
-          return err;
-        }       
-        APP_TRACE_INFO(("Load vec[%d] (%d Bytes) ...\r\n",index,flash_info.bin_size));
-        pChar = (unsigned char *)FLASH_ADDR_FW_VEC + index * FLASH_ADDR_FW_VEC_SIZE;
-        for( i = 0; i < flash_info.bin_size / 3; i++ ) { 
-            err =  TWID_Write(  iM401_I2C_ADDR>>1, 0, 0, pChar + i*3 , 3, NULL);     
-            if ( err != SUCCESS )  {
-                return(I2C_BUS_ERR) ;
-            }
-        } 
-    } 
-    
-    return err;     
-    
-}
 
 
+/*
+*********************************************************************************************************
+*                                           MCU_Load_Vec()
+*
+* Description :  Load parameters stored in flash to iM401/iM501 and turn on / turn off PDM clock accordingly.
+*
+* Argument(s) :  firsttime     is used to identify this is a full power up - power down cycle(firsttime=0),
+*                              or just a power down cycle for first stage(firsttime=1)                          
+*
+* Return(s)   :  error number.           
+*
+* Note(s)     :  None.
+*********************************************************************************************************
+*/
 unsigned char MCU_Load_Vec( unsigned char firsttime )
 {     
     unsigned char err;
-    unsigned char i, index, *pChar; 
+    unsigned char i,j;
+    unsigned char index, *pChar, buf[6]; 
     unsigned char dev_addr, data_num;
     FLASH_INFO    flash_info;   
     
@@ -243,14 +209,32 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
             }   
             APP_TRACE_INFO(("Load vec[%d] (%d Bytes) ...\r\n",index,flash_info.bin_size));
             pChar = (unsigned char *)FLASH_ADDR_FW_VEC + index * FLASH_ADDR_FW_VEC_SIZE;
-            for( i = 0; i < flash_info.bin_size ;  ) {
-                data_num = *(pChar+i) ;
-                err =  TWID_Write(  dev_addr>>1, 0, 0, pChar + i + 1 , data_num, NULL); 
-                i += ( data_num + 1 );               
-                if ( err != SUCCESS )  {
-                    return(I2C_BUS_ERR) ;
+            
+            if(  Global_VEC_Cfg.if_type == 1 ) { //I2C interface
+                for( i = 0; i < flash_info.bin_size ;  ) {
+                    data_num = *(pChar+i) ;
+                    err =  TWID_Write(  dev_addr>>1, 0, 0, pChar + i + 1 , data_num, NULL); 
+                    i += ( data_num + 1 );               
+                    if ( err != SUCCESS )  {
+                        return (I2C_BUS_ERR) ;
+                    }
                 }
-            } 
+            }else if( Global_VEC_Cfg.if_type == 2 ) { //SPI interface
+                for( i = 0; i < flash_info.bin_size ;  ) {
+                    data_num = *(pChar+i) ;
+                    if(data_num > sizeof(buf)) {
+                        return (SPI_BUS_ERR);
+                    }
+                    for(j = 0; j < data_num ; j++) {
+                        buf[j] = *(pChar + i + 1 + j);
+                    }                
+                    err = SPI_WriteBuffer_API( &buf, data_num );                  
+                    i += ( data_num + 1 );
+                    if (err != SUCCESS) {
+                        return (SPI_BUS_ERR);
+                    }
+                }
+            }            
         }  
         
         OSTimeDly( Global_VEC_Cfg.delay );  //Delay mSecond
@@ -267,17 +251,34 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
         }       
         APP_TRACE_INFO(("Load vec[%d] (%d Bytes) ...\r\n",index,flash_info.bin_size));
         pChar = (unsigned char *)FLASH_ADDR_FW_VEC + index * FLASH_ADDR_FW_VEC_SIZE;
-        for( i = 0; i < flash_info.bin_size ;  ) {
-            data_num = *(pChar+i) ;
-            err =  TWID_Write(  dev_addr>>1, 0, 0, pChar + i + 1 , data_num, NULL); 
-            i += ( data_num + 1 );     
-            if ( err != SUCCESS )  {
-                return(I2C_BUS_ERR) ;
+        if(  Global_VEC_Cfg.if_type == 1 ) { //I2C interface
+            for( i = 0; i < flash_info.bin_size ;  ) {
+                data_num = *(pChar+i) ;
+                err =  TWID_Write(  dev_addr>>1, 0, 0, pChar + i + 1 , data_num, NULL); 
+                i += ( data_num + 1 );     
+                if ( err != SUCCESS )  {
+                    return(I2C_BUS_ERR) ;
+                }
             }
-        } 
+        } else if( Global_VEC_Cfg.if_type == 2 ) { //SPI interface
+            for( i = 0; i < flash_info.bin_size ;  ) {
+                data_num = *(pChar+i) ; 
+                if(data_num > sizeof(buf)) {
+                    return (SPI_BUS_ERR);
+                }
+                for(j = 0; j < data_num ; j++) {
+                    buf[j] = *(pChar + i + 1 + j);
+                }                
+                err = SPI_WriteBuffer_API( &buf, data_num ); 
+                i += ( data_num + 1 );
+                if (err != SUCCESS) {
+                    return (SPI_BUS_ERR);
+                }
+            }           
+        }        
     }
     
-    if(  Global_VEC_Cfg.pdm_clk_off ) { 
+    if( Global_VEC_Cfg.pdm_clk_off ) { 
        OSTimeDly(30);//delay for iM501 test
        I2C_Mixer(I2C_MIX_FM36_CODEC);
        FM36_PDMADC_CLK_Onoff(0); //disable PDM clock
@@ -289,30 +290,16 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*
 *********************************************************************************************************
 *                                           im501_read_reg_i2c()
 *
-* Description :  read iM501 Reg via I2C, just read 1 byte.
-* Argument(s) :  reg_addr :  register adress, 1 byte length
-*                *pdata : pointer to where read data stores            
+* Description :  read iM501 Reg via I2C, just read one byte.
+*
+* Argument(s) :  reg_addr      is the iM501 register adress(one byte length)
+*
+*                *pdata        is point to where read back data will be stored  
+*
 * Return(s)   :  error number.           
 *
 * Note(s)     :  None.
@@ -350,13 +337,18 @@ unsigned char im501_read_reg_i2c( unsigned char reg_addr, unsigned char *pdata )
     return err;
     
 }
+
+
 /*
 *********************************************************************************************************
 *                                           im501_read_reg_spi()
 *
-* Description :  read iM501 Reg via SPI, just read 1 byte.
-* Argument(s) :  reg_addr :  register adress, 1 byte length
-*                *pdata : pointer to where read data stores            
+* Description :  read iM501 Reg via SPI, just read one byte.
+*
+* Argument(s) :  reg_addr      is the iM501 register adress(one byte length)
+*
+*                *pdata        is point to where read back data will be stored
+*
 * Return(s)   :  error number.           
 *
 * Note(s)     :  None.
@@ -398,9 +390,12 @@ unsigned char im501_read_reg_spi( unsigned char reg_addr, unsigned char *pdata )
 *********************************************************************************************************
 *                                           im501_write_reg_i2c()
 *
-* Description :  write iM501 Reg via I2C, just write 1 byte.
-* Argument(s) :  reg_addr :  register adress, 1 byte length
-*                data : 1 byte data need write to reg            
+* Description :  write iM501 Reg via I2C, just write one byte.
+*
+* Argument(s) :  reg_addr      is the iM501 register adress(one byte length)
+*
+*                data          is the data will be write to im501
+*
 * Return(s)   :  error number.           
 *
 * Note(s)     :  None.
@@ -433,9 +428,12 @@ unsigned char im501_write_reg_i2c( unsigned char reg_addr, unsigned char data )
 *********************************************************************************************************
 *                                           im501_write_reg_spi()
 *
-* Description :  write iM501 Reg via SPI, just write 1 byte.
-* Argument(s) :  reg_addr :  register adress, 1 byte length
-*                data : 1 byte data need write to reg            
+* Description :  write iM501 Reg via SPI, just write one byte.
+*
+* Argument(s) :  reg_addr      is the iM501 register adress(one byte length)
+*
+*                data          is the data will be write to im501
+*
 * Return(s)   :  error number.           
 *
 * Note(s)     :  None.
@@ -468,8 +466,11 @@ unsigned char im501_write_reg_spi( unsigned char reg_addr, unsigned char data )
 *                                           im501_read_dram_i2c()
 *
 * Description :  read iM501 DRAM via I2C, just read 4 bytes.
-* Argument(s) :  mem_addr :  register adress, 3 bytes length, 4bytes alignment
-*                *pdata : pointer to where read data stores            
+*
+* Argument(s) :  mem_addr       is dram adress, total 3 bytes length and need 4bytes alignment
+*
+*                *pdata         is point to where read back data will be stored   
+*
 * Return(s)   :  error number.           
 *
 * Note(s)     :  None.
@@ -521,8 +522,11 @@ unsigned char im501_read_dram_i2c( unsigned int mem_addr, unsigned char *pdata )
 *                                           im501_read_dram_spi()
 *
 * Description :  burst read iM501 DRAM via SPI, just limited to 4 bytes.
-* Argument(s) :  mem_addr :  register adress, 3 bytes length, 4bytes alignment
-*                *pdata : pointer to where read data stores  
+*
+* Argument(s) :  mem_addr       is dram adress, total 3 bytes length and need 4bytes alignment
+*
+*                *pdata         is point to where read back data will be stored 
+*
 * Return(s)   :  error number.           
 *
 * Note(s)     :  None.
@@ -570,13 +574,17 @@ unsigned char im501_read_dram_spi( unsigned int mem_addr, unsigned char *pdata )
 *********************************************************************************************************
 *                                           im501_burst_read_dram_spi()
 *
-* Description :  burst read iM501 DRAM via SPI, just limited to 2048-8-1 bytes.
-* Argument(s) :  mem_addr :  register adress, 3 bytes length, 4bytes alignment
-*                **pdata : pointer to where read data buffer point stores 
-*                data_len : teh data length to be read in bytes  
+* Description :  burst read iM501 DRAM via SPI, just limited to 4095 bytes.
+*
+* Argument(s) :  mem_addr       is dram adress, total 3 bytes length and need 4bytes alignment
+*
+*                **pdata        is point to where the pointer pointing to read back data will be stored 
+*
+*                data_len       is data length to read in bytes, maxium 4095 bytes  
+*
 * Return(s)   :  error number.           
 *
-* Note(s)     :  Non-Reentrant function.
+* Note(s)     :  Non-Reentrant function.   Reg_RW_Data is used.
 *                Be care full this function use fixed buffer, and return a **pointer to.
 *********************************************************************************************************
 */
@@ -587,14 +595,10 @@ unsigned char im501_burst_read_dram_spi( unsigned int mem_addr, unsigned char **
     unsigned char *pbuf;
     
     err   =  NO_ERR;
-    pbuf = (unsigned char *)Reg_RW_Data; //global usage
-    
-    if( data_len > (EMB_BUF_SIZE-1-13) ) {
-        return PARA_SET_ERR;
-    }
-    
+    pbuf = (unsigned char *)Reg_RW_Data; //global usage    
+   
     buf[0] =  IM501_SPI_CMD_DM_RD;
-    buf[1] =  mem_addr & 0xFF;
+    buf[1] =  mem_addr     & 0xFF;
     buf[2] =  (mem_addr>>8) & 0xFF;
     buf[3] =  (mem_addr>>16) & 0xFF;
     buf[4] =  (data_len>>1)   & 0xFF;
@@ -611,8 +615,7 @@ unsigned char im501_burst_read_dram_spi( unsigned int mem_addr, unsigned char **
         return err;
     } 
     
-    *pdata =  pbuf + 1; 
-        
+    *pdata =  pbuf + 1;         
      
     return err;
     
@@ -623,9 +626,12 @@ unsigned char im501_burst_read_dram_spi( unsigned int mem_addr, unsigned char **
 *********************************************************************************************************
 *                                           im501_write_dram_i2c()
 *
-* Description :  write iM501 DRAM via I2C, just write 2 bytes.
-* Argument(s) :  mem_addr :  register adress, 3 bytes length, 4bytes alignment
-*                *pdata : pointer to where to be written data stores            
+* Description :  write iM501 DRAM via I2C, just write two bytes.
+*
+* Argument(s) :  mem_addr       is dram adress, total 3 bytes length and need 4bytes alignment
+*
+*                *pdata         is pointer to where to be written data stores 
+*
 * Return(s)   :  error number.           
 *
 * Note(s)     :  None.
@@ -655,19 +661,22 @@ unsigned char im501_write_dram_i2c( unsigned int mem_addr, unsigned char *pdata 
         err = I2C_BUS_ERR;
         return err;
     } 
-   
-    
+       
     return err;
     
 }
+
 
 /*
 *********************************************************************************************************
 *                                           im501_write_dram_spi()
 *
 * Description :  write iM501 DRAM via SPI, just write 4 bytes.
-* Argument(s) :  mem_addr :  register adress, 3 bytes length, 4bytes alignment
-*                *pdata : pointer to where to be written data stores 
+*
+* Argument(s) :  mem_addr       is dram adress, total 3 bytes length and need 4bytes alignment
+*
+*                *pdata         is pointer to where to be written data stores 
+*
 * Return(s)   :  error number.           
 *
 * Note(s)     :  None.
@@ -676,9 +685,10 @@ unsigned char im501_write_dram_i2c( unsigned int mem_addr, unsigned char *pdata 
 unsigned char im501_write_dram_spi( unsigned int mem_addr, unsigned char *pdata )
 {
     unsigned char err, state;
-    unsigned char buf[8];
+    unsigned char buf[10];
     
     err    =  NO_ERR;
+    
     buf[0] =  IM501_SPI_CMD_DM_WR;
     buf[1] =  mem_addr & 0xFF;
     buf[2] =  (mem_addr>>8) & 0xFF;
@@ -701,9 +711,21 @@ unsigned char im501_write_dram_spi( unsigned int mem_addr, unsigned char *pdata 
 }
 
 
-
-//if_type = 0 : set to SPI mode
-//if_type = 1 : set to I2C mode
+/*
+*********************************************************************************************************
+*                                           im501_switch_i2c_spi()
+*
+* Description :  change iM501 actived interface type 
+*
+* Argument(s) :  if_type     is for indicating which interface will be actived, SPI(if_type = 2) or  I2C(if_type = 1)
+*
+*                spi_mode    is for indicating  SPI format( 0~3 )
+*
+* Return(s)   :  error number.           
+*
+* Note(s)     :  
+*********************************************************************************************************
+*/
 unsigned char im501_switch_i2c_spi( unsigned char if_type, unsigned char spi_mode )
 {
     unsigned char err;
@@ -713,7 +735,7 @@ unsigned char im501_switch_i2c_spi( unsigned char if_type, unsigned char spi_mod
     if( err != NO_ERR ) {
         return err;
     }
-    if(( data & 0x04 ) && (if_type==0) ) { // I2C mode, need switch to SPI
+    if(( data & 0x04 ) && (if_type==1) ) { // I2C mode, need switch to SPI
         err = im501_write_reg_spi(iM501_I2C_SPI_REG, 0x80+(spi_mode&0x03));
         if( err != NO_ERR ) {
             return err;
@@ -722,7 +744,7 @@ unsigned char im501_switch_i2c_spi( unsigned char if_type, unsigned char spi_mod
         if( err != NO_ERR ) {
             return err;
         }
-    } else if( (!(data & 0x04 )) && (if_type != 0) ) { // SPI mode, need switch to I2C
+    } else if( (!(data & 0x04 )) && (if_type == 2) ) { // SPI mode, need switch to I2C
         err = im501_write_reg_i2c(iM501_I2C_SPI_REG, 0x04);
         if( err != NO_ERR ) {
             return err;
@@ -732,6 +754,8 @@ unsigned char im501_switch_i2c_spi( unsigned char if_type, unsigned char spi_mod
     return err;
     
 }
+
+
 
 
 unsigned char test_send_cmd_to_im501( void )
@@ -745,7 +769,7 @@ unsigned char test_send_cmd_to_im501( void )
 //        return 1;
 //    }
 
-    err = im501_switch_i2c_spi(0, 0); //switch to SPI mode 0
+    err = im501_switch_i2c_spi(2, 0); //switch to SPI mode 0
     err = im501_write_reg_spi(0x0F,5); //turn on DSP clock and on hold dsp
     
  //   for (;;) {
@@ -775,9 +799,6 @@ unsigned char test_send_cmd_to_im501( void )
 
 
 
-//this routine is called by iM501 IRQ service
-
-VOICE_BUF  voice_buf_data;
 
 unsigned char parse_to_host_command( To_Host_CMD cmd )
 {
@@ -929,7 +950,8 @@ unsigned char Read_iM501_Voice_Buffer( unsigned char gpio_irq, unsigned int time
     Config_GPIO_Interrupt( gpio_irq, ISR_iM501_IRQ );     
   
     //
-    while(1) {     
+    while(1) {  
+   
         if ( im501_irq_counter ) {
             //APP_TRACE_INFO(("::ISR_iM501_IRQ : %d\r\n",im501_irq_counter)); //for test
             im501_irq_counter--;

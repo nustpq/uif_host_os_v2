@@ -88,7 +88,6 @@ typedef struct {
 //extern unsigned char iM401_Standby( void );
 
 unsigned char MCU_Load_Vec( unsigned char firsttime );
-unsigned char iM401_Load_Vec( void );
 
 
 unsigned char im501_read_reg_i2c( unsigned char reg_addr, unsigned char *pdata );

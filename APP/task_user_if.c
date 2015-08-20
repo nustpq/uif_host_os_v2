@@ -164,21 +164,16 @@ void  App_TaskUserIF (void *p_arg)
                         if( (key_state>>( 8 + 7 - ruler_id)) & 0x01) {  //check if Ruler Port[0] switch status changed                            
                             if( ( (key_state>>(7 - ruler_id)) & 0x01 ) == 0 ) { // ruler attached, setup ruler                              
                                 //LED_Clear( LED_P0 + ruler_id );
-                                APP_TRACE_INFO(("GPIO[%d] is Low Level.\r\n", ruler_id ));                            
-
+                                APP_TRACE_INFO(("GPIO[%d] is Low Level.\r\n", ruler_id )); 
 //                                                                           
                             } else { // ruler detached
+                                
                                 //LED_Set( LED_P0 + ruler_id );
                                 APP_TRACE_INFO(("GPIO[%d] is High Level.\r\n", ruler_id ));                                 
 //                                Global_Ruler_State[ruler_id] = RULER_STATE_DETACHED ;
 //                                Global_Mic_Mask[ruler_id]    = 0 ; 
                                 //if( (ruler_id == 0) && (iM401_Ctrl_Enable == 1) ) {
-                                if( (ruler_id == Global_VEC_Cfg.gpio) && (Global_VEC_Cfg.trigger_en) ) {
-                                    //OSTimeDly(500);
-                                    //iM401_Bypass();
-                                    //OSTimeDly(3000);
-                                    //iM401_Standby(); 
-                                    //iM401_Load_Vec();
+                                if( (ruler_id == Global_VEC_Cfg.gpio) && (Global_VEC_Cfg.trigger_en) ) {                                
                                     MCU_Load_Vec( 0 );
                                 }
                                 

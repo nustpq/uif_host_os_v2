@@ -46,11 +46,11 @@
 
 /////////  UART Message Storage Area:  MemPartition_MsgUART   //////////////////
 #define MsgUARTQueue_SIZE       5//10                            //memory partition block numbers
-#define MsgUARTBody_SIZE        (4096) //length of each message == length per frame: head+ datalength +data( MUST be 4 X )
+#define MsgUARTBody_SIZE        4200//(4096) //length of each message == length per frame: head+ datalength +data( MUST be 4 X )
 #define EMB_BUF_SIZE            (MsgUARTBody_SIZE-8)// 8 bytes are for package header reserved
 
 #define MAX_RESEND_TIMES        3
-#define DBG_UART_Send_Buf_Size  4096
+#define DBG_UART_Send_Buf_Size  4096 //kFIFO
 
 extern OS_MEM       *pMEM_Part_MsgUART;
 extern CPU_INT08U    MemPartition_MsgUART[MsgUARTQueue_SIZE][MsgUARTBody_SIZE];

@@ -659,12 +659,10 @@ CPU_INT08U  EMB_Data_Build (  CPU_INT16U   cmd_type,
     CPU_INT32S   pos;     
     emb_builder  builder;
     CPU_INT08U   ver_buf[28];  //sizeof(Audio_Version) + szieof(fw_version)    
-    CPU_INT08U   endchar;
-    
+        
     err      =  NO_ERR ; 
     pos      =  0;
-    endchar  = '\0';
-    
+        
     switch( cmd_type ){      
 
         case DATA_AB_STATUS :       	
@@ -681,8 +679,7 @@ CPU_INT08U  EMB_Data_Build (  CPU_INT16U   cmd_type,
             pos = emb_append_attr_string(&builder, pos, 1, hw_model);
             pos = emb_append_attr_string(&builder, pos, 2, hw_version); 
             strcpy( (char*)ver_buf, (char*)fw_version );  
-            strcat( (char*)ver_buf, (char*)Audio_Version ); 
-            strcat( (char*)ver_buf, (char*)endchar);
+            strcat( (char*)ver_buf, (char*)Audio_Version );             
             pos = emb_append_attr_string(&builder, pos, 3, (const char*)ver_buf);    
             pos = emb_append_end(&builder, pos);
             *p_emb_length = pos;           
@@ -928,6 +925,9 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             temp = emb_get_attr_int(&root, 7, -1);
             if(temp == -1 ) { temp = 1; }  //default turn off pdm clk after pwd             
             PCCmd.set_vec_cfg.pdm_clk_off = (CPU_INT08U)temp;
+            temp = emb_get_attr_int(&root, 8, -1);
+            if(temp == -1 ) { temp = 1; }  //default interface type is I2C            
+            PCCmd.set_vec_cfg.if_type = (CPU_INT08U)temp;
             err = Set_DSP_VEC( &PCCmd.set_vec_cfg );    
            
         break ;
