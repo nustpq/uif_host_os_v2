@@ -564,13 +564,15 @@ void Config_GPIO_Interrupt( unsigned char gpio_index, CPU_FNCT_VOID isr_handler 
 }
 
 unsigned char Check_GPIO_Intrrupt( unsigned char gpio_index )
-{
+{   
+    unsigned int state = pinsGpios[gpio_index].pio->PIO_ISR;
+    
     //discard falling edge interruption, because it seems PIO interrupt edge sellection not work
     if ( (pinsGpios[gpio_index].pio->PIO_PDSR & pinsGpios[gpio_index].mask) == 0) { 
         return 0; 
     }
     
-    if( pinsGpios[gpio_index].pio->PIO_ISR & pinsGpios[gpio_index].mask ) {
+    if(  state & pinsGpios[gpio_index].mask ) {
         return 1;
     } else {
         return 0;

@@ -178,11 +178,13 @@ void Check_UART_Mixer_Ready( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
+static unsigned char global_i2s_tdm_sel[2];
 unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
 {
     unsigned char err; 
     unsigned char mic_num; 
     unsigned char data  = 0xFF;
+    unsigned char i2s_tdm_sel;
     unsigned char buf[] = {         
         CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_SET_AUDIO_CFG,\
         pAudioCfg->type, pAudioCfg->channels,\
@@ -264,6 +266,17 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         }
     }
 #endif
+    
+    if( (buf[4] <= 2) && (pAudioCfg->bit_length == 16) ) { 
+        global_i2s_tdm_sel[pAudioCfg->type] = 0 ;//I2S
+    } else {
+        global_i2s_tdm_sel[pAudioCfg->type] = 1 ;//TDM
+    }
+    if( global_i2s_tdm_sel[0] + global_i2s_tdm_sel[1] == 0 ) {
+        i2s_tdm_sel = 0;
+    } else {
+        i2s_tdm_sel = 1;
+    }
     //Dump_Data(buf, sizeof(buf));
     
     UART2_Mixer(3); 
@@ -277,8 +290,9 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         APP_TRACE_INFO(("\r\nSetup_Audio ERROR: %d\r\n ",data)); 
         return data; 
     }
+    
     I2C_Mixer(I2C_MIX_FM36_CODEC);
-    err = Init_CODEC( pAudioCfg->sr,  pAudioCfg->bit_length);
+    err = Init_CODEC( pAudioCfg->sr,  pAudioCfg->bit_length, i2s_tdm_sel);
     I2C_Mixer(I2C_MIX_UIF_S);
     if( err != NO_ERR ) {
         APP_TRACE_INFO(("\r\nSetup_Audio Init_CODEC ERROR: %d\r\n",err)); 
@@ -1439,7 +1453,7 @@ unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
         err = MCU_Load_Vec(1);
     } else {    
         I2C_Mixer(I2C_MIX_FM36_CODEC);
-        err = FM36_PDMADC_CLK_Onoff(1); //enable PDM clock
+        err = FM36_PDMADC_CLK_OnOff(1); //enable PDM clock
         I2C_Mixer(I2C_MIX_UIF_S); 
     }
     return err;  
@@ -1818,7 +1832,7 @@ void AB_POST( void )
 
     APP_TRACE_INFO(("\r\n1. CODEC... \r\n"));
     I2C_Mixer(I2C_MIX_FM36_CODEC);
-    err = Init_CODEC( SAMPLE_RATE_DEF,  SAMPLE_LENGTH);  
+    err = Init_CODEC( SAMPLE_RATE_DEF,  SAMPLE_LENGTH, 1); //TDM  
     I2C_Mixer(I2C_MIX_UIF_S);
     if( err != NO_ERR ) {
         Global_Bridge_POST = POST_ERR_CODEC;

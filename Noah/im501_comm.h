@@ -89,7 +89,6 @@ typedef struct {
 
 unsigned char MCU_Load_Vec( unsigned char firsttime );
 
-
 unsigned char im501_read_reg_i2c( unsigned char reg_addr, unsigned char *pdata );
 unsigned char im501_read_reg_spi( unsigned char reg_addr, unsigned char *pdata );
 
@@ -110,6 +109,6 @@ unsigned char test_send_cmd_to_im501( void );
 
 unsigned char Read_iM501_Voice_Buffer( unsigned char gpio_irq, unsigned int timeout_ms, unsigned char pkt_sn );
 
-unsigned char Write_CMD_To_iM501( unsigned char cmd_index, unsigned int para );
+unsigned char Write_CMD_To_iM501( unsigned char cmd_index, unsigned short para );
 
 #endif

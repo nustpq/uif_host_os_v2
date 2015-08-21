@@ -180,9 +180,9 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         
         case UIF_TYPE_FM36_PDMCLK :
             I2C_Mixer(I2C_MIX_FM36_CODEC);
-            //err = FM36_PDMADC_CLK_Set( GET_BYTE_HIGH_4BIT(pInterface_Cfg->attribute), GET_BYTE_LOW_4BIT(pInterface_Cfg->attribute), 1 ); //pdm_dac_clk, pdm_adc_clk, type=ontheflychange
+            //err = FM36_PDM_CLK_Set( GET_BYTE_HIGH_4BIT(pInterface_Cfg->attribute), GET_BYTE_LOW_4BIT(pInterface_Cfg->attribute), 1 ); //pdm_dac_clk, pdm_adc_clk, type=ontheflychange
             Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute = pInterface_Cfg->attribute; //save clock data in attribute to global for  Init_FM36_AB03_Preset() use
-            err = Init_FM36_AB03_Preset(); 
+            err = Init_FM36_AB03_Preset(); //be careful if the I2C switch status changed during OSTimeDly() in side this routine
             I2C_Mixer(I2C_MIX_UIF_S);                       
         break ;
         
@@ -201,6 +201,7 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         default:
             err = UIF_TYPE_NOT_SUPPORT;
         break;
+        
     }
     
     if ( err == NULL ) {

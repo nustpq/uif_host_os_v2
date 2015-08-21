@@ -198,7 +198,7 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
         index = Global_VEC_Cfg.vec_index_a ; //Power up
         if(  Global_VEC_Cfg.pdm_clk_off ) {
             I2C_Mixer(I2C_MIX_FM36_CODEC);
-            FM36_PDMADC_CLK_Onoff(1); //enable PDM clock    
+            FM36_PDMADC_CLK_OnOff(1); //enable PDM clock    
             I2C_Mixer(I2C_MIX_UIF_S); 
         }
         if( index != 0 ) {        
@@ -281,7 +281,7 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
     if( Global_VEC_Cfg.pdm_clk_off ) { 
        OSTimeDly(30);//delay for iM501 test
        I2C_Mixer(I2C_MIX_FM36_CODEC);
-       FM36_PDMADC_CLK_Onoff(0); //disable PDM clock
+       FM36_PDMADC_CLK_OnOff(0); //disable PDM clock
        I2C_Mixer(I2C_MIX_UIF_S);          
     }     
      
@@ -826,9 +826,9 @@ unsigned char parse_to_host_command( To_Host_CMD cmd )
             }
         break;
         
-        case 0x83 : //Reuest host to turn PDM CLKI (PDMADC CLK for FM36)
+        case 0x83 : //Reuest host to turn on PDM CLKI (PDMADC CLK for FM36)
             I2C_Mixer(I2C_MIX_FM36_CODEC);
-            err = FM36_PDMADC_CLK_Onoff(1); //Enable PDM clock
+            err = FM36_PDMADC_CLK_OnOff(1); //Enable PDM clock
             I2C_Mixer(I2C_MIX_UIF_S); 
             if( err != NO_ERR ){ 
                 return err;
@@ -841,7 +841,7 @@ unsigned char parse_to_host_command( To_Host_CMD cmd )
         
     }
         
-    if( err != NO_ERR ) {
+    if( err == NO_ERR ) {
         voice_buf_data.pdata = pbuf ;
         err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
                                       (pPCCMDDAT)&voice_buf_data,
@@ -911,27 +911,14 @@ unsigned char resp_to_host_command( void )
 
 
 
-unsigned char Write_CMD_To_iM501( unsigned char cmd_index, unsigned int para )
-{
-    unsigned char err;
-    To_501_CMD cmd;
-    
-    cmd.cmd_byte = cmd_index;
-    cmd.attri    = para & 0xFFFF ;
-    
-    err = send_to_dsp_command( cmd );
-    
-    return err;
-    
-}
-
-
 void ISR_iM501_IRQ( void )
 {
     if( Check_GPIO_Intrrupt( im501_irq_gpio ) ) {                       
         im501_irq_counter++;        
     }
 }
+
+
 
 
 
@@ -975,3 +962,17 @@ unsigned char Read_iM501_Voice_Buffer( unsigned char gpio_irq, unsigned int time
     
 }
 
+
+unsigned char Write_CMD_To_iM501( unsigned char cmd_index, unsigned short para )
+{
+    unsigned char err;
+    To_501_CMD cmd;
+    
+    cmd.cmd_byte = ((cmd_index & 0x3F) << 2) | 0x02; //D[1]   : "1", interrupt DSP. This bit generates NMI (non-mask-able interrupt)
+    cmd.attri    = para & 0xFFFF ;
+    
+    err = send_to_dsp_command( cmd );
+    
+    return err;
+    
+}
