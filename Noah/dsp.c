@@ -192,8 +192,8 @@ static unsigned short int fm36_para_table_3[][2] =
    //{0x226A, 0x7d00}, //2.048M 
    {0x226A, 0x3e80},//1.024   //clock from iM401
    
-   ///////////////// SP1 Format  //////////////////
-   //reset in Config_SPx_Format()
+  ///////////////// SP1 Format  //////////////////
+  //reset in Config_SPx_Format()
   //{0x2261, 0x78FF},//32bit TDM,MSB first,Left alignment,8 slot, Left alignment of word inside slot to meet AD1937
   //{0x2260, 0x78D9}, //16bit I2S,MSB first,Left alignment,2 slot 
   //{0x2268, 0xBB80}, 
@@ -217,10 +217,6 @@ static unsigned short int fm36_para_table_3[][2] =
   {0x22B3, 0x0001},
   {0x22B4, 0x0001},  
     //additional, input
-    ////229A = 0x1 //Aux-in From SP0
-    ////229B = 0x0 //Aux-in-L in slot0 
-    ////229C = 0x1 //Aux-in-R in slot1
-    //// 
     //////output, aux2 output same as aux1
     ////22C7 = 0x1018 //Aux-in-L
     ////22C8 = 0x1019 //Aux-in-R
@@ -238,7 +234,7 @@ static unsigned short int fm36_para_table_3[][2] =
   {0x22C3, 0x101C},
   {0x22C4, 0x101D},
   {0x22C5, 0x101E},
-  {0x22C6, 0x101F},   
+  {0x22C6, 0x101F},
   {0x22C7, 0x1018}, //Aux-in-L
   {0x22C8, 0x1019}, //Aux-in-R
 //  {0x22C7, 0x1020}, //default 0
@@ -254,11 +250,11 @@ static unsigned short int fm36_para_table_3[][2] =
   {0x22D9, 0x0002},
   {0x22DA, 0x0003},
   {0x22DB, 0x0004},
-  {0x22DC, 0x0005},  
+  {0x22DC, 0x0005},
   {0x22D5, 0x0006}, //slot6 
   {0x22D6, 0x0007}, //slot7
   
-  //mic souce
+  //mic souce 
   {0x2282, 0x0000},
   {0x2283, 0x0001},
   {0x2284, 0x0002},
@@ -275,14 +271,14 @@ static unsigned short int fm36_para_table_3[][2] =
   {0x22BE, 0x3F4A}, 
 
   //{0x22B3, 0}, 
-  {0x22FA, 0xFF}, 
+  {0x22FA, 0x00FF}, 
   
-  {0x22E5, 0x20}, //PDM DAC CLOCK As Input
+  {0x22E5, 0x0020}, //PDM DAC CLOCK As Input
   {0x22EB, 0x0006}, //Actual MIC number in system.
   
-  {0x22F1, 0xD800}, //pwd resume mode., enable pwd bypass
+  {0x22F1, 0xD800}, //pwd resume mode, enable pwd bypass
   
-  {0x22FB, 0 },  //run flag
+  {0x22FB, 0x0000}, //run flag
   
   //{0x3FCF, 0x020},//PDMDAC CLOCK As Input
   
@@ -512,40 +508,42 @@ unsigned char FM36_PWD_Bypass( void )
     
 }  
 
-unsigned char FM36_PDMADC_CLK_Onoff( unsigned char onoff )
+
+
+unsigned char FM36_PDMADC_CLK_OnOff( unsigned char onoff )
 {
     unsigned char  err ;  
     
     APP_TRACE_INFO(("\r\nEnable/Disbale FM36 ADC PDM CLK: %d",onoff));    
 
-    if( onoff ) {  //Normal operation 
+    if( onoff ) {  //PDMCLK_ON, for normal operation 
         
-        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FCF, 0x20 ) ;  //turn on clk
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FCF, 0x0020 ) ;  //turn on clk
         if( OS_ERR_NONE != err ) {
             return FM36_WR_DM_ERR;
         }          
-        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3F90, 0 ) ;  //power up MIC0-5
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3F90, 0x0000 ) ;  //power up MIC0-5
         if( OS_ERR_NONE != err ) {
             return FM36_WR_DM_ERR;
         }  
         OSTimeDly(5);  //depop time
-        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3F96, 0x3F ) ;  //unmute MIC0-5
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3F96, 0x003F ) ;  //unmute MIC0-5
         if( OS_ERR_NONE != err ) {
             return FM36_WR_DM_ERR;
         }  
         
-    } else {    //PDMCLK_OFF
+    } else { //PDMCLK_OFF
         
         err = DM_SingleWrite( FM36_I2C_ADDR, 0x3F96, 0x3F3F ) ;  //mute MIC0-5
         if( OS_ERR_NONE != err ) {
             return FM36_WR_DM_ERR;
         }     
         OSTimeDly(5); //wait data 0 to cyclebuffer
-        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3F90, 0x3F ) ;  //power down MIC0-5 
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3F90, 0x003F ) ;  //power down MIC0-5 
         if( OS_ERR_NONE != err ) {
             return FM36_WR_DM_ERR;
         } 
-        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FCF, 0x24 ) ;  //turn off clk
+        err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FCF, 0x0024 ) ;  //turn off clk
         if( OS_ERR_NONE != err ) {
             return FM36_WR_DM_ERR;
         } 
@@ -556,7 +554,8 @@ unsigned char FM36_PDMADC_CLK_Onoff( unsigned char onoff )
     
 }  
 
-unsigned char FM36_PDMADC_CLK_Set( unsigned char pdm_dac_clk, unsigned char pdm_adc_clk, unsigned char type )
+
+unsigned char FM36_PDM_CLK_Set( unsigned char pdm_dac_clk, unsigned char pdm_adc_clk, unsigned char type )
 {
     
     unsigned char  err ;
@@ -726,7 +725,7 @@ unsigned char Init_FM36_AB03( unsigned short sr,
 //    if( OS_ERR_NONE != err ) {
 //        return FM36_WR_HOST_ERR;
 //    }
-    
+
     //check chip type by rom id 
     err = CM_LegacyRead( FM36_I2C_ADDR, 0x2FFF,(unsigned char *)&temp ) ;
     if( OS_ERR_NONE != err ) {
@@ -758,7 +757,7 @@ unsigned char Init_FM36_AB03( unsigned short sr,
         addr = fm36_para_table_3[i][0];
         val  = fm36_para_table_3[i][1];
         
-        if( addr == 0x22FB ) {  //if run chip, do sth before            
+        if( addr == 0x22FB ) {  //hit run flag para, do other inits before write it            
             err = Config_SP0_Out( mic_num );
             if( OS_ERR_NONE != err ) {
                 return err ;
@@ -775,7 +774,7 @@ unsigned char Init_FM36_AB03( unsigned short sr,
             if( OS_ERR_NONE != err ) {
                 return err ;
             }
-            err = FM36_PDMADC_CLK_Set( GET_BYTE_HIGH_4BIT(Global_UIF_Setting[ UIF_TYPE_FM36_PDMCLK - 1 ].attribute), GET_BYTE_LOW_4BIT(Global_UIF_Setting[ UIF_TYPE_FM36_PDMCLK - 1 ].attribute), 0 );
+            err = FM36_PDM_CLK_Set( GET_BYTE_HIGH_4BIT(Global_UIF_Setting[ UIF_TYPE_FM36_PDMCLK - 1 ].attribute), GET_BYTE_LOW_4BIT(Global_UIF_Setting[ UIF_TYPE_FM36_PDMCLK - 1 ].attribute), 0 );
             if( OS_ERR_NONE != err ) {
                 return err ;
             }
@@ -788,7 +787,7 @@ unsigned char Init_FM36_AB03( unsigned short sr,
         }
         if( addr == 0x22FB ) {  //if run chip, delay
             OSTimeDly(100);            
-        } 
+        }
     } 
           
     //check running status

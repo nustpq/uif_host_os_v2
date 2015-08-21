@@ -661,8 +661,9 @@ unsigned char config_aic3204[][2] = {
 
 static unsigned int  codec_saved_sr;
 static unsigned char codec_saved_sample_length;
+static unsigned char codec_saved_format;
 
-unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length ) 
+unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length, unsigned char format ) 
 {
     unsigned char err;
     unsigned char mode;
@@ -672,12 +673,15 @@ unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length )
         4, 5, 6, 7, 8, 11, 12, 13, 14, 18, 19, 20, 29, 30
     };
     
-    if( (sr == codec_saved_sr)  && (sample_length == codec_saved_sample_length) ) {
+    if( (sr == codec_saved_sr)  &&\
+        (sample_length == codec_saved_sample_length) &&\
+        (format == codec_saved_format) ) {
         APP_TRACE_INFO(("No need Re-Init CODEC\r\n"));
         return 0;
     } else {
         codec_saved_sr = sr;
         codec_saved_sample_length = sample_length;
+        codec_saved_format = format;
     }
          
     Pin_Reset_Codec();
@@ -692,14 +696,18 @@ unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length )
         return CODEC_SR_NOT_SUPPORT_ERR;
     }
     
-    if( sample_length == 16 ) {
-        mode = 1;
-        //mode = 0; //for iM401
-    } else {//if(sample_length == 32 ) {
-        mode = 2;
-    } //else {
-        //return CODEC_SR_LEN_NOT_SUPPORT_ERR;
-    //}
+    if( format == 0 ) { //Standard I2S
+        mode = 0;
+    } else { 
+        if( sample_length == 16 ) { //TDM 16
+            mode = 1;
+            //mode = 0; //for iM401
+        } else {//if(sample_length == 32 ) { //TDM32
+            mode = 2;
+        } //else {
+            //return CODEC_SR_LEN_NOT_SUPPORT_ERR;
+        //}
+    }
     
     reg_data[0] = CODEC_PARA_TABLE[mode][8][sr_index];
     reg_data[1] = CODEC_PARA_TABLE[mode][10][sr_index]*128+CODEC_PARA_TABLE[mode][12][sr_index]*16+ CODEC_PARA_TABLE[mode][11][sr_index];

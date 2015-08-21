@@ -971,7 +971,7 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }           
             temp2 = emb_get_attr_int(&root, 2, -1);//cmd attribute, 2 bytes
             if(temp2 == -1 ) { Send_GACK(EMB_CMD_ERR); break; }         
-            err = Write_CMD_To_iM501( (CPU_INT08U)temp, (CPU_INT32U)temp2 );              
+            err = Write_CMD_To_iM501( (CPU_INT08U)temp, (CPU_INT16U)temp2 );              
               
         break;
         
