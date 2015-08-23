@@ -598,12 +598,15 @@ unsigned char im501_burst_read_dram_spi( unsigned int mem_addr, unsigned char **
     err   =  NO_ERR;
     pbuf = (unsigned char *)Reg_RW_Data; //global usage    
     
-    unsigned short *pint = (unsigned short *)pbuf;
-    for( unsigned int i = 0; i< (data_len>>1); i++)
-    {
-       *(pint+i) = test_data_ctr++;
-       //*(pbuf+i) = i;
-    }
+//    unsigned short *pint = (unsigned short *)pbuf;
+//    for( unsigned int i = 0; i< (data_len>>1); i++)
+//    {
+//       *(pint+i) = test_data_ctr++;
+//       //*(pbuf+i) = i;
+//    }
+    
+    Demo_Sine_Gen(pbuf, data_len, 16000,1); 
+    
     *pdata = pbuf;
     return err;
     

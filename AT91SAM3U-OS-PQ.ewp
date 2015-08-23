@@ -2206,6 +2206,12 @@
       <name>$PROJ_DIR$\Noah\ruler.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\Noah\sine_table.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Noah\sine_table.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\Noah\uif.c</name>
     </file>
     <file>
