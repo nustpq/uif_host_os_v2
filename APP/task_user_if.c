@@ -100,11 +100,19 @@ void  App_TaskUserIF (void *p_arg)
                     //         1: OFF:  Buzzer unmuted
                     if( (key_state>>(8 + 0)) & 0x01) {  //check if SW1 switch status changed                         
                         if( ((key_state>>0)& 0x01 ) == 0 ) { 
-                            //BUZZER_MUTE =  1;   //mute buzzer                           
-                            GPIOPIN_Set_Fast(2,0);
+                            //BUZZER_MUTE =  1;   //mute buzzer 
+                            if(debug_voice_buf_pack_en) {
+                              GPIOPIN_Set_Fast(2,0);
+                            }
                         } else {                                                 
-                            BUZZER_MUTE =  0;   //unmute buzzer                        
-                            GPIOPIN_Set_Fast(2,1);
+                            BUZZER_MUTE =  0;   //unmute buzzer 
+                              if(debug_voice_buf_pack_en) {
+                            for(unsigned char i = 0; i< debug_voice_buf_pack_num ; i++) {
+                                GPIOPIN_Set_Fast(2,0);
+                                GPIOPIN_Set_Fast(2,1);
+                                OSTimeDly(1);
+                            }
+                              }
                         }
                     }
                     

@@ -355,9 +355,9 @@ CPU_INT08U  pcSendDateToBuffer ( OS_EVENT    *pOS_EVENT,
         if( (NULL != pMemPtr) && (OS_ERR_NONE == err) )  {
             break;
         }
-        while(1){
-               APP_TRACE_INFO(("\r\n:::::OSMemGet error"));
-        };
+//        while(1){
+//               APP_TRACE_INFO(("\r\n:::::OSMemGet error"));
+//        };
         OSTimeDly(1); //wait for free MemoryPart
     }
     pSendPtr = (pNEW_CMD)pMemPtr;

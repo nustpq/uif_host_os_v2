@@ -822,14 +822,14 @@ unsigned char parse_to_host_command( To_Host_CMD cmd )
     test_irq_ctr++;
     
     if(test_irq_ctr == 1 ) {
-            voice_buf_data.length   = 2048;
+            voice_buf_data.length   = debug_voice_buf_pack_len;
             voice_buf_data.index    = test_irq_ctr;
             voice_buf_data.done     = 0;
             err = im501_burst_read_dram_spi( HW_BUF_RX_L,  &pbuf,  voice_buf_data.length );
-    } else if( test_irq_ctr ==10) {            
+    } else if( test_irq_ctr ==debug_voice_buf_pack_num) {            
             voice_buf_data.index    = test_irq_ctr;
             voice_buf_data.done     = 1;
-             err = im501_burst_read_dram_spi( HW_BUF_RX_L,  &pbuf,  voice_buf_data.length );
+            err = im501_burst_read_dram_spi( (voice_buf_data.index %2)==1? HW_BUF_RX_L :HW_BUF_RX_R,  &pbuf,  voice_buf_data.length );
     } else {
           voice_buf_data.index    = test_irq_ctr;
           voice_buf_data.done     = 0;
@@ -957,7 +957,7 @@ void ISR_iM501_IRQ( void )
 }
 
 
-
+ unsigned char debug_voice_buf_pack_en = 0;
 
 
 unsigned char Read_iM501_Voice_Buffer( unsigned char gpio_irq, unsigned int timeout_ms, unsigned char pkt_sn )
@@ -976,6 +976,7 @@ unsigned char Read_iM501_Voice_Buffer( unsigned char gpio_irq, unsigned int time
     
     test_irq_ctr = 0;
     test_data_ctr = 0;
+    debug_voice_buf_pack_en = 1;
     //
     while(1) {  
    
@@ -993,11 +994,12 @@ unsigned char Read_iM501_Voice_Buffer( unsigned char gpio_irq, unsigned int time
         if( (OSTimeGet() - time_start) >= timeout_ms ) { //timeout hit
             break;  
         }
-        OSTimeDly(5); //for test 
+                          
+        OSTimeDly(1); //for test 
     }
     
     Disable_GPIO_Interrupt( gpio_irq );
-    
+    debug_voice_buf_pack_en = 0;
     return err;
     
 }

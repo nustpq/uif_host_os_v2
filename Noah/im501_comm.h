@@ -13,6 +13,10 @@
 #ifndef __IM501_COMM_H__
 #define __IM501_COMM_H__
 
+#define debug_voice_buf_pack_len         960
+#define debug_voice_buf_pack_num         100
+extern unsigned char debug_voice_buf_pack_en;
+
 #define  iM401_I2C_ADDR                  0xAE
 #define  iM501_I2C_ADDR                  0xE2
 
