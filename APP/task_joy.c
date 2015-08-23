@@ -105,7 +105,7 @@ void  App_TaskJoy (void *p_arg)
            
         switch_value = Get_Switches() & 0x03; //mask 0~1     
         if( switch_value != switch_value_prev ) {  
-            OSTimeDly(100); 
+            OSTimeDly(1); 
             if( switch_value == Get_Switches() & 0x03 ) { //jitter immune                         
                 data = switch_value ^ switch_value_prev ;   
                 switch_value_prev = switch_value ;

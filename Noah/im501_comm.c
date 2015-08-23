@@ -588,6 +588,7 @@ unsigned char im501_read_dram_spi( unsigned int mem_addr, unsigned char *pdata )
 *                Be care full this function use fixed buffer, and return a **pointer to.
 *********************************************************************************************************
 */
+unsigned short test_data_ctr = 0;
 unsigned char im501_burst_read_dram_spi( unsigned int mem_addr, unsigned char **pdata, unsigned int data_len )
 {
     unsigned char  err, state;
@@ -596,7 +597,17 @@ unsigned char im501_burst_read_dram_spi( unsigned int mem_addr, unsigned char **
     
     err   =  NO_ERR;
     pbuf = (unsigned char *)Reg_RW_Data; //global usage    
-   
+    
+    unsigned short *pint = (unsigned short *)pbuf;
+    for( unsigned int i = 0; i< (data_len>>1); i++)
+    {
+       *(pint+i) = test_data_ctr++;
+       //*(pbuf+i) = i;
+    }
+    *pdata = pbuf;
+    return err;
+    
+    
     buf[0] =  IM501_SPI_CMD_DM_RD;
     buf[1] =  mem_addr     & 0xFF;
     buf[2] =  (mem_addr>>8) & 0xFF;
@@ -798,13 +809,35 @@ unsigned char test_send_cmd_to_im501( void )
 
 
 
-
+unsigned char test_irq_ctr = 0;
 
 unsigned char parse_to_host_command( To_Host_CMD cmd )
 {
     unsigned char err;
     unsigned char *pbuf;
-         
+    
+    test_irq_ctr++;
+    
+    if(test_irq_ctr == 1 ) {
+            voice_buf_data.length   = 2048;
+            voice_buf_data.index    = test_irq_ctr;
+            voice_buf_data.done     = 0;
+            err = im501_burst_read_dram_spi( HW_BUF_RX_L,  &pbuf,  voice_buf_data.length );
+    } else if( test_irq_ctr ==10) {            
+            voice_buf_data.index    = test_irq_ctr;
+            voice_buf_data.done     = 1;
+             err = im501_burst_read_dram_spi( HW_BUF_RX_L,  &pbuf,  voice_buf_data.length );
+    } else {
+          voice_buf_data.index    = test_irq_ctr;
+          voice_buf_data.done     = 0;
+         err = im501_burst_read_dram_spi( HW_BUF_RX_L,  &pbuf,  voice_buf_data.length );
+    }
+    
+
+
+/*    
+    
+    
     switch( cmd.cmd_byte ) {
         
         case 0x81 : //Reuest host to read To-Host Buffer 1st package
@@ -840,7 +873,9 @@ unsigned char parse_to_host_command( To_Host_CMD cmd )
         break;
         
     }
-        
+      
+*/    
+    
     if( err == NO_ERR ) {
         voice_buf_data.pdata = pbuf ;
         err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
@@ -889,21 +924,21 @@ unsigned char resp_to_host_command( void )
     unsigned char err;
     To_Host_CMD   cmd;
     
-    err = im501_read_dram_spi( TO_HOST_CMD_ADDR, (unsigned char *)&cmd );
-    if( err != NO_ERR ){ 
-        return err;
-    }
-    
+//    err = im501_read_dram_spi( TO_HOST_CMD_ADDR, (unsigned char *)&cmd );
+//    if( err != NO_ERR ){ 
+//        return err;
+//    }
+//    
     err = parse_to_host_command( cmd );
     if( err != NO_ERR ){ 
         return err;
     }
     
-    cmd.status = 0;
-    err = im501_write_dram_spi( TO_HOST_CMD_ADDR, (unsigned char *)&cmd );
-    if( err != NO_ERR ){ 
-        return err;
-    }
+//    cmd.status = 0;
+//    err = im501_write_dram_spi( TO_HOST_CMD_ADDR, (unsigned char *)&cmd );
+//    if( err != NO_ERR ){ 
+//        return err;
+//    }
     
     return err;
     
@@ -935,7 +970,9 @@ unsigned char Read_iM501_Voice_Buffer( unsigned char gpio_irq, unsigned int time
     
     //set gpio interruption
     Config_GPIO_Interrupt( gpio_irq, ISR_iM501_IRQ );     
-  
+    
+    test_irq_ctr = 0;
+    test_data_ctr = 0;
     //
     while(1) {  
    
@@ -953,7 +990,7 @@ unsigned char Read_iM501_Voice_Buffer( unsigned char gpio_irq, unsigned int time
         if( (OSTimeGet() - time_start) >= timeout_ms ) { //timeout hit
             break;  
         }
-        //OSTimeDly(5); //for test 
+        OSTimeDly(5); //for test 
     }
     
     Disable_GPIO_Interrupt( gpio_irq );
