@@ -78,14 +78,16 @@
 #define  RULER_CMD_RESET_AUDIO          0x10
 ////////////////////////////////////////////////////////////////////////////////
 
-#define DEF_VERSION_STR_LEN  ( 11 + 1 )
-#define DEF_MODEL_STR_LEN    ( 7 + 1 )
+#define DEF_VERSION_STR_LEN             ( 11 + 1 )
+#define DEF_MODEL_STR_LEN               ( 7 + 1 )
 
-///////////////////////////////////////////////////////////////////////////////
 
-#define FW_DOWNLAD_CMD_START     1
-#define FW_DOWNLAD_CMD_DOING     2
-#define FW_DOWNLAD_CMD_DONE      3
+
+/////////////////  Flash store Vec file related defines  ///////////////////////
+
+#define FW_DOWNLAD_CMD_START           1
+#define FW_DOWNLAD_CMD_DOING           2
+#define FW_DOWNLAD_CMD_DONE            3
 
 #define FW_DOWNLAD_STATE_INITIALIZE    0xFF
 #define FW_DOWNLAD_STATE_UNFINISHED    0xAA
@@ -99,6 +101,8 @@
 #define FLASH_ADDR_FW_VEC_NUM        ( 7 )      //(64kB = 8kB*7 
 #define FLASH_ADDR_FW_VEC_STATE      ( AT91C_IFLASH1 +  FLASH_ADDR_FW_BIN_MAX_SIZE  ) //256*4
 #define FLASH_ADDR_FW_VEC            ( FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * FLASH_ADDR_FW_VEC_NUM ) //from 128kB + 64kB + (0.256*4)kB
+
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -232,7 +236,7 @@ typedef struct {
     char            bin_name[30] ; //add
 }FLASH_INFO ;
 
-//////////////////////
+
 typedef struct {
     unsigned char    if_type;      
     unsigned char    attribute;
@@ -298,6 +302,9 @@ typedef struct {
 }SET_VEC_CFG ;    
    
 
+
+
+
 extern unsigned char Audio_Version[];
 extern unsigned char Ruler_CMD_Result;
 
@@ -342,7 +349,9 @@ extern unsigned char Save_Ruler_FW( unsigned int cmd, unsigned char *pBin, unsig
 extern unsigned char Ruler_Setup_Sync(unsigned char ruler_slot_id);
 extern unsigned char Save_DSP_VEC( MCU_FLASH *p_dsp_vec );
 
-
 extern void Debug_Audio( void ) ;
+
+
+
 
 #endif

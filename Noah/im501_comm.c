@@ -149,8 +149,51 @@ unsigned char iM401_Bypass( void )
 ////////////////////////////////////////////////////////////////////////////////
 
 
+void im501_change_if_speed( unsigned char type )
+{
+    if( type == 0) { //change to low speed
+        if(  Global_VEC_Cfg.if_type == 1 ) { //I2C interface 
+            TWI_Init( 20 * 1000 );               
+        } else if(Global_VEC_Cfg.if_type == 2 ) { //SPI 
+            SPI_Init( 1000000,  Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].attribute );       
+        } 
+        
+    } else { //change to normal speed
+        if(  Global_VEC_Cfg.if_type == 1 ) { //I2C interface 
+            TWI_Init( Global_UIF_Setting[ UIF_TYPE_I2C - 1 ].speed * 1000 );               
+        } else if(Global_VEC_Cfg.if_type == 2 ) { //SPI 
+            SPI_Init(Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].speed * 1000,  Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].attribute );       
+        }         
+    }  
+    
+    
+}
 
 
+unsigned char im501_check_pll_ready( void )
+{
+    unsigned int data;
+    unsigned char err;
+     
+    if( Global_VEC_Cfg.if_type == 1 ) { //I2C interface         
+        err =  im501_read_dram_i2c(0x0FFFFF34, (unsigned char*)&data );         
+    } else if(Global_VEC_Cfg.if_type == 2 ) { //SPI         
+        err =  im501_read_dram_spi(0x0FFFFF34, (unsigned char*)&data );
+    } else {
+        err = 1;
+    }
+     
+    if( err != 0 ) {
+        return 1;   
+    }
+    
+    if( data & 0x20 ) { //check bit5 == 1 ?        
+        return 1; //ready
+    }else {
+        return 0; //not ready
+    }   
+    
+}
 
 
 /*
@@ -199,7 +242,7 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
         if(  Global_VEC_Cfg.pdm_clk_off ) {
             I2C_Mixer(I2C_MIX_FM36_CODEC);
             FM36_PDMADC_CLK_OnOff(1); //enable PDM clock    
-            I2C_Mixer(I2C_MIX_UIF_S); 
+            I2C_Mixer(I2C_MIX_UIF_S);             
         }
         if( index != 0 ) {        
             Read_Flash_State(&flash_info, FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * index  );
@@ -278,8 +321,18 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
         }        
     }
     
-    if( Global_VEC_Cfg.pdm_clk_off ) { 
-       OSTimeDly(30);//delay for iM501 test
+    if( Global_VEC_Cfg.pdm_clk_off ) {
+       //OSTimeDly(30);//delay for iM501 test 
+       // wait for iM501 PLL change stable
+       unsigned int time_start = OSTimeGet();       
+       im501_change_if_speed(0);
+       while( im501_check_pll_ready() == 0 ) {
+           if( (OSTimeGet() - time_start) > 500 ){ //500ms timeout
+               break;
+           }
+       };
+       im501_change_if_speed(1);
+      
        I2C_Mixer(I2C_MIX_FM36_CODEC);
        FM36_PDMADC_CLK_OnOff(0); //disable PDM clock
        I2C_Mixer(I2C_MIX_UIF_S);          
@@ -822,7 +875,8 @@ unsigned char parse_to_host_command( To_Host_CMD cmd )
         case 0x82 : //Reuest host to read To-Host Buffer  
             voice_buf_data.index    =  cmd.attri & 0x7FFF;
             voice_buf_data.done     = (cmd.attri>>15) & 0x01;
-            err = im501_burst_read_dram_spi( HW_BUF_RX_L,  &pbuf,  voice_buf_data.length );
+            //err = im501_burst_read_dram_spi( HW_BUF_RX_L,  &pbuf,  voice_buf_data.length );
+            err = im501_burst_read_dram_spi( (voice_buf_data.index % 2) == 1 ? HW_BUF_RX_L : HW_BUF_RX_R,  &pbuf,  voice_buf_data.length );
             if( err != NO_ERR ){ 
                 return err;
             }

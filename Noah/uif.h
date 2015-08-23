@@ -53,12 +53,13 @@
 
 extern unsigned char Reg_RW_Data[];
 extern INTERFACE_CFG   Global_UIF_Setting[];
-extern void Reverse_Endian( unsigned char *pdata, unsigned char size ) ;
-extern unsigned char Setup_Interface( INTERFACE_CFG *interface_cfg );
-extern unsigned char Raw_Write( RAW_WRITE *p_raw_write );
-extern unsigned char Raw_Read( RAW_READ *p_raw_read );
-extern unsigned char Write_Burst( BURST_WRITE nurst_write );
-extern void Dump_Data ( unsigned char *pdata, unsigned int size );
+
+void Reverse_Endian( unsigned char *pdata, unsigned char size ) ;
+unsigned char Setup_Interface( INTERFACE_CFG *interface_cfg );
+unsigned char Raw_Write( RAW_WRITE *p_raw_write );
+unsigned char Raw_Read( RAW_READ *p_raw_read );
+unsigned char Write_Burst( BURST_WRITE nurst_write );
+void Dump_Data ( unsigned char *pdata, unsigned int size );
 
 
 #endif

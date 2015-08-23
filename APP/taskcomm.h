@@ -41,16 +41,16 @@
 #define  MCU_SW_RESET_PATTERN   0xA5000005
 
 
-
-//#define UART_CMD_DATA_LENGTH    255 
-
-/////////  UART Message Storage Area:  MemPartition_MsgUART   //////////////////
-#define MsgUARTQueue_SIZE       5//10                            //memory partition block numbers
-#define MsgUARTBody_SIZE        4200//(4096) //length of each message == length per frame: head+ datalength +data( MUST be 4 X )
+/////////  UART Message Storage Area  //////////////////
+#define MsgUARTQueue_SIZE       5//10   //memory partition block numbers
+#define MsgUARTBody_SIZE        4200//4096 // package header(8B) + data(4096) + EMB Ext data
 #define EMB_BUF_SIZE            (MsgUARTBody_SIZE-8)// 8 bytes are for package header reserved
 
+//
 #define MAX_RESEND_TIMES        3
 #define DBG_UART_Send_Buf_Size  4096 //kFIFO
+
+
 
 extern OS_MEM       *pMEM_Part_MsgUART;
 extern CPU_INT08U    MemPartition_MsgUART[MsgUARTQueue_SIZE][MsgUARTBody_SIZE];
@@ -80,7 +80,6 @@ extern OS_EVENT *Done_Sem_RulerUART;
 extern OS_EVENT *UART_MUX_Sem_lock;
 
 extern CPU_INT08U DBG_UART_Send_Buffer[];
-
 
 extern CPU_INT08U       PcCmdTxID;
 extern CPU_INT08U       PcCmdTxID_Ruler[];
