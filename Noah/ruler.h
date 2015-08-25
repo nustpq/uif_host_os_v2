@@ -299,7 +299,7 @@ typedef struct {
     unsigned char    trigger_en;
     unsigned char    pdm_clk_off; //trun off pdm clk after pwd or not
     unsigned char    if_type;//1: I2C, 2:SPI
-}SET_VEC_CFG ;    
+}SET_VEC_CFG ;  
    
 
 

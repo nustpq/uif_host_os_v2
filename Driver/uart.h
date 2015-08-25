@@ -40,7 +40,7 @@
 #define UART2_SEND_QUEUE_LENGTH     4     // not used
 #define UART2_RECE_QUEUE_LENGTH     4    
 
-#define UART_PDC_LENGTH             32    // 32B transfer time is ok for a interruption 
+#define UART_PDC_LENGTH             128    // 32B transfer time is ok for a interruption 
 
 #define UART_TIMEOUT_BIT            (50 * 10) // 500 bit=50*10bit,  timeout in 50 Bytes' time, due to IT6322 slow response  
 

@@ -267,7 +267,7 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
     }
 #endif
     
-    if( (buf[4] <= 2) && (pAudioCfg->bit_length == 16) ) { 
+    if( buf[4] <= 2 ) { 
         global_i2s_tdm_sel[pAudioCfg->type] = 0 ;//I2S
     } else {
         global_i2s_tdm_sel[pAudioCfg->type] = 1 ;//TDM
