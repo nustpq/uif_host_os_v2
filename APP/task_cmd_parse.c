@@ -64,7 +64,7 @@ void App_TaskCMDParse( void *p_arg )
     CPU_INT08U   err ;
     CPU_INT08U  *pTaskMsgIN ;
     pNEW_CMD     pNewCmd ; 
-    EMB_BUF      *pEBuf;
+    //EMB_BUF      *pEBuf;
     
     pTaskMsgIN  = NULL;
     

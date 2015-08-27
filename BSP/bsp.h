@@ -115,6 +115,7 @@
 #include  <taskcomm.h>
 #include  <kfifo.h>
 
+#include  <nvic.h>
 #include  <board.h>
 #include  <uart.h>
 #include  <pio.h>

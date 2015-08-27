@@ -61,7 +61,7 @@ void App_TaskUART_Rx( void *p_arg )
    (void)p_arg; 
    
     CPU_INT32U       i;
-    CPU_INT16U       temp ;	
+    //CPU_INT16U       temp ;	
     CPU_INT16U       counter ;	
     CPU_INT08U       idle_counter ;	    
     CMDREAD          CMD_Read_PC ;

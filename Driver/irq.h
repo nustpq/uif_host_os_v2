@@ -71,7 +71,7 @@
 //------------------------------------------------------------------------------
 //         Global functions
 //------------------------------------------------------------------------------
-
+/*
 extern void IRQ_ConfigureIT(unsigned int source,
                             unsigned int mode,         // mode for AIC, priority for NVIC
                             void( *handler )( void )); // ISR
@@ -79,6 +79,6 @@ extern void IRQ_ConfigureIT(unsigned int source,
 extern void IRQ_EnableIT(unsigned int source);
 
 extern void IRQ_DisableIT(unsigned int source);
-
+*/
 #endif //#ifndef IRQ_H
 

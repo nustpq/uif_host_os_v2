@@ -40,7 +40,7 @@
 #define FRQ_TYPE_ERR             164u
 #define BUST_DM_IN_SESS          165u
 #define REPEAD_CMD_ERR           166u
-#define TIME_TEST_TIMEOVER       167u
+#define TIME_OUT                 167u
 #define CODEC_ERR                168u 
 #define CMD_NOT_SURRPORT         169u
 #define GPIO_HIGHT_WTG           170u
@@ -231,8 +231,10 @@
 #define  PC_CMD_DELAY                36
 #define  PC_CMD_MCU_FLASH_WRITE      40
 #define  PC_CMD_SET_VEC_CFG          41
-#define  PC_CMD_READ_VOICE_BUFFER    42
-#define  PC_CMD_TO_IM501_CMD         43
+#define  PC_CMD_REC_VOICE_BUFFER     42
+#define  PC_CMD_FETCH_VOICE_BUFFER   43
+#define  PC_CMD_TO_IM501_CMD         44
+
 
 #define  PC_CMD_DOWNLOAD_RULER_FW    100
 #define  PC_CMD_UPDATE_RULER_FW      101

@@ -93,14 +93,25 @@
 #define FW_DOWNLAD_STATE_UNFINISHED    0xAA
 #define FW_DOWNLAD_STATE_FINISHED      0x55
 
-#define FLASH_ADDR_FW_BIN_MAX_SIZE   ( 0x10000 )  //64kB max for ruler fw bin
-#define FLASH_ADDR_FW_STATE          ( AT91C_IFLASH1 )  //from 128kB-
-#define FLASH_ADDR_FW_BIN            ( FLASH_ADDR_FW_STATE + AT91C_IFLASH_PAGE_SIZE ) //from 128kB+256
+//#define FLASH_RULER_FW_BIN_MAX_SIZE  ( 0x10000 )  //64kB max for ruler fw bin
+//#define FLASH_ADDR_FW_STATE          ( AT91C_IFLASH1 )  //from 128kB-
+//#define FLASH_ADDR_FW_BIN            ( FLASH_ADDR_FW_STATE + AT91C_IFLASH_PAGE_SIZE ) //from 128kB+256
+//
+//#define FLASH_ADDR_FW_VEC_SIZE       ( 0x2000 ) //8kB
+//#define FLASH_ADDR_FW_VEC_NUM        ( 7 )      //(64kB = 8kB*7 
+//#define FLASH_ADDR_FW_VEC_STATE      ( AT91C_IFLASH1 +  FLASH_RULER_FW_BIN_MAX_SIZE  ) //256*4
+//#define FLASH_ADDR_FW_VEC            ( FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * FLASH_ADDR_FW_VEC_NUM ) //from 128kB + 64kB + (0.256*4)kB
 
-#define FLASH_ADDR_FW_VEC_SIZE       ( 0x2000 ) //8kB
-#define FLASH_ADDR_FW_VEC_NUM        ( 7 )      //(64kB = 8kB*7 
-#define FLASH_ADDR_FW_VEC_STATE      ( AT91C_IFLASH1 +  FLASH_ADDR_FW_BIN_MAX_SIZE  ) //256*4
-#define FLASH_ADDR_FW_VEC            ( FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * FLASH_ADDR_FW_VEC_NUM ) //from 128kB + 64kB + (0.256*4)kB
+#define FLASH_RULER_FW_BIN_MAX_SIZE  ( 0x10000 - AT91C_IFLASH_PAGE_SIZE )  //64kB max for ruler fw bin, 
+#define FLASH_VOICE_BUFFER_MAX_SIZE  ( 0x20000 - AT91C_IFLASH_PAGE_SIZE )  //128kB max for ruler fw bin
+#define FLASH_ADDR_FW_STATE          ( AT91C_IFLASH1 )  //from 128kB -> (128k+256)B
+#define FLASH_ADDR_FW_BIN            ( FLASH_ADDR_FW_STATE + AT91C_IFLASH_PAGE_SIZE ) //store from 128kB+256B ->end
+
+#define FLASH_HOST_FW_BIN_MAX_SIZE   ( 0x1C000 ) //128kB for host MCU fw bin
+#define FLASH_ADDR_FW_VEC_SIZE       ( 0x800 ) //2kB/vec
+#define FLASH_ADDR_FW_VEC_NUM        ( 8 )     //(16kB = 2kB*8
+#define FLASH_ADDR_FW_VEC_STATE      ( AT91C_IFLASH0 +  FLASH_HOST_FW_BIN_MAX_SIZE  ) 
+#define FLASH_ADDR_FW_VEC            ( FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * FLASH_ADDR_FW_VEC_NUM ) // 0x80000 + 0x1C000 + (0.256*8)kB = 0x9C800
 
 
 
@@ -348,9 +359,9 @@ extern unsigned char Update_Ruler_FW( unsigned char ruler_slot_id );
 extern unsigned char Save_Ruler_FW( unsigned int cmd, unsigned char *pBin, unsigned char *pStr, unsigned int size );
 extern unsigned char Ruler_Setup_Sync(unsigned char ruler_slot_id);
 extern unsigned char Save_DSP_VEC( MCU_FLASH *p_dsp_vec );
-
+extern void Read_Flash_State( FLASH_INFO  *pFlash_Info, unsigned int flash_address );
 extern void Debug_Audio( void ) ;
-
+extern unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg );
 
 
 

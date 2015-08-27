@@ -1202,7 +1202,7 @@ unsigned char FLASHD_Write_Safe( unsigned int address, const void *pBuffer,  uns
     if( size == 0 ) {
         return 0;
     }
-    if( address < AT91C_IFLASH + AT91C_IFLASH_CODE_SIZE ) {
+    if( address < (AT91C_IFLASH + FLASH_HOST_FW_BIN_MAX_SIZE) ) {
         APP_TRACE_INFO(("ERROR: this operation wanna flush code area!\r\n"));  
         return FW_BIN_SAVE_ADDR_ERR;
     }
@@ -1431,7 +1431,7 @@ unsigned char Save_DSP_VEC( MCU_FLASH *p_dsp_vec )
  
 unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
 {  
-    unsigned char err, index; 
+    unsigned char err; 
     
     err = NO_ERR;
     
@@ -1587,14 +1587,14 @@ unsigned char Update_Ruler_FW( unsigned char ruler_slot_id )
 */
 unsigned char Toggle_Mic(  TOGGLE_MIC *pdata )
 {  
+#ifdef BOARD_TYPE_UIF 
+    return 0;
+#else
+    
     unsigned char  err ;
     unsigned char  id;
     unsigned int   mic_mask;  
     unsigned int   fpga_mask;
-    
-#ifdef BOARD_TYPE_UIF 
-    return 0;
-#else
     
 #if OS_CRITICAL_METHOD == 3u
     OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */

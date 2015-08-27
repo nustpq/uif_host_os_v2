@@ -2113,6 +2113,9 @@
       <name>$PROJ_DIR$\Driver\nvic.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\Driver\nvic.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\Driver\pio.c</name>
     </file>
     <file>

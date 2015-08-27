@@ -107,8 +107,11 @@ unsigned char im501_switch_i2c_spi( unsigned char if_type, unsigned char spi_mod
 
 unsigned char test_send_cmd_to_im501( void );
 
-unsigned char Read_iM501_Voice_Buffer( unsigned char gpio_irq, unsigned int timeout_ms, unsigned char pkt_sn );
+unsigned char Record_iM501_Voice_Buffer( unsigned char gpio_irq, unsigned int timeout_ms );
 
 unsigned char Write_CMD_To_iM501( unsigned char cmd_index, unsigned short para );
 
+unsigned char save_voice_buffer_to_flash( VOICE_BUF  *p_voice_buf_data );
+
+unsigned char fetch_voice_buffer_from_flash( unsigned char pkt_sn );
 #endif

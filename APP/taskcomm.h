@@ -45,6 +45,7 @@
 #define MsgUARTQueue_SIZE       5//10   //memory partition block numbers
 #define MsgUARTBody_SIZE        4200//4096 // package header(8B) + data(4096) + EMB Ext data
 #define EMB_BUF_SIZE            (MsgUARTBody_SIZE-8)// 8 bytes are for package header reserved
+#define MAX_DATA_SIZE           4096 //suggest maximum data size
 
 //
 #define MAX_RESEND_TIMES        3

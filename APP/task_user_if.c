@@ -60,7 +60,7 @@ void  App_TaskUserIF (void *p_arg)
     CPU_INT08U   err;
     CPU_INT32U   key_state; 
     CPU_INT08U   ruler_id;
-    CPU_INT08U   iM401_Ctrl_Enable;
+    //CPU_INT08U   iM401_Ctrl_Enable;
   
     (void)p_arg;    
     
@@ -68,7 +68,7 @@ void  App_TaskUserIF (void *p_arg)
     Head_Info(); //Send header 
     //Ruler_Power_Switch(1);
     Init_Global_Var(); 
-    iM401_Ctrl_Enable = 1;
+    //iM401_Ctrl_Enable = 1;
     AB_POST();
 
 

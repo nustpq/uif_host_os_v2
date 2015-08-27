@@ -177,12 +177,12 @@ CPU_INT08U TaskFunc( CPU_INT08U argc,CPU_CHAR **argv )
 CPU_INT08U HelpFunc( CPU_INT08U argc,CPU_CHAR **argv )
 {
   
-	CPU_INT08U i;
+    CPU_INT08U i;
     
     if(argc==0){ 
       
         UART_SHELL_SEND_STR(("Genieshell only support the following command now. If you wanna use \n\r more functions, pls contact PQ, thx !"));	
-	    LsFunc( 0,NULL );
+	LsFunc( 0,NULL );
         UART_SHELL_SEND_STR(("\n\r\n\rFor detailed info, pls use command: help [command]\n\r"));	
         UART_SHELL_SEND_STR(("e.g.: help readdm\n\r"));	
         
@@ -209,16 +209,16 @@ CPU_INT08U HelpFunc( CPU_INT08U argc,CPU_CHAR **argv )
 CPU_INT08U HostNameFunc( CPU_INT08U argc,CPU_CHAR **argv )
 {
   
-	CPU_INT08U i ;
+    CPU_INT08U i ;
     UART_SHELL_SEND_STR(("Hostname is Genies ^_<  : "));	
     
-	if(argc>0){      
+    if(argc>0){      
         for(i=0;i<argc;i++){
             UART_SHELL_SEND_STR(("\n\r"));
             UART_SHELL_SEND_STR((argv[i]));	            
         }
-  	}
-	return 0;
+    }
+    return 0;
     
 }
 
@@ -251,15 +251,14 @@ CPU_INT08U WriteGPIOFunc(CPU_INT08U argc,CPU_CHAR **argv)
       
     }  
     
-	return 0;
-
+    return 0;
  
 }
 
 
 CPU_INT08U InitI2CFunc(CPU_INT08U argc,CPU_CHAR **argv)
 {
-    CPU_INT32U temp1;    
+    CPU_INT32U temp1; 
 
     if(argc != 1)  {
         return 1 ;
@@ -270,11 +269,11 @@ CPU_INT08U InitI2CFunc(CPU_INT08U argc,CPU_CHAR **argv)
         TWI_Init( temp1 * 1000 );     
         UART_SHELL_SEND_STR(("\n\rI2C port is re-initialized to %d kHz",temp1));     
         
-    }  else {
+    } else {
       return 2 ;
       
     }     
-	return 0;
+    return 0;
  
 }
 
@@ -289,7 +288,7 @@ CPU_INT08U RebootFunc(CPU_INT08U argc,CPU_CHAR **argv)
     AT91C_BASE_RSTC->RSTC_RCR = MCU_SW_RESET_PATTERN ; // do reset processor and peripherals
     //while(1);
     
-	return 0;
+    return 0;
  
 }         
 
@@ -300,7 +299,7 @@ CPU_INT08U RebootFunc(CPU_INT08U argc,CPU_CHAR **argv)
 
 CPU_INT08U ReadDMFunc( CPU_INT08U argc,CPU_CHAR **argv )	
 {
-	CPU_INT08U errcode  ;
+    CPU_INT08U errcode  ;
     CPU_INT16U address ;
     CPU_INT16U data ;
     CPU_INT32U temp ;    
@@ -322,14 +321,14 @@ CPU_INT08U ReadDMFunc( CPU_INT08U argc,CPU_CHAR **argv )
       return 2 ;
       
     }
-	return 0;
+    return 0;
     
 }
 
 
 CPU_INT08U WriteDMFunc( CPU_INT08U argc,CPU_CHAR **argv )	
 {
-	CPU_INT08U errcode  ;
+    CPU_INT08U errcode  ;
     CPU_INT16U address ;
     CPU_INT16U data ;
     CPU_INT32U temp1, temp2;
@@ -356,14 +355,14 @@ CPU_INT08U WriteDMFunc( CPU_INT08U argc,CPU_CHAR **argv )
       return 2 ;
       
     }
-	return 0;
+    return 0;
 }
 
 
  
 CPU_INT08U ReadCMFunc( CPU_INT08U argc,CPU_CHAR **argv )	
 {
-	CPU_INT08U errcode  ;
+    CPU_INT08U errcode  ;
     CPU_INT16U address ;
     CPU_INT16U data ;
     CPU_INT32U temp ;    
@@ -385,14 +384,14 @@ CPU_INT08U ReadCMFunc( CPU_INT08U argc,CPU_CHAR **argv )
       return 2 ;
       
     }
-	return 0;
+    return 0;
     
 }
 
 
 CPU_INT08U WriteCMFunc( CPU_INT08U argc,CPU_CHAR **argv )	
 {
-	CPU_INT08U errcode  ;
+    CPU_INT08U errcode  ;
     CPU_INT16U address ;
     CPU_INT16U data ;
     CPU_INT32U temp1, temp2;
@@ -419,13 +418,13 @@ CPU_INT08U WriteCMFunc( CPU_INT08U argc,CPU_CHAR **argv )
       return 2 ;
       
     }
-	return 0;
+    return 0;
 }
 
  
 CPU_INT08U ReadPMFunc( CPU_INT08U argc,CPU_CHAR **argv )	
 {
-	CPU_INT08U errcode  ;
+    CPU_INT08U errcode  ;
     CPU_INT16U address ;
     CPU_INT32U data ;
     CPU_INT32U temp ;
@@ -450,14 +449,14 @@ CPU_INT08U ReadPMFunc( CPU_INT08U argc,CPU_CHAR **argv )
       return 2 ;
       
     }
-	return 0;
+    return 0;
     
 }
 
 
 CPU_INT08U WritePMFunc( CPU_INT08U argc,CPU_CHAR **argv )	
 {
-	CPU_INT08U errcode  ;
+    CPU_INT08U errcode  ;
     CPU_INT16U address ;
     CPU_INT32U data ;
     CPU_INT32U temp1, temp2;
@@ -492,7 +491,7 @@ CPU_INT08U WritePMFunc( CPU_INT08U argc,CPU_CHAR **argv )
 
 CPU_INT08U ReadDSPREGFunc( CPU_INT08U argc,CPU_CHAR **argv )	
 {
-	CPU_INT08U errcode  ;
+    CPU_INT08U errcode  ;
     CPU_INT08U address ;
     CPU_INT16U data ;
     CPU_INT32U temp ;
@@ -517,7 +516,7 @@ CPU_INT08U ReadDSPREGFunc( CPU_INT08U argc,CPU_CHAR **argv )
       return 2 ;
       
     }
-	return 0;
+    return 0;
     
 }
 
@@ -525,7 +524,7 @@ CPU_INT08U ReadDSPREGFunc( CPU_INT08U argc,CPU_CHAR **argv )
 
 CPU_INT08U WriteDSPREGFunc( CPU_INT08U argc,CPU_CHAR **argv )	
 {
-	CPU_INT08U errcode  ;
+    CPU_INT08U errcode  ;
     CPU_INT16U address ;
     CPU_INT16U data ;
     CPU_INT32U temp1, temp2;
@@ -558,15 +557,15 @@ CPU_INT08U WriteDSPREGFunc( CPU_INT08U argc,CPU_CHAR **argv )
       return 2 ;
       
     }
+    return 0;
     
-	return 0;
 }
 
 
 
 CPU_INT08U ReadHostREGFunc( CPU_INT08U argc,CPU_CHAR **argv )	
 {
-	CPU_INT08U errcode  ;
+    CPU_INT08U errcode  ;
     CPU_INT08U address  ;
     CPU_INT16U data ;
     CPU_INT32U temp ;
@@ -591,7 +590,7 @@ CPU_INT08U ReadHostREGFunc( CPU_INT08U argc,CPU_CHAR **argv )
       return 2 ;
       
     }
-	return 0;
+    return 0;
     
 }
 
@@ -600,7 +599,7 @@ CPU_INT08U ReadHostREGFunc( CPU_INT08U argc,CPU_CHAR **argv )
 CPU_INT08U WriteHostREGFunc( CPU_INT08U argc,CPU_CHAR **argv )	
 {
     
-	CPU_INT08U errcode  ;
+    CPU_INT08U errcode  ;
     CPU_INT16U address ;
     CPU_INT16U data ;
     CPU_INT32U temp1, temp2;
@@ -634,7 +633,7 @@ CPU_INT08U WriteHostREGFunc( CPU_INT08U argc,CPU_CHAR **argv )
       
     }
     
-	return 0;
+    return 0;
 }
 
 CPU_INT08U Write_Ruler_FW( CPU_INT08U argc,CPU_CHAR **argv )	
@@ -676,7 +675,6 @@ CPU_INT08U Get_Ver_Info( CPU_INT08U argc,CPU_CHAR **argv )
 
 
 
-
 CPU_INT08U Flash_Info( CPU_INT08U argc,CPU_CHAR **argv )
 {   
  
@@ -699,7 +697,7 @@ CPU_INT08U CommandParse( CPU_CHAR *Buf, CPU_INT08U *p_argc, CPU_CHAR *argv[] )
 	CPU_INT08U i;
 	CPU_INT08U pointer;
 	CPU_INT08U num;
-    CPU_INT08U argc;
+        CPU_INT08U argc;
 	CPU_CHAR   name[MAX_COMMAND_NAME_LENGTH+1];		//SHELL_CMD name length <20
 
 	argc    = 0;            
@@ -713,7 +711,7 @@ CPU_INT08U CommandParse( CPU_CHAR *Buf, CPU_INT08U *p_argc, CPU_CHAR *argv[] )
 		pointer++;
 	}    
 	name[pointer] = '\0';	//now got the command name, and pointer is to the first space in the Buf
-    pointer = 0;
+        pointer = 0;
     
 	for( i=0; i<MAX_COMMAND_NUM; i++){
 		//if(!strcmp(name,ShellComms[i].name)){
@@ -740,7 +738,7 @@ CPU_INT08U CommandParse( CPU_CHAR *Buf, CPU_INT08U *p_argc, CPU_CHAR *argv[] )
 		}
 	}//while
     
-    *p_argc = argc ;    
+        *p_argc = argc ;    
 	return ( num );
     
 }

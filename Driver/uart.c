@@ -269,7 +269,7 @@ CPU_INT08U UART_Init( CPU_INT08U uart_index,void (*isr_handler)( void ),CPU_INT3
 */
 CPU_INT08U UART_WriteStart( CPU_INT08U uart_index )
 {
-    CPU_INT16U byte_send,counter ;
+    CPU_INT16U counter ;
     CPU_INT08U error;
     
 #if OS_CRITICAL_METHOD == 3u   /* Allocate storage for CPU status register   */
@@ -311,7 +311,7 @@ CPU_INT08U UART_WriteStart( CPU_INT08U uart_index )
 
 CPU_INT08U UART_ReWriteStart( CPU_INT08U uart_index )
 {
-    CPU_INT16U byte_send,counter ;
+    CPU_INT16U counter ;
     CPU_INT08U error;
     
 #if OS_CRITICAL_METHOD == 3u   /* Allocate storage for CPU status register   */
@@ -454,13 +454,11 @@ CPU_INT08U UART_Read( CPU_INT08U uart_index, QUEUE_DATA_TYPE *pdata )
 void ISR_PC_UART( void )
 {
     CPU_INT32U status; 
-    CPU_INT16U byte_send, counter;
+    CPU_INT16U counter;
     
 #if OS_CRITICAL_METHOD == 3u   /* Allocate storage for CPU status register           */
     OS_CPU_SR  cpu_sr = 0u;
 #endif   
- 
-    byte_send = 0;
     
     OS_ENTER_CRITICAL();
     
