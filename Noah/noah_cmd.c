@@ -695,7 +695,7 @@ CPU_INT08U  EMB_Data_Build (  CPU_INT16U   cmd_type,
             *p_emb_length = pos;   
         break;
         
-        case PC_CMD_READ_VOICE_BUFFER :
+        case PC_CMD_FETCH_VOICE_BUFFER :
             pos = emb_init_builder(pChar, EMB_BUF_SIZE, cmd_type, &builder);
             pos = emb_append_attr_uint(&builder, pos, 1, pPcCmdData->voice_buf_data.done); //package status is finished?
             pos = emb_append_attr_uint(&builder, pos, 2, pPcCmdData->voice_buf_data.index); //package index               
@@ -703,7 +703,6 @@ CPU_INT08U  EMB_Data_Build (  CPU_INT16U   cmd_type,
             pos = emb_append_end(&builder, pos);
             *p_emb_length = pos;   
         break;
-        
         
         default:
             err = CMD_NOT_SURRPORT ;    
@@ -957,14 +956,21 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         break ; 
         
         
-        case PC_CMD_READ_VOICE_BUFFER:
+        case PC_CMD_REC_VOICE_BUFFER:
             temp = emb_get_attr_int(&root, 1, -1); //irq gpio index
             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }           
             temp2 = emb_get_attr_int(&root, 2, -1); //timeout ms
             if(temp2 == -1 ) { Send_GACK(EMB_CMD_ERR); break; }         
-            err = Read_iM501_Voice_Buffer( (CPU_INT32U)temp, (CPU_INT32U)temp2, pkt_sn );              
+            err = Record_iM501_Voice_Buffer( (CPU_INT32U)temp, (CPU_INT32U)temp2, pkt_sn );              
               
         break;
+        
+        case PC_CMD_FETCH_VOICE_BUFFER:
+            err = fetch_voice_buffer_from_flash( pkt_sn );              
+              
+        break;
+        
+
         
         case PC_CMD_TO_IM501_CMD:
             temp = emb_get_attr_int(&root, 1, -1); //To iM501 cmd id

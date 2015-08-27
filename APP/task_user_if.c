@@ -156,7 +156,7 @@ void  App_TaskUserIF (void *p_arg)
 //                            UART_Init(PC_UART, ISR_PC_UART, 115200 );    //To PC  ? Sem recreat issue
 //                        }
                           //test_send_cmd_to_im501();
-                          //Read_iM501_Voice_Buffer(2,15000);
+                          //Record_iM501_Voice_Buffer(2,15000);
                     } 
                 break;
                 
