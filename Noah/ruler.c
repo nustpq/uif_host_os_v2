@@ -46,6 +46,7 @@ extern EMB_BUF   Emb_Buf_Cmd;
 
 SET_VEC_CFG  Global_VEC_Cfg; 
 
+volatile unsigned char Global_SPI_Record = 0;
 
 /*
 *********************************************************************************************************
@@ -403,6 +404,11 @@ unsigned char Stop_Audio( void )
         APP_TRACE_INFO(("\r\nStop_Audio ERROR: %d\r\n ",data)); 
         return data; 
     } 
+    //check if it is in SPI recording mode
+    if( Global_SPI_Record == 1 ) {
+        Global_SPI_Record = 0;
+        Enable_SPI_Port();
+    }
    
 //    err = Init_CODEC( 0 );
 //    if( err != NO_ERR ) {
@@ -494,7 +500,42 @@ unsigned char Get_Audio_Version( void )
 
 
 
-
+unsigned char Rec_Voice_Buffer_Start( VOICE_BUF_CFG *pv_b_cfg )
+{   
+    unsigned char err   = 0xFF;  
+    unsigned char data  = 0xFF; 
+   
+    unsigned char buf[] = {   CMD_DATA_SYNC1, CMD_DATA_SYNC2,\
+                              RULER_CMD_START_RD_VOICE_BUF,\
+                              (pv_b_cfg->spi_speed) & 0xFF, ((pv_b_cfg->spi_speed)>>8) & 0xFF,\
+                              ((pv_b_cfg->spi_speed)>>16) & 0xFF, ((pv_b_cfg->spi_speed)>>24) & 0xFF,\
+                              pv_b_cfg->spi_mode, pv_b_cfg->gpio_irq }; 
+    
+    //APP_TRACE_INFO(("\r\nRec_Voice_Buffer_Start : gpio_irq = [%d], spi mode = %d, spi speed = %d MHz\r\n", pv_b_cfg->gpio_irq, pv_b_cfg->spi_mode, pv_b_cfg->spi_speed / 1000000 ));
+    
+    if( pv_b_cfg->gpio_irq < 2 ) {
+        APP_TRACE_INFO(("\r\nIRQ gpio support: UIF_GPIO_2 ~ UIF_GPIO_9 only!\r\n ",data)); 
+        return UIF_TYPE_NOT_SUPPORT;
+    } 
+    buf[8] = pv_b_cfg->gpio_irq - 2 ;//Cause UIF_GPIO connecting to Host is differnt from Audio
+    
+    UART2_Mixer(3); 
+    USART_SendBuf( AUDIO_UART, buf,  sizeof(buf) );    
+    err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM );  
+    if( err != NO_ERR ) { 
+        //APP_TRACE_INFO(("\r\nRec_Voice_Buffer_Start ERROR: Timeout : %d\r\n",err));
+        return err;
+    }
+    if( data != NO_ERR ) {
+        //APP_TRACE_INFO(("\r\nRec_Voice_Buffer_Start ERROR: Data : %d\r\n ",data)); 
+        return data; 
+    }
+    //Disable_SPI_Port();
+    
+    Global_SPI_Record = 1; //set flag for SPI rec
+    
+    return 0 ;   
+}
 
 /*
 *********************************************************************************************************

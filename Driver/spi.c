@@ -36,7 +36,8 @@
 #include "spi.h"
 #include <timer.h>
 
-static const Pin spi_pins[] = { PINS_SPI0, PIN_SPI0_NPCS0 } ;
+static const Pin spi_pins[]     = { PINS_SPI0, PIN_SPI0_NPCS0 } ;
+static const Pin spi_pins_dis[] = { PINS_SPI0_DIS, PIN_SPI0_NPCS0_DIS } ;
 
 OS_EVENT * SPI_Sem = NULL ; //sem for TWI
 
@@ -608,7 +609,7 @@ void SPI_Initialize( AT91S_SPI *spi, unsigned int npcs, unsigned int spi_clk, un
    
 } 
 
-void SPI_Init(  unsigned int spi_clk, unsigned char format ) 
+void SPI_Init(  unsigned int spi_clk, unsigned char format )  //based on polling 
 {
    static unsigned int spi_clk_save ;
    static unsigned int format_save ;
@@ -670,7 +671,17 @@ void SPI_Init(  unsigned int spi_clk, unsigned char format )
 }
 
    
-         
+void Enable_SPI_Port( void )// unsigned int spi_clk, unsigned char format )
+{
+    //SPI_Init(spi_clk,format);
+    PIO_Configure(spi_pins, PIO_LISTSIZE(spi_pins) ); 
+}
+
+
+void Disable_SPI_Port( void )
+{
+    PIO_Configure(spi_pins_dis, PIO_LISTSIZE(spi_pins_dis) ); 
+}        
 
 
 

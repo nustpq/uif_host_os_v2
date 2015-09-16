@@ -139,7 +139,9 @@ void  App_TaskJoy (void *p_arg)
         }
    
         //AB_Status_Change_Report();        
-        //OSTimeDly(100);
+         
+        Check_KeyWords_Detect_Status();
+
         OSTimeDly(1); 
        
     }

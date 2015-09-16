@@ -38,7 +38,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:H:V2.50]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:H:V2.51]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB01
 const CPU_CHAR hw_version[]  = "[HW:V1.0]"; 
@@ -63,8 +63,6 @@ OS_EVENT *Bsp_Ser_Rx_Sem_lock;
 
 static  Pin PinBuzzer    =   BUZZER ;
 CPU_INT08U Debug_COM_Sel = 0 ; //debug uart use:    0: DBGUART, 1: UART1, >1: debug muted
-
-
 
 
 //////////////////////////////////////////////////////////////////////////

@@ -23,8 +23,13 @@
 #define  TO_DSP_CMD_ADDR                 (0x0FFFBFF8)
 #define  TO_DSP_CMD_OFFSET_ATTR( x )     ( (x) & 0xFFFF )
 #define  TO_DSP_CMD_OFFSET_STAT( x )     ( ((x) & 0xFF) << 24 )
+#define  TO_DSP_CMD_REQ_START_BUF_TRANS   0x19
+#define  TO_DSP_CMD_REQ_STOP_BUF_TRANS    0x1D
+#define  TO_DSP_CMD_REQ_ENTER_PSM         0x0D
 
 #define  TO_HOST_CMD_ADDR                (0x0FFFBFFC)
+#define  HW_VOICE_BUF_START              (0x0FFF3EE0)  // DRAM voice buffer : 0x0FFF3EE0 ~ 0x0FFFBEDF = 32kB
+#define  HW_VOICE_BUF_END                (0x0FFFBEDF)  //
 #define  HW_BUF_RX_L                     (0x0FFFE000)  //1kB
 #define  HW_BUF_RX_R                     (0x0FFFE400)  //1kB
 #define  HW_BUF_RX_SIZE                  (2048)
@@ -59,19 +64,42 @@
 #define  IM501_SPI_CMD_IM_RD             0x00 
 #define  IM501_SPI_CMD_REG_WR            0x06 
 #define  IM501_SPI_CMD_REG_RD            0x02 
+       
+#define SUCCESS                          0u
+#define NO_ERR                           0u
+#define NULL                             0u
+
+#define SPI_BUS_ERR                      179u
+#define I2C_BUS_ERR                      180u
+#define TO_501_CMD_ERR                   181u 
         
 
+//typedef struct {
+//    unsigned short attri;
+//    unsigned char  cmd_byte;
+//    unsigned char  status;
+//}To_Host_CMD ;
+//
+//typedef struct {
+//    unsigned short attri;
+//    unsigned char  cmd_byte_ext;
+//    unsigned char  status;
+//    unsigned char  cmd_byte;
+//}To_501_CMD ;
+
+
 typedef struct {
-    unsigned short attri;
-    unsigned char  cmd_byte;
-    unsigned char  status;
+    unsigned int   attri    : 24;
+    unsigned int   cmd_byte : 7;
+    unsigned int   status   : 1;
 }To_Host_CMD ;
 
 typedef struct {
-    unsigned short attri;
-    unsigned char  cmd_byte_ext;
-    unsigned char  status;
-    unsigned char  cmd_byte;
+    unsigned int  attri        : 24 ;
+    unsigned int  cmd_byte_ext : 7 ;
+    unsigned int  status       : 1 ;
+    
+    unsigned char cmd_byte;
 }To_501_CMD ;
 
 typedef struct {
@@ -81,8 +109,11 @@ typedef struct {
     unsigned char  done;
 }VOICE_BUF ;
 
-
-
+typedef struct {
+  unsigned int   spi_speed;
+  unsigned char  spi_mode;  
+  unsigned char  gpio_irq; 
+}VOICE_BUF_CFG;
 
 //extern unsigned char iM401_Bypass( void );
 //extern unsigned char iM401_Standby( void );
@@ -114,4 +145,12 @@ unsigned char Write_CMD_To_iM501( unsigned char cmd_index, unsigned short para )
 unsigned char save_voice_buffer_to_flash( VOICE_BUF  *p_voice_buf_data );
 
 unsigned char fetch_voice_buffer_from_flash( unsigned char pkt_sn );
+
+void Wait_Keywords_Detect( unsigned char gpio_irq );
+
+unsigned char Request_Enter_PSM( void );
+
+void Check_KeyWords_Detect_Status( void );
+
+
 #endif

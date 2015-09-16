@@ -234,7 +234,7 @@
 #define  PC_CMD_REC_VOICE_BUFFER     42
 #define  PC_CMD_FETCH_VOICE_BUFFER   43
 #define  PC_CMD_TO_IM501_CMD         44
-
+#define  PC_CMD_ENTER_PSM            45
 
 #define  PC_CMD_DOWNLOAD_RULER_FW    100
 #define  PC_CMD_UPDATE_RULER_FW      101
@@ -322,6 +322,7 @@ typedef union  {
     MCU_FLASH             mcu_flash;
     SET_VEC_CFG           set_vec_cfg;
     VOICE_BUF             voice_buf_data;
+    VOICE_BUF_CFG         voice_buf_cfg;
 }PCCMDDAT, *pPCCMDDAT ;
 
 //#pragma pack()
@@ -332,7 +333,6 @@ typedef struct {
     CPU_INT32U   PcCmdCounter;
     CPU_INT32U   PcCmdDataLen;   
 }CMDREAD ;
-
 
 /*
 *********************************************************************************************************

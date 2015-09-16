@@ -243,7 +243,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
 //    
     err    = NO_ERR;
     pChar  = p_raw_write->pdata ;
-    
+        
     switch( p_raw_write->if_type ) {
         
         ////////////////////////////////////////////////////////////////////////   

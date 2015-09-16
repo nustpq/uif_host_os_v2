@@ -36,6 +36,7 @@ VOICE_BUF  voice_buf_data;
 
 static unsigned int im501_irq_counter;
 static unsigned int im501_irq_gpio;
+static unsigned int im501_key_words_detect;
 static unsigned char voice_data_pkt_sn;
 
 
@@ -498,7 +499,7 @@ unsigned char im501_write_reg_spi( unsigned char reg_addr, unsigned char data )
     unsigned char buf[3];
     
     err    =  NO_ERR;
-    buf[0] =  IM501_I2C_CMD_REG_WR_1;
+    buf[0] =  IM501_SPI_CMD_REG_WR;
     buf[1] =  reg_addr;
     buf[2] =  data;
       
@@ -596,13 +597,13 @@ unsigned char im501_read_dram_spi( unsigned int mem_addr, unsigned char *pdata )
   
     
     buf[0] =  IM501_SPI_CMD_DM_RD;
-    buf[1] =  mem_addr & 0xFF;
+    buf[1] =  mem_addr & 0xFC;
     buf[2] =  (mem_addr>>8) & 0xFF;
     buf[3] =  (mem_addr>>16) & 0xFF;
     buf[4] =  2;
     buf[5] =  0;    
 
-    state =  SPI_WriteReadBuffer_API(  pbuf, 
+    state  =  SPI_WriteReadBuffer_API(  pbuf, 
                                        buf, 
                                        4 , 
                                        sizeof(buf) );
@@ -857,52 +858,41 @@ unsigned char test_send_cmd_to_im501( void )
 
 unsigned char parse_to_host_command( To_Host_CMD cmd )
 {
-    unsigned char err;
-    unsigned char *pbuf;
-         
+    unsigned char err; 
+    unsigned int address;
+       
     switch( cmd.cmd_byte ) {
         
-        case 0x81 : //Reuest host to read To-Host Buffer 1st package
-            voice_buf_data.length   = cmd.attri & 0x7FFF;
-            voice_buf_data.index    = 1;
-            voice_buf_data.done     = (cmd.attri>>15) & 0x01;
-            err = im501_burst_read_dram_spi( HW_BUF_RX_L,  &pbuf,  voice_buf_data.length );
-            if( err != NO_ERR ){ 
-                return err;
-            }
+        case 0x40 : //Infom host Keywords detected
+            im501_key_words_detect = 1 ;
         break;
         
-        case 0x82 : //Reuest host to read To-Host Buffer  
-            voice_buf_data.index    =  cmd.attri & 0x7FFF;
-            voice_buf_data.done     = (cmd.attri>>15) & 0x01;
-            //err = im501_burst_read_dram_spi( HW_BUF_RX_L,  &pbuf,  voice_buf_data.length );
-            err = im501_burst_read_dram_spi( (voice_buf_data.index % 2) == 1 ? HW_BUF_RX_L : HW_BUF_RX_R,  &pbuf,  voice_buf_data.length );
-            if( err != NO_ERR ){ 
-                return err;
-            }
+        case 0x41 : //Reuest host to read To-Host Buffer-Fast
+//            voice_buf_data.length   = (cmd.attri & 0xFFFF ) << 1;  //sample to bytes
+//            address = HW_VOICE_BUF_START;
+//            global_rec_spi_fast = 1;
+//            err = fetch_voice_data( address, voice_buf_data.length ); 
+//            if( err != NO_ERR ){
+//                return err;
+//            }
         break;
         
-        case 0x83 : //Reuest host to turn on PDM CLKI (PDMADC CLK for FM36)
-            I2C_Mixer(I2C_MIX_FM36_CODEC);
-            err = FM36_PDMADC_CLK_OnOff(1); //Enable PDM clock
-            I2C_Mixer(I2C_MIX_UIF_S); 
-            if( err != NO_ERR ){ 
-                return err;
-            }
+        case 0x42 : //Reuest host to read To-Host Buffer-RealTime            
+//            voice_buf_data.length   = ( (cmd.attri & 0xFF0000 )>>16 ) << 1;  //sample to bytes
+//            address = HW_VOICE_BUF_START + (cmd.attri & 0xFFFF);
+//            global_rec_spi_fast = 0;  
+//            err = fetch_voice_data( address,  voice_buf_data.length );
+//            if( err != NO_ERR ){ 
+//                return err;
+//            }
         break;
-        
+                       
         default:
-            err = MODE_NOT_SUPPORT;           
+            err = 2;           
         break;
         
     }
-        
-    if( err == NO_ERR ) {
-        voice_buf_data.pdata = pbuf ;
-		err = save_voice_buffer_to_flash(&voice_buf_data);          
-        
-    }
-    
+            
     return err;
     
 }
@@ -912,25 +902,31 @@ unsigned char parse_to_host_command( To_Host_CMD cmd )
 unsigned char send_to_dsp_command( To_501_CMD cmd )
 {
     unsigned char err;
+    unsigned int  i;
     
     err = im501_write_dram_spi( TO_DSP_CMD_ADDR, (unsigned char *)&cmd );
-    if( err != NO_ERR ){ 
-        return err;
-    }
-    err = im501_write_reg_spi( 0x01, cmd.cmd_byte );
-    if( err != NO_ERR ){ 
+    if( err != 0 ){ 
         return err;
     }
     
-    OSTimeDly(1); //wait for DSP execute the cmd
-    
-    err = im501_read_dram_spi( TO_DSP_CMD_ADDR, (unsigned char *)&cmd );
-    if( err != NO_ERR ){ 
+    err = im501_write_reg_spi( 0x01, cmd.cmd_byte ); //generate interrupt to DSP
+    if( err != 0 ){ 
         return err;
     }
-    if( cmd.status != 0 ) {
-        err = cmd.status;
+    
+    for( i = 0; i< 50; i++ ) {   //wait for (50*100us = 5ms) to check if DSP finished 
+        err = im501_read_dram_spi( TO_DSP_CMD_ADDR, (unsigned char *)&cmd );
+        if( err != 0 ){ 
+            return err;
+        }
+        if( cmd.status != 0 ) {
+            err = TO_501_CMD_ERR;
+        } else {
+            err = 0;
+        }
+        delay_us(100); //??
     }
+    
     return err;
     
 }
@@ -964,14 +960,86 @@ unsigned char resp_to_host_command( void )
 
 
 
+
+
 void ISR_iM501_IRQ( void )
-{
-    if( Check_GPIO_Intrrupt( im501_irq_gpio ) ) {                       
-        im501_irq_counter++;        
+{    
+    if( Check_GPIO_Intrrupt( im501_irq_gpio ) ) {         
+        im501_irq_counter++;
+      
     }
+    
 }
 
 
+void Check_KeyWords_Detect_Status( void )
+{
+    
+    unsigned char err;
+    VOICE_BUF_CFG voice_buf_cfg;
+    
+    if ( im501_irq_counter ) {
+        
+        im501_irq_counter--;
+        
+        err = resp_to_host_command();             
+        if( err != NO_ERR ){            
+            return;
+        }  
+    
+        if( im501_key_words_detect == 1 ) {
+            
+            Disable_GPIO_Interrupt( im501_irq_gpio ); //disable IRQ interrupt
+                    
+            I2C_Mixer(I2C_MIX_FM36_CODEC);
+            FM36_PDMADC_CLK_OnOff(1); //Enable PDM clock
+            I2C_Mixer(I2C_MIX_UIF_S); 
+                    
+            Disable_SPI_Port(); //disabled host mcu SPI
+                    
+            voice_buf_cfg.spi_mode = Global_UIF_Setting[1].speed;
+            voice_buf_cfg.spi_speed = Global_UIF_Setting[1].attribute;
+            voice_buf_cfg.gpio_irq = im501_irq_gpio;    
+            
+            Rec_Voice_Buffer_Start( &voice_buf_cfg ); //send CMD to Audio MCU                    
+        }  
+        
+    }
+    
+}
+
+void Wait_Keywords_Detect( unsigned char gpio_irq )
+{
+    im501_irq_counter = 0;
+    im501_key_words_detect = 0 ;
+    im501_irq_gpio = gpio_irq ; 
+    //set gpio interruption
+    Config_GPIO_Interrupt( im501_irq_gpio, ISR_iM501_IRQ );     
+  
+    //PP_TRACE_INFO(("\r\n::Record voice buffer time cost: %d ms\r\n",time_rec));
+    
+    
+}
+
+
+unsigned char Request_Enter_PSM( void )
+{
+    
+    unsigned char err;
+        
+    err = Write_CMD_To_iM501( TO_DSP_CMD_REQ_ENTER_PSM, 0 );
+    if( err != NO_ERR ){ 
+        return err;
+    }
+    
+    I2C_Mixer(I2C_MIX_FM36_CODEC);
+    FM36_PDMADC_CLK_OnOff(0); //Disable PDM clock
+    I2C_Mixer(I2C_MIX_UIF_S);
+    
+    Wait_Keywords_Detect(2);
+    return err;
+    
+}
 
 
 
@@ -1023,17 +1091,19 @@ unsigned char Record_iM501_Voice_Buffer( unsigned char gpio_irq, unsigned int ti
 
 unsigned char Write_CMD_To_iM501( unsigned char cmd_index, unsigned short para )
 {
+    
     unsigned char err;
-    To_501_CMD cmd;
+    To_501_CMD    cmd;
     
-    cmd.cmd_byte = ((cmd_index & 0x3F) << 2) | 0x02; //D[1]   : "1", interrupt DSP. This bit generates NMI (non-mask-able interrupt)
+    cmd.cmd_byte = cmd_index;//((cmd_index & 0x3F) << 2) | 0x01; //D[1] : "1", interrupt DSP. This bit generates NMI (non-mask-able interrupt), D[0]: "1" generate mask-able interrupt
     cmd.attri    = para & 0xFFFF ;
-    
+    cmd.status   = 1;
     err = send_to_dsp_command( cmd );
     
     return err;
     
 }
+
 
 
 static FLASH_INFO  flash_info_voice_buf;

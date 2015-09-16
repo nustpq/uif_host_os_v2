@@ -948,27 +948,41 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         break ;      
 
            
-        case PC_CMD_RAED_AB_INFO : 
-             
+        case PC_CMD_RAED_AB_INFO :              
             err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
                                       &PCCmd,
                                       pkt_sn, 
                                       DATA_AB_INFO ) ;           
         break ; 
         
-        
         case PC_CMD_REC_VOICE_BUFFER:
             temp = emb_get_attr_int(&root, 1, -1); //irq gpio index
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }           
-            temp2 = emb_get_attr_int(&root, 2, -1); //timeout ms
-            if(temp2 == -1 ) { Send_GACK(EMB_CMD_ERR); break; }         
-            err = Record_iM501_Voice_Buffer( (CPU_INT32U)temp, (CPU_INT32U)temp2 );              
-              
+            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
+//            PCCmd.voice_buf_cfg.gpio_irq = (CPU_INT08U)temp; 
+//            temp = emb_get_attr_int(&root, 2, -1); //spi mode
+//            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }  
+//            PCCmd.voice_buf_cfg.spi_mode = (CPU_INT08U)temp; 
+//            temp = emb_get_attr_int(&root, 3, -1); //spe speed
+//            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }  
+//            PCCmd.voice_buf_cfg.spi_mode = (CPU_INT32U)temp; 
+            
+            //err = Rec_Voice_Buffer_Start( &PCCmd.voice_buf_cfg );           
+              Wait_Keywords_Detect(temp);
         break;
-        case PC_CMD_FETCH_VOICE_BUFFER:
-            err = fetch_voice_buffer_from_flash( pkt_sn );              
-              
-        break;
+        
+//        case PC_CMD_REC_VOICE_BUFFER:
+//            temp = emb_get_attr_int(&root, 1, -1); //irq gpio index
+//            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }           
+//            temp2 = emb_get_attr_int(&root, 2, -1); //timeout ms
+//            if(temp2 == -1 ) { Send_GACK(EMB_CMD_ERR); break; }         
+//            err = Record_iM501_Voice_Buffer( (CPU_INT32U)temp, (CPU_INT32U)temp2 );              
+//            
+//        break;
+//        
+//        case PC_CMD_FETCH_VOICE_BUFFER:
+//            err = fetch_voice_buffer_from_flash( pkt_sn );              
+//              
+//        break;
         
         case PC_CMD_TO_IM501_CMD:
             temp = emb_get_attr_int(&root, 1, -1); //To iM501 cmd id
@@ -979,7 +993,10 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
               
         break;
         
-        
+        case PC_CMD_ENTER_PSM:
+            err = Request_Enter_PSM();              
+              
+        break;        
 /***************************************************************************
         
 //        case PC_CMD_BURST_WRITE :

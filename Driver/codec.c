@@ -470,6 +470,7 @@ unsigned char CODEC_Set_Volume( unsigned int vol_spk, unsigned int vol_lin )
 
 unsigned short CODEC_PARA_TABLE[][14][7] = {
     { //mode 0
+        
           //I2S format
           //BCLK = 16 * 2 * FCLK = 32 * FCLK
 	  //parameter for MCLK = 24.576MHz 

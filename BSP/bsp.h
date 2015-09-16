@@ -128,12 +128,12 @@
 #include  <twid.h>
 #include  <spi.h>
 #include  <i2c_gpio.h>
+#include  <im501_comm.h>
 #include  <ruler.h>
 #include  <emb.h>
 #include  <mem_basic.h>
 #include  <uif.h>
 #include  <dsp.h>
-#include  <im501_comm.h>
 #include  <noah_cmd.h>
 #include  <commands.h>
 #include  <codec.h>
@@ -290,7 +290,7 @@ extern CPU_INT08U Debug_COM_Sel;
 extern OS_EVENT *Bsp_Ser_Tx_Sem_lock;  
 extern OS_EVENT *Bsp_Ser_Rx_Sem_lock;
 extern volatile CPU_INT08U  Flag_Reset_Pin_Trigger;
-extern volatile CPU_INT08U  Flag_Reset_Pin_Trigger  ;
+
 
 extern const CPU_CHAR fw_version[];
 extern const CPU_CHAR hw_version[];
