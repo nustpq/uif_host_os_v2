@@ -155,6 +155,10 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         break ;
         
         case UIF_TYPE_SPI :
+            if( Global_SPI_Record == 1 ) {
+                Global_SPI_Record = 0;
+                Enable_SPI_Port();
+            }
             if( Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].speed  == temp &&\
                 Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].attribute == temp2 ) {
                 break;
@@ -480,7 +484,7 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
 //                         p_raw_read->if_type,p_raw_read->dev_addr,p_raw_read->data_len_read,p_raw_read->data_len_write ));
 //    
 //    Dump_Data( p_raw_read->pdata_write,  p_raw_read->data_len_write );
-    
+     
     switch( p_raw_read->if_type ) {
         
         case UIF_TYPE_I2C:        

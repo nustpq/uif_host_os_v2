@@ -46,7 +46,7 @@ extern EMB_BUF   Emb_Buf_Cmd;
 
 SET_VEC_CFG  Global_VEC_Cfg; 
 
-volatile unsigned char Global_SPI_Record = 0;
+volatile unsigned char  Global_SPI_Record = 0;
 
 /*
 *********************************************************************************************************
@@ -299,10 +299,10 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         APP_TRACE_INFO(("\r\nSetup_Audio Init_CODEC ERROR: %d\r\n",err)); 
     } 
 #ifdef BOARD_TYPE_AB03  
-    err = Init_FM36_AB03( pAudioCfg->sr, mic_num, 1, 0, 0 ); //Lin from SP1_RX, slot0~1
+    err = Init_FM36_AB03( pAudioCfg->sr, mic_num, 1, 0, 1, 0 ); //Lin from SP1_RX, slot0~1
 #elif defined BOARD_TYPE_UIF
     I2C_Mixer(I2C_MIX_FM36_CODEC);
-    err = Init_FM36_AB03( pAudioCfg->sr, mic_num, 1, 0, pAudioCfg->bit_length, 0 ); //Lin from SP1_RX, slot0~1
+    err = Init_FM36_AB03( pAudioCfg->sr, mic_num, 1, 0, pAudioCfg->bit_length, i2s_tdm_sel, 0 ); //Lin from SP1_RX, slot0~1
     I2C_Mixer(I2C_MIX_UIF_S);
 #else
     err = ReInit_FM36( pAudioCfg->sr ); 
@@ -503,7 +503,7 @@ unsigned char Get_Audio_Version( void )
 unsigned char Rec_Voice_Buffer_Start( VOICE_BUF_CFG *pv_b_cfg )
 {   
     unsigned char err   = 0xFF;  
-    unsigned char data  = 0xFF; 
+    unsigned char data  = 0xFF;
    
     unsigned char buf[] = {   CMD_DATA_SYNC1, CMD_DATA_SYNC2,\
                               RULER_CMD_START_RD_VOICE_BUF,\
@@ -1885,11 +1885,11 @@ void AB_POST( void )
     
     APP_TRACE_INFO(("\r\n2. FM36 DSP... \r\n"));
 #ifdef BOARD_TYPE_AB03   
-    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, 0 ); //Lin from SP1.Slot0
+    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, 0, 1, 0 ); //Lin from SP1.Slot0
 #elif defined BOARD_TYPE_UIF
     I2C_Mixer(I2C_MIX_FM36_CODEC);
-    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH, 0  ); 
-    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH, 0  ); //Lin from SP1.Slot0
+    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH, 1, 0  ); 
+    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH, 1, 0  ); //Lin from SP1.Slot0
     I2C_Mixer(I2C_MIX_UIF_S);
 #else 
     err = Init_FM36( SAMPLE_RATE_DEF );
@@ -1912,6 +1912,7 @@ void AB_POST( void )
         APP_TRACE_INFO(("\r\n---OK\r\n"));
     }    
    
+    //Config_PDM_PA();
     
     
 //    APP_TRACE_INFO(("\r\n4. external CODEC... \r\n"));

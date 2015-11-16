@@ -321,7 +321,6 @@ typedef struct {
 extern unsigned char Audio_Version[];
 extern unsigned char Ruler_CMD_Result;
 
-
 extern volatile unsigned char Global_Ruler_Type[]; 
 extern volatile unsigned char Global_Ruler_State[];
 extern volatile unsigned char Global_Ruler_Index; //current ruler index
@@ -329,6 +328,7 @@ extern volatile unsigned char Global_Mic_State[];
 extern volatile unsigned char Global_Bridge_POST;
 extern volatile unsigned int  Global_Mic_Mask[];
 extern volatile unsigned char Ruler_Setup_Sync_Data;
+extern volatile unsigned char Global_SPI_Record;
 
 extern SET_VEC_CFG  Global_VEC_Cfg;
 

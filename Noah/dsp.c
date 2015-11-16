@@ -34,14 +34,14 @@
 
 //Note: This routine do NOT support reentrance
 
-static bool flag_power_lose       = true;
-
+static bool flag_power_lose  = true;
+static bool flag_state_pwd   = false;
 static unsigned short sr_saved               = 0;
 static unsigned char  mic_num_saved          = 0;
 static unsigned char  lin_sp_index_saved     = 0;
 static unsigned char  start_slot_index_saved = 0;
 static unsigned char  bit_length_saved       = 0;
-
+static unsigned char  i2s_tdm_sel_saved      = 0;
 
 
 static void Revert_patch_Endien( unsigned int *pData )
@@ -141,9 +141,6 @@ static unsigned int fm36_patch_code_3[] =
 };
 
 
-
-
-
 //parameters for FM36 signal path on AB03
 static unsigned short int fm36_para_table_3[][2] = 
 {
@@ -198,9 +195,10 @@ static unsigned short int fm36_para_table_3[][2] =
   //{0x2260, 0x78D9}, //16bit I2S,MSB first,Left alignment,2 slot 
   //{0x2268, 0xBB80}, 
 
-  {0x2288, 0x0000},
-  {0x2289, 0x7FFF},
+  {0x2288, 0x0000}, //mic source select : mic_PDM
+  {0x2289, 0x7FFF}, //unit gain
   {0x2290, 0x7FFF}, 
+  
   {0x22FD, 0x00DE}, //enable ADC/DAC interrupt
   //{0x2274, 0x0001},//mic revert  
   //{0x2303, 0x8000},
@@ -209,36 +207,36 @@ static unsigned short int fm36_para_table_3[][2] =
   {0x22FC, 0x8000}, //BYPASS ALL SIGNAL PORCESSING
   {0x226E, 0x000C}, //PLL 24.576MHz OSC 
   
-  ////////////////////////////////////////////////////////////
+  ////////////////////// UpLink Path ////////////////////////////////////
   
-  //select data interruption source :  
-  // 0: PDM, 1: SP0, 2: SP1, 3: SP2
-  {0x22B2, 0x0001},
-  {0x22B3, 0x0001},
-  {0x22B4, 0x0001},  
+  //select data interruption source : [ 0: PDM, 1: SP0, 2: SP1, 3: SP2 ] 
+  {0x22B2, 0x0001}, //_lout_des_sel : SP0
+  {0x22B3, 0x0001}, //_spkout_des_sel : SP0
+  {0x22B4, 0x0001}, //_auxout_des_sel : SP0 
+  
     //additional, input
     //////output, aux2 output same as aux1
     ////22C7 = 0x1018 //Aux-in-L
     ////22C8 = 0x1019 //Aux-in-R
     ////22B4 = 1 //SP0
     ////22D5 = 6 //slot6 
-    ////22D6 = 7 //slot7  
-  //lin source 
-  {0x229A, 0x0002}, //Aux-in From SP1
-  {0x229B, 0x0008}, //Aux-in-L in SP1 slot0 
-  {0x229C, 0x0009}, //Aux-in-R in SP1 slot1
+    ////22D6 = 7 //slot7 
+  
+  //select aux2 - lin source 
+  {0x229A, 0x0002}, //Aux2-in From SP1
+  {0x229B, 0x0008}, //Aux2-in-L in SP1 slot0 
+  {0x229C, 0x0009}, //Aux2-in-R in SP1 slot1
 
   //select output data source slot
-  {0x22C1, 0x101A},
+  {0x22C1, 0x101A}, //patch
   {0x22C2, 0x101B},
   {0x22C3, 0x101C},
   {0x22C4, 0x101D},
   {0x22C5, 0x101E},
   {0x22C6, 0x101F},
-  {0x22C7, 0x1018}, //Aux-in-L
-  {0x22C8, 0x1019}, //Aux-in-R
-//  {0x22C7, 0x1020}, //default 0
-//  {0x22C8, 0x1020}, //default 0
+  {0x22C7, 0x1018}, //Aux2-in-L
+  {0x22C8, 0x1019}, //Aux2-in-R
+
   
   //select data dest slot
   //If lineout is from TX0, offset is 0~7
@@ -251,10 +249,11 @@ static unsigned short int fm36_para_table_3[][2] =
   {0x22DA, 0x0003},
   {0x22DB, 0x0004},
   {0x22DC, 0x0005},
-  {0x22D5, 0x0006}, //slot6 
-  {0x22D6, 0x0007}, //slot7
+  {0x22D5, 0x0006}, 
+  {0x22D6, 0x0007}, 
   
-  //mic souce 
+  ////////////////////// DownLink Path ////////////////////////////////////
+  //mic souce
   {0x2282, 0x0000},
   {0x2283, 0x0001},
   {0x2284, 0x0002},
@@ -263,9 +262,9 @@ static unsigned short int fm36_para_table_3[][2] =
   {0x2287, 0x0005},
   
   //set PDM out data
-  {0x22B9, 0x3F40},
-  {0x22BA, 0x3F42},
-  {0x22BB, 0x3F44},
+  {0x22B9, 0x3F40}, //PDM output0 source pointer to :  RX0-Slot0 data register  
+  {0x22BA, 0x3F42}, //PDM output1 source pointer to :  RX0-Slot1 data register 
+  {0x22BB, 0x3F44}, //...
   {0x22BC, 0x3F46},
   {0x22BD, 0x3F48},
   {0x22BE, 0x3F4A}, 
@@ -315,6 +314,8 @@ unsigned char DMIC_PGA_Control( unsigned short gain )
     unsigned short data ;
     unsigned short mute ;
     
+    if( flag_state_pwd ) return 0 ;
+    
     mute = 0x3F;
     err = NO_ERR;
     
@@ -361,6 +362,8 @@ static unsigned char Config_Lin( unsigned char lin_sp_index, unsigned char start
     
     unsigned char err ;
     
+    if( flag_state_pwd ) return 0 ;
+     
     APP_TRACE_INFO(("\r\nConfig_Lin sp_index = %d, start_slot_index = %d\r\n", lin_sp_index, start_slot_index));
     
     //Aux-Source
@@ -394,6 +397,7 @@ static unsigned char Config_SP0_Out( unsigned char mic_num )
     
     unsigned char err ;
     
+    if( flag_state_pwd ) return 0 ;
     APP_TRACE_INFO(("\r\nConf FM36 Mic num = %d\r\n", mic_num));
     
     err = DM_SingleWrite( FM36_I2C_ADDR, 0x22EB, mic_num ) ;
@@ -416,18 +420,30 @@ static unsigned char Config_SP0_Out( unsigned char mic_num )
 }
 
 
-static unsigned char Config_SPx_Format( unsigned char bit_length )
+static unsigned char Config_SPx_Format( unsigned char bit_length, unsigned char i2s_tdm_sel )
 {
     
     unsigned char  err ;
     unsigned short temp;
     
+    if( flag_state_pwd ) return 0 ;
     APP_TRACE_INFO(("\r\nConf FM36 Bit length = %d\r\n", bit_length));
     
-    if( bit_length == 32 ) {          
-          temp = 0x78FF;//32bit TDM, 16bit data, MSB first,Left alignment,8 slot 
-    } else {
-          temp = 0x78DF;//16bit TDM,16bit data, MSB first,Left alignment,8 slot 
+    if( i2s_tdm_sel == 0 ) { //I2S
+        if( bit_length == 32 ) {          
+              //temp = 0x78FF;//32bit I2S, 16bit data, MSB first,Left alignment
+              APP_TRACE_INFO(("\r\nConf FM36 I2S to 32bit, not support!\r\n"));
+              return FM36_WR_DM_ERR;
+        } else {//16
+              temp = 0x78D9;//16bit I2S,16bit data, MSB first,Left alignment 
+        }       
+        
+    } else { //TDM
+        if( bit_length == 32 ) {          
+              temp = 0x78FF;//32bit TDM, 16bit data, MSB first,Left alignment,8 slot 
+        } else { //16
+              temp = 0x78DF;//16bit TDM,16bit data, MSB first,Left alignment,8 slot 
+        }
     }
     err = DM_SingleWrite( FM36_I2C_ADDR, 0x2260, temp ) ; //SP0
     if( OS_ERR_NONE != err ) {
@@ -450,6 +466,7 @@ static unsigned char Config_SR( unsigned short sr )
     unsigned char err ;
     unsigned short temp ;
     
+    if( flag_state_pwd ) return 0 ;
     APP_TRACE_INFO(("\r\nConf FM36 SR = %dkHz\r\n", sr));
       
     switch ( sr ) {
@@ -495,7 +512,9 @@ static unsigned char Config_SR( unsigned short sr )
 unsigned char FM36_PWD_Bypass( void )
 {
     
-    unsigned char  err ;    
+    unsigned char  err ;  
+    
+    if( flag_state_pwd ) return 0 ;
     APP_TRACE_INFO(("\r\nPower down FM36 to bypass SP0<-->SP1\r\n"));
      
     err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FEF, 0x2000 ) ; //pwd
@@ -503,6 +522,8 @@ unsigned char FM36_PWD_Bypass( void )
     if( OS_ERR_NONE != err ) {
         return FM36_WR_DM_ERR;;
     }  
+    
+    flag_state_pwd = true ;
     
     return err;
     
@@ -514,6 +535,8 @@ unsigned char FM36_PDMADC_CLK_OnOff( unsigned char onoff )
 {
     unsigned char  err ;  
     
+    if( flag_state_pwd ) return 0 ;
+     
     APP_TRACE_INFO(("\r\nEnable/Disbale FM36 ADC PDM CLK: %d",onoff));    
 
     if( onoff ) {  //PDMCLK_ON, for normal operation 
@@ -562,6 +585,8 @@ unsigned char FM36_PDM_CLK_Set( unsigned char pdm_dac_clk, unsigned char pdm_adc
     unsigned char  err ;
     unsigned short data1,data2,data3 ;
     
+    if( flag_state_pwd ) return 0 ;
+     
     APP_TRACE_INFO(("\r\nConf FM36 PDMADC Clock = %dMHz\r\n", pdm_adc_clk));      
     switch ( pdm_adc_clk ) {
         case 4 : //4.096
@@ -651,7 +676,48 @@ unsigned char FM36_PDM_CLK_Set( unsigned char pdm_dac_clk, unsigned char pdm_adc
 }
 
 
+//TDM mode, in addition, bypass RX0.0 and RX0.1 to TX1.0 and TX1.1
+static unsigned short int fm36_para_table_tdm_aec[][2] =   
+{
+       //select aux2 - lin source 
+      {0x229A, 0x0001}, //Aux2-in From SP0
+      {0x229B, 0x0000}, //Aux2-in-L in SP0 slot0 
+      {0x229C, 0x0001}, //Aux2-in-R in SP0 slot1 
+      {0x22D5, 0x0008}, //Aux2-out-L to SP1 slot0
+      {0x22D6, 0x0009}  //Aux2-out-R to SP1 slot1
+};
 
+
+//I2S mode, in addition, bypass RX0.0 and RX0.1 to TX1.0 and TX1.1
+static unsigned short int fm36_para_table_i2s_aec[][2] =   
+{
+       //select aux2 - lin source 
+      {0x229A, 0x0001}, //Aux2-in From SP0
+      {0x229B, 0x0000}, //Aux2-in-L in SP0 slot0 
+      {0x229C, 0x0001}, //Aux2-in-R in SP0 slot1 
+      {0x22D5, 0x0008}, //Aux2-out-L to SP1 slot0
+      {0x22D6, 0x0009}  //Aux2-out-R to SP1 slot1
+};
+
+static unsigned char Config_SP0IN_to_SP1Out( void )
+{
+    
+    unsigned char  err ;
+    unsigned int   i ;
+
+    if( flag_state_pwd ) return 0 ;
+    APP_TRACE_INFO(("\r\nConf FM36 SP0 Rx to SP1 Tx\r\n"));
+    
+    for(i = 0; i < sizeof(fm36_para_table_tdm_aec)/4; i++) {  
+        err = DM_SingleWrite( FM36_I2C_ADDR, fm36_para_table_tdm_aec[i][0], fm36_para_table_tdm_aec[i][1] ) ;
+        if( OS_ERR_NONE != err ) {
+            return FM36_WR_DM_ERR;;
+        }      
+    }
+  
+    return err;
+    
+}
 
 /*
 *********************************************************************************************************
@@ -669,28 +735,25 @@ unsigned char FM36_PDM_CLK_Set( unsigned char pdm_dac_clk, unsigned char pdm_adc
 * Note(s)     : None.
 *********************************************************************************************************
 */
-unsigned char Init_FM36_AB03_Preset( void )
-{
-    return ( Init_FM36_AB03( sr_saved, mic_num_saved, lin_sp_index_saved, start_slot_index_saved, bit_length_saved, 1 ) );   
-}
-
 unsigned char Init_FM36_AB03( unsigned short sr, 
                               unsigned char mic_num, 
                               unsigned char lin_sp_index, 
                               unsigned char start_slot_index, 
-                              unsigned char bit_length, 
+                              unsigned char bit_length,
+                              unsigned char i2s_tdm_sel,
                               unsigned char force_reset)
 {
     unsigned int   i;
     unsigned short temp, temp2 ;
     unsigned short addr, val; 
     unsigned char  err ;     
-   
+      
     if( sr               == sr_saved  &&  \
         mic_num          == mic_num_saved && \
         lin_sp_index     == lin_sp_index_saved && \
         start_slot_index == start_slot_index_saved && \
         bit_length       == bit_length_saved && \
+        i2s_tdm_sel      == i2s_tdm_sel_saved && \
         force_reset      == 0  ) 
     {    
         APP_TRACE_INFO(("No need Re-Init FM36\r\n"));
@@ -701,9 +764,11 @@ unsigned char Init_FM36_AB03( unsigned short sr,
         lin_sp_index_saved = lin_sp_index;
         start_slot_index_saved = start_slot_index ;
         bit_length_saved = bit_length;
+        i2s_tdm_sel_saved = i2s_tdm_sel;
     }   
     
     Pin_Reset_FM36();
+    flag_state_pwd  = false ;
      
 //    err = HOST_SingleWrite_2(FM36_I2C_ADDR, 0x0C, 2); //reset
 //    if( OS_ERR_NONE != err ) {
@@ -767,7 +832,7 @@ unsigned char Init_FM36_AB03( unsigned short sr,
             if( OS_ERR_NONE != err ) {
                 return err ;
             }
-            err = Config_SPx_Format( bit_length );
+            err = Config_SPx_Format( bit_length, i2s_tdm_sel );
             if( OS_ERR_NONE != err ) {
                 return err ;
             }
@@ -776,6 +841,10 @@ unsigned char Init_FM36_AB03( unsigned short sr,
                 return err ;
             }
             err = FM36_PDM_CLK_Set( GET_BYTE_HIGH_4BIT(Global_UIF_Setting[ UIF_TYPE_FM36_PDMCLK - 1 ].attribute), GET_BYTE_LOW_4BIT(Global_UIF_Setting[ UIF_TYPE_FM36_PDMCLK - 1 ].attribute), 0 );
+            if( OS_ERR_NONE != err ) {
+                return err ;
+            }
+            err = Config_SP0IN_to_SP1Out();
             if( OS_ERR_NONE != err ) {
                 return err ;
             }
@@ -829,3 +898,73 @@ unsigned char Init_FM36_AB03( unsigned short sr,
 }
 
 
+//Force reset and init FM36 using previous setting
+unsigned char Init_FM36_AB03_Preset( void )
+{
+    return ( Init_FM36_AB03( sr_saved, mic_num_saved, lin_sp_index_saved, start_slot_index_saved, bit_length_saved, i2s_tdm_sel_saved, 1 ) );   
+}
+
+
+static unsigned char para_table_pdm_pa[][2] = 
+{
+    {0x01, 0x00},
+    {0x02, 0x00},
+    {0x03, 0x00},
+    {0x04, 0x00},
+    {0x10, 0x00},
+    {0x11, 0x00},
+    {0x12, 0x00},
+    {0x13, 0x00},
+    {0x14, 0x00},
+    {0x15, 0x00},
+    {0x16, 0x00},
+    {0x17, 0x00},
+    {0x18, 0x00},
+    {0x19, 0x00},
+    {0x1A, 0x00},
+    {0x20, 0x00},
+    {0x21, 0x00},
+    {0x22, 0x00},
+    {0x23, 0x02},
+    {0x24, 0x80},
+    {0x25, 0x10},
+    {0x26, 0x04},
+    {0x27, 0x88},
+    {0x28, 0x88},
+    {0x30, 0x03},
+    {0x31, 0x00},
+    {0x32, 0x00},
+    {0x33, 0x01},
+    {0x34, 0x01},
+    {0x35, 0x02},
+    {0x36, 0x00},
+    {0x37, 0x00},
+    {0x38, 0x00},
+    {0x39, 0x00},
+    {0x40, 0x01},
+    {0x41, 0x00}     
+};
+
+
+unsigned char Config_PDM_PA( void )
+{
+    
+    unsigned char  err ;
+    unsigned int   i ;
+    unsigned char  buf[3] ;  
+    
+    APP_TRACE_INFO(("\r\nConf PDM PA\r\n"));
+    buf[0] = 0;
+    
+    for(i = 0; i < sizeof(para_table_pdm_pa)/2; i++) {  
+        buf[1] = para_table_pdm_pa[i][0];
+        buf[2] = para_table_pdm_pa[i][1];
+        err = TWID_Write( MAX98504>>1, 0, 0, buf, sizeof(buf), NULL); 
+        if( OS_ERR_NONE != err ) {
+            return FM36_WR_DM_ERR;;
+        }      
+    }
+  
+    return err;
+    
+}

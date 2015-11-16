@@ -917,12 +917,13 @@ unsigned char send_to_dsp_command( To_501_CMD cmd )
     for( i = 0; i< 50; i++ ) {   //wait for (50*100us = 5ms) to check if DSP finished 
         err = im501_read_dram_spi( TO_DSP_CMD_ADDR, (unsigned char *)&cmd );
         if( err != 0 ){ 
-            return err;
+            break;
         }
         if( cmd.status != 0 ) {
             err = TO_501_CMD_ERR;
         } else {
             err = 0;
+            break;
         }
         delay_us(100); //??
     }
@@ -970,6 +971,7 @@ void ISR_iM501_IRQ( void )
     }
     
 }
+
 
 
 void Check_KeyWords_Detect_Status( void )
@@ -1036,7 +1038,7 @@ unsigned char Request_Enter_PSM( void )
     FM36_PDMADC_CLK_OnOff(0); //Disable PDM clock
     I2C_Mixer(I2C_MIX_UIF_S);
     
-    Wait_Keywords_Detect(2);
+    //Wait_Keywords_Detect(2);
     return err;
     
 }
@@ -1105,152 +1107,3 @@ unsigned char Write_CMD_To_iM501( unsigned char cmd_index, unsigned short para )
 }
 
 
-
-static FLASH_INFO  flash_info_voice_buf;
-
-unsigned char save_voice_buffer_to_flash( VOICE_BUF  *p_voice_buf_data )
-{  
-    unsigned char err; 
-    unsigned int flash_addr;    
-              
-    err  = NO_ERR;
-    flash_addr = FLASH_ADDR_FW_BIN + ( p_voice_buf_data->index - 1 ) * p_voice_buf_data->length;
-    
-    LED_Toggle(LED_DS2);     
-    err = FLASHD_Write_Safe( flash_addr, p_voice_buf_data->pdata, p_voice_buf_data->length );     
-    if(err != NO_ERR ) {                     
-        APP_TRACE_INFO(("ERROR: Write MCU flash failed!\r\n"));
-        return err;
-    }
-    
-    if( p_voice_buf_data->index == 1) { //first package
-        Read_Flash_State(&flash_info_voice_buf, FLASH_ADDR_FW_STATE);
-        if( flash_info_voice_buf.flag != 0x55 ) {
-            flash_info_voice_buf.flag = 0x55;
-            flash_info_voice_buf.f_w_counter = 0;
-            flash_info_voice_buf.s_w_counter = 0;
-        }
-        flash_info_voice_buf.bin_size  = p_voice_buf_data->length;
-        flash_info_voice_buf.f_w_state = FW_DOWNLAD_STATE_UNFINISHED ;
-        if( p_voice_buf_data->done == 0) { //first not last  
-           strcpy(flash_info_voice_buf.bin_name, (char const*)("iM501 voice buffer:broken"));    
-           err = Write_Flash_State( &flash_info_voice_buf,  FLASH_ADDR_FW_STATE );
-           if(err != NO_ERR ) {                     
-                APP_TRACE_INFO(("ERROR: Write MCU flash failed!\r\n"));
-                return err;
-            }
-        }
-    }   
-           
-    flash_info_voice_buf.bin_size   += p_voice_buf_data->length ;   
-    
-    if( p_voice_buf_data->done == 1 ) { //last package
-        flash_info_voice_buf.f_w_state = FW_DOWNLAD_STATE_FINISHED ;  
-        flash_info_voice_buf.f_w_counter++;
-        flash_info_voice_buf.s_w_counter++;        
-        strcpy(flash_info_voice_buf.bin_name, (char const*)("iM501 voice buffer"));    
-        err = Write_Flash_State( &flash_info_voice_buf,  FLASH_ADDR_FW_STATE ); 
-    }
-    
-    return err;  
-    
-}
-/*
-unsigned char save_voice_buffer_to_flash( VOICE_BUF  *p_voice_buf_data )
-{  
-    unsigned char err; 
-    unsigned int flash_addr;    
-    FLASH_INFO   flash_info, flash_info_pre;
-          
-    err   = NO_ERR;
-    flash_addr = FLASH_ADDR_FW_BIN + ( p_voice_buf_data->index - 1 ) * p_voice_buf_data->length;
-    
-    Read_Flash_State(&flash_info, FLASH_ADDR_FW_STATE);          
-    if( p_voice_buf_data->index == 1) { //first package
-        flash_info.bin_size = 0;
-    }            
-    LED_Toggle(LED_DS2);    
-    err = FLASHD_Write_Safe( flash_addr, p_voice_buf_data->pdata, p_voice_buf_data->length ); 
-    
-    if(err != NO_ERR ) {                     
-        APP_TRACE_INFO(("ERROR: Write MCU flash failed!\r\n"));
-        return err;
-    }
-    if( flash_info.flag != 0x55 ) {
-        flash_info.flag = 0x55;
-        flash_info.f_w_counter = 0;
-        flash_info.s_w_counter = 0;
-    }
-    if( p_voice_buf_data->done == 1 ) {
-        flash_info.f_w_state = FW_DOWNLAD_STATE_FINISHED ;
-    } else {
-        flash_info.f_w_state = FW_DOWNLAD_STATE_UNFINISHED ;
-    }
-    flash_info.f_w_counter++;
-    flash_info.s_w_counter++;
-    flash_info.bin_size   += (p_voice_buf_data->length) ;
-    strcpy(flash_info.bin_name, (char const*)("iM501 voice buffer")); 
-    if( flash_info_pre != flash_info) {   
-      err = Write_Flash_State( &flash_info,  FLASH_ADDR_FW_STATE ); 
-    }
-    return err;  
-    
-}
-*/
-
-unsigned char fetch_voice_buffer_from_flash( unsigned char pkt_sn )
-{
-    unsigned char err;
-    unsigned int  flash_addr; 
-    unsigned int  i, index;
-    unsigned int  addr;
-    unsigned int  times, counter;    
-    FLASH_INFO   flash_info;
-    
-    err   = NO_ERR;      
-    flash_addr = FLASH_ADDR_FW_BIN ;    
-    Read_Flash_State(&flash_info, FLASH_ADDR_FW_STATE);     
-    
-    //check if voice buffer data broken
-    if( (flash_info.flag != 0x55) || (flash_info.f_w_state != FW_DOWNLAD_STATE_FINISHED) ) { //voice buffer broken
-        voice_buf_data.index  = 1;
-        voice_buf_data.pdata  = (unsigned char *)flash_addr;
-        voice_buf_data.done   = 2; //2 means error data
-        voice_buf_data.length = 0;
-        err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
-                                      (pPCCMDDAT)&voice_buf_data,
-                                      pkt_sn, 
-                                      PC_CMD_FETCH_VOICE_BUFFER ) ; 
-       return err; 
-    }
-    
-    //start fetch voice buffer
-    times   = flash_info.bin_size / MAX_DATA_SIZE ;
-    counter = flash_info.bin_size % MAX_DATA_SIZE ;
-    index   = 1;
-    
-    for ( i = 0; i < times; i++ ) {   
-        voice_buf_data.index  = index++;
-        voice_buf_data.pdata  = (unsigned char *)(flash_addr + (i*MAX_DATA_SIZE));
-        voice_buf_data.done   = (counter || (i < times)) ? 0 : 1; //0:unfinised, 1:done
-        voice_buf_data.length = MAX_DATA_SIZE;
-        err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
-                                      (pPCCMDDAT)&voice_buf_data,
-                                      pkt_sn, 
-                                      PC_CMD_FETCH_VOICE_BUFFER ) ;  
-    }
-    
-    if( counter ) {   
-        voice_buf_data.index  = index++;
-        voice_buf_data.pdata  = (unsigned char *)(flash_addr + (i*MAX_DATA_SIZE));
-        voice_buf_data.done   = 1; //done
-        voice_buf_data.length = counter;
-        err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
-                                      (pPCCMDDAT)&voice_buf_data,
-                                      pkt_sn, 
-                                      PC_CMD_FETCH_VOICE_BUFFER ) ;         
-    }
-    
-    return err;
-    
-}
