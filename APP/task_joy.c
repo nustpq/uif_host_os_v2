@@ -138,10 +138,10 @@ void  App_TaskJoy (void *p_arg)
             }
         }
    
-        //AB_Status_Change_Report();        
+        //AB_Status_Change_Report();     
          
-        Check_KeyWords_Detect_Status();
-
+        Service_To_iM501_IRQ();
+        
         OSTimeDly(1); 
        
     }

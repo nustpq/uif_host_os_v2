@@ -511,7 +511,7 @@ unsigned char Rec_Voice_Buffer_Start( VOICE_BUF_CFG *pv_b_cfg )
                               ((pv_b_cfg->spi_speed)>>16) & 0xFF, ((pv_b_cfg->spi_speed)>>24) & 0xFF,\
                               pv_b_cfg->spi_mode, pv_b_cfg->gpio_irq }; 
     
-    //APP_TRACE_INFO(("\r\nRec_Voice_Buffer_Start : gpio_irq = [%d], spi mode = %d, spi speed = %d MHz\r\n", pv_b_cfg->gpio_irq, pv_b_cfg->spi_mode, pv_b_cfg->spi_speed / 1000000 ));
+    APP_TRACE_INFO(("\r\nRec_Voice_Buffer_Start : gpio_irq = [%d], spi mode = %d, spi speed = %d MHz\r\n", pv_b_cfg->gpio_irq, pv_b_cfg->spi_mode, pv_b_cfg->spi_speed / 1000000 ));
     
     if( pv_b_cfg->gpio_irq < 2 ) {
         APP_TRACE_INFO(("\r\nIRQ gpio support: UIF_GPIO_2 ~ UIF_GPIO_9 only!\r\n ",data)); 
@@ -1494,7 +1494,7 @@ unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
         err = MCU_Load_Vec(1);
     } else {    
         I2C_Mixer(I2C_MIX_FM36_CODEC);
-        err = FM36_PDMADC_CLK_OnOff(1); //enable PDM clock
+        err = FM36_PDMADC_CLK_OnOff(1,0); //enable PDM clock
         I2C_Mixer(I2C_MIX_UIF_S); 
     }
     return err;  

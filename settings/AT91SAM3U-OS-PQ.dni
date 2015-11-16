@@ -33,7 +33,7 @@ Stop=1
 Freq=10000000
 MultiCoreRunAll=1
 [DebugChecksum]
-Checksum=1276465126
+Checksum=-681101131
 [JLinkDriver]
 CStepIntDis=_ 0
 [Exceptions]
@@ -73,14 +73,12 @@ Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\spi.c}.584.5" 0 0 1 "" 0 "" 0
 Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\APP\task_uart_rx.c}.103.14" 0 0 1 "" 0 "" 0
 Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\spi.c}.286.5" 0 0 1 "" 0 "" 0
 Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.384.9" 0 0 1 "" 0 "" 0
-Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\im501_comm.c}.1011.1" 0 0 1 "" 0 "" 0
-Bp8=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.177.23" 0 0 1 "" 0 "" 0
-Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.251.5" 0 0 1 "" 0 "" 0
-Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.540.13" 0 0 1 "" 0 "" 0
-Bp11=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.860.13" 0 0 1 "" 0 "" 0
-Bp12=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\im501_comm.c}.1024.1" 0 0 1 "" 0 "" 0
-Bp13=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Noah\im501_comm.c}.1006.13" 0 0 1 "" 0 "" 0
-Count=14
+Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.177.23" 0 0 1 "" 0 "" 0
+Bp8=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.251.5" 0 0 1 "" 0 "" 0
+Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.540.13" 0 0 1 "" 0 "" 0
+Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.860.13" 0 0 1 "" 0 "" 0
+Bp11=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Noah\im501_comm.c}.1046.9" 0 0 1 "" 0 "" 0
+Count=12
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

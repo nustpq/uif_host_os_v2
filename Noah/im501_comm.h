@@ -27,9 +27,12 @@
 #define  TO_DSP_CMD_REQ_STOP_BUF_TRANS    0x1D
 #define  TO_DSP_CMD_REQ_ENTER_PSM         0x0D
 
+#define  TO_HOST_CMD_KEYWORD_DET          0x40
+#define  TO_HOST_CMD_DATA_BUF_RDY         0x41
+
 #define  TO_HOST_CMD_ADDR                (0x0FFFBFFC)
 #define  HW_VOICE_BUF_START              (0x0FFF3EE0)  // DRAM voice buffer : 0x0FFF3EE0 ~ 0x0FFFBEDF = 32kB
-#define  HW_VOICE_BUF_END                (0x0FFFBEDF)  //
+#define  HW_VOICE_BUF_BANK_SIZE          (1024*2)  //2kB
 #define  HW_BUF_RX_L                     (0x0FFFE000)  //1kB
 #define  HW_BUF_RX_R                     (0x0FFFE400)  //1kB
 #define  HW_BUF_RX_SIZE                  (2048)
@@ -67,7 +70,7 @@
        
 #define SUCCESS                          0u
 #define NO_ERR                           0u
-#define NULL                             0u
+//#define NULL                             0u
 
 #define SPI_BUS_ERR                      179u
 #define I2C_BUS_ERR                      180u
@@ -138,19 +141,14 @@ unsigned char im501_switch_i2c_spi( unsigned char if_type, unsigned char spi_mod
 
 unsigned char test_send_cmd_to_im501( void );
 
-unsigned char Record_iM501_Voice_Buffer( unsigned char gpio_irq, unsigned int timeout_ms );
-
 unsigned char Write_CMD_To_iM501( unsigned char cmd_index, unsigned short para );
-
-unsigned char save_voice_buffer_to_flash( VOICE_BUF  *p_voice_buf_data );
-
-unsigned char fetch_voice_buffer_from_flash( unsigned char pkt_sn );
 
 void Wait_Keywords_Detect( unsigned char gpio_irq );
 
 unsigned char Request_Enter_PSM( void );
 
-void Check_KeyWords_Detect_Status( void );
+void Service_To_iM501_IRQ( void );
 
+void ISR_iM501_IRQ( void );
 
 #endif

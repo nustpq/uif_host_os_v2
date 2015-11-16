@@ -530,8 +530,9 @@ unsigned char FM36_PWD_Bypass( void )
 }  
 
 
-
-unsigned char FM36_PDMADC_CLK_OnOff( unsigned char onoff )
+//onoff       : 0 - turn off PDM clock, 1 - turn on PDM clock
+//fast_switch : 0 - normal usage,  1 - fast onoff switch, not care pop sound
+unsigned char FM36_PDMADC_CLK_OnOff( unsigned char onoff, unsigned char fast_switch )
 {
     unsigned char  err ;  
     
@@ -549,7 +550,9 @@ unsigned char FM36_PDMADC_CLK_OnOff( unsigned char onoff )
         if( OS_ERR_NONE != err ) {
             return FM36_WR_DM_ERR;
         }  
-        OSTimeDly(5);  //depop time
+        if( fast_switch == 0 ) {
+          OSTimeDly(5);  //depop time
+        }
         err = DM_SingleWrite( FM36_I2C_ADDR, 0x3F96, 0x003F ) ;  //unmute MIC0-5
         if( OS_ERR_NONE != err ) {
             return FM36_WR_DM_ERR;
@@ -560,13 +563,17 @@ unsigned char FM36_PDMADC_CLK_OnOff( unsigned char onoff )
         err = DM_SingleWrite( FM36_I2C_ADDR, 0x3F96, 0x3F3F ) ;  //mute MIC0-5
         if( OS_ERR_NONE != err ) {
             return FM36_WR_DM_ERR;
-        }     
-        OSTimeDly(10); //wait data 0 to cyclebuffer
+        }  
+        if( fast_switch == 0 ) {
+            OSTimeDly(10); //wait data 0 to cyclebuffer
+        }
         err = DM_SingleWrite( FM36_I2C_ADDR, 0x3F90, 0x003F ) ;  //power down MIC0-5 
         if( OS_ERR_NONE != err ) {
             return FM36_WR_DM_ERR;
         } 
-        OSTimeDly(5);
+        if( fast_switch == 0 ) {
+            OSTimeDly(5);
+        }
         err = DM_SingleWrite( FM36_I2C_ADDR, 0x3FCF, 0x0024 ) ;  //turn off clk
         if( OS_ERR_NONE != err ) {
             return FM36_WR_DM_ERR;
