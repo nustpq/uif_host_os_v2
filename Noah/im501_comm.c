@@ -45,9 +45,12 @@ static unsigned int im501_key_words_detect;
 *
 * Description :  change current iM501 interface speed 
 *
-* Argument(s) :  type      is for indicating which speed level(low/high)will be actived :
-*                            low speed  : type = 0
-*                            high speed : type = 1
+* Argument(s) :   if_type     is for indicating which interface will be actived :
+*                               I2C : if_type = 1
+*                               SPI : if_type = 2
+*                speed_type   is for indicating which speed level(low/high)will be actived :
+*                               low speed  : type = 0
+*                               high speed : type = 1
 *
 * Return(s)   :  none.           
 *
@@ -55,19 +58,19 @@ static unsigned int im501_key_words_detect;
 
 *********************************************************************************************************
 */
-void im501_change_if_speed( unsigned char type )
+void im501_change_if_speed( unsigned char if_type, unsigned char speed_type )
 {
-    if( type == 0) { //change to low speed
-        if(  Global_VEC_Cfg.if_type == 1 ) { //I2C interface 
+    if( speed_type == 0) { //change to low speed
+        if( if_type == 1 ) { //I2C interface 
             TWI_Init( 20 * 1000 );               
-        } else if(Global_VEC_Cfg.if_type == 2 ) { //SPI 
-            SPI_Init( 1000000,  Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].attribute );       
+        } else if( if_type == 2 ) { //SPI 
+            SPI_Init( 1500000,  Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].attribute );       
         } 
         
     } else { //change to normal speed
-        if(  Global_VEC_Cfg.if_type == 1 ) { //I2C interface 
+        if( if_type == 1 ) { //I2C interface 
             TWI_Init( Global_UIF_Setting[ UIF_TYPE_I2C - 1 ].speed * 1000 );               
-        } else if(Global_VEC_Cfg.if_type == 2 ) { //SPI 
+        } else if( if_type == 2 ) { //SPI 
             SPI_Init(Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].speed * 1000,  Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].attribute );       
         }         
     }  
@@ -293,13 +296,13 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
        //OSTimeDly(30);//delay for iM501 test 
        // wait for iM501 PLL change stable
        unsigned int time_start = OSTimeGet();       
-       im501_change_if_speed(0);
+       im501_change_if_speed(Global_VEC_Cfg.if_type, 0);
        while( im501_check_pll_ready() == 0 ) {
            if( (OSTimeGet() - time_start) > 500 ){ //max 500ms timeout
                break;
            }
        };
-       im501_change_if_speed(1);
+       im501_change_if_speed(Global_VEC_Cfg.if_type,1);
       
        I2C_Mixer(I2C_MIX_FM36_CODEC);
        FM36_PDMADC_CLK_OnOff(0,0); //disable PDM clock
@@ -794,18 +797,18 @@ unsigned char send_to_dsp_command( To_501_CMD cmd )
     if( err != 0 ){ 
         return err;
     }
-    
-    for( i = 0; i< 50; i++ ) {   //wait for (50*100us = 5ms) to check if DSP finished 
+
+    for( i = 0; i< 50; i++ ) {   //wait for (50*100us = 5ms) to check if DSP finished        
         err = im501_read_dram_spi( TO_DSP_CMD_ADDR, (unsigned char *)&cmd );
         if( err != 0 ){ 
             return err;
         }
-        if( cmd.status != 0 ) {
-            err = TO_501_CMD_ERR;
+        if( cmd.status == 0 ) {
+            break;
         } else {
-            err = 0;
-        }
-        delay_us(100); //??
+            err = TO_501_CMD_ERR;
+        } 
+        delay_us(100);
     }
     
     return err;
@@ -857,7 +860,8 @@ unsigned char Request_Enter_PSM( void )
 {
     
     unsigned char err;
-        
+           
+    im501_change_if_speed(2,0); //change SPI speed to low speed   
     err = Write_CMD_To_iM501( TO_DSP_CMD_REQ_ENTER_PSM, 0 );
     if( err != NO_ERR ){ 
         return err;
@@ -948,16 +952,18 @@ void Service_To_iM501_IRQ( void )
             Disable_GPIO_Interrupt( im501_irq_gpio ); //disable IRQ interrupt
                     
             I2C_Mixer(I2C_MIX_FM36_CODEC);           
-            FM36_PDMADC_CLK_OnOff(1,1); //Enable PDM clock rapidly
+            FM36_PDMADC_CLK_OnOff(1,1); //Enable PDM clock fast switch
             I2C_Mixer(I2C_MIX_UIF_S); 
-                    
+            
+            im501_change_if_speed(2,1); //change SPI speed to high speed 
             Disable_SPI_Port(); //disabled host mcu SPI
                     
             voice_buf_cfg.spi_mode = Global_UIF_Setting[1].speed;
             voice_buf_cfg.spi_speed = Global_UIF_Setting[1].attribute;
             voice_buf_cfg.gpio_irq = im501_irq_gpio;    
             
-            Rec_Voice_Buffer_Start( &voice_buf_cfg ); //send CMD to Audio MCU                    
+            Rec_Voice_Buffer_Start( &voice_buf_cfg ); //send CMD to Audio MCU 
+                        
         }  
         
     }

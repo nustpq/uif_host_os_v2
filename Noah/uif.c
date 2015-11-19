@@ -133,7 +133,7 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
             if( Global_UIF_Setting[ UIF_TYPE_I2C - 1 ].speed  == temp ) {
                 break;
             }
-            if( temp <= 1000 && temp >= 10) { 
+            if( temp <= 1000 && temp >= 10) { //10k ~ 1M
                 TWI_Init( temp * 1000 );     
                 APP_TRACE_INFO(("\r\nI2C port is set to %d kHz\r\n",temp));        
             }  else {
@@ -185,7 +185,7 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         case UIF_TYPE_FM36_PDMCLK :
             I2C_Mixer(I2C_MIX_FM36_CODEC);
             //err = FM36_PDM_CLK_Set( GET_BYTE_HIGH_4BIT(pInterface_Cfg->attribute), GET_BYTE_LOW_4BIT(pInterface_Cfg->attribute), 1 ); //pdm_dac_clk, pdm_adc_clk, type=ontheflychange
-            Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute = pInterface_Cfg->attribute; //save clock data in attribute to global for  Init_FM36_AB03_Preset() use
+            Global_UIF_Setting[ UIF_TYPE_FM36_PDMCLK - 1 ].attribute = pInterface_Cfg->attribute; //save clock data in attribute to global for  Init_FM36_AB03_Preset() use
             err = Init_FM36_AB03_Preset(); //be careful if the I2C switch status changed during OSTimeDly() in side this routine
             I2C_Mixer(I2C_MIX_UIF_S);                       
         break ;

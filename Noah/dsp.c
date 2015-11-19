@@ -427,7 +427,7 @@ static unsigned char Config_SPx_Format( unsigned char bit_length, unsigned char 
     unsigned short temp;
     
     if( flag_state_pwd ) return 0 ;
-    APP_TRACE_INFO(("\r\nConf FM36 Bit length = %d\r\n", bit_length));
+    APP_TRACE_INFO(("\r\nConf FM36 Bit length = %d, %d\r\n", bit_length, i2s_tdm_sel));
     
     if( i2s_tdm_sel == 0 ) { //I2S
         if( bit_length == 32 ) {          
@@ -754,7 +754,7 @@ unsigned char Init_FM36_AB03( unsigned short sr,
     unsigned short temp, temp2 ;
     unsigned short addr, val; 
     unsigned char  err ;     
-      
+    
     if( sr               == sr_saved  &&  \
         mic_num          == mic_num_saved && \
         lin_sp_index     == lin_sp_index_saved && \

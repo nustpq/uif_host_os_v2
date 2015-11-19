@@ -139,6 +139,8 @@ unsigned char im501_write_dram_spi( unsigned int mem_addr, unsigned char *pdata 
 
 unsigned char im501_switch_i2c_spi( unsigned char if_type, unsigned char spi_mode );
 
+void im501_change_if_speed( unsigned char if_type, unsigned char speed_type );
+
 unsigned char test_send_cmd_to_im501( void );
 
 unsigned char Write_CMD_To_iM501( unsigned char cmd_index, unsigned short para );
