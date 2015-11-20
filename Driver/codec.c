@@ -535,16 +535,93 @@ unsigned short CODEC_PARA_TABLE[][14][7] = {
 	  {0,     2,     0,     0,     2,    0,     0}, //PLL_P       = 
 	  {0,     7,     0,     0,     7,    0,     0}, //PLL_J       = 
 	  {0,     3500,  0,     0,     3500, 0,     0}  //PLL_D       = 
-             
+    },
     
-    }    
+    { //mode 3
+          //I2S32 format
+          //BCLK = 32 * 2 * FCLK = 64 * FCLK
+	  //parameter for MCLK = 24.576MHz 
+          {48000, 44100, 32000, 24000, 22050, 16000, 8000 }, //SR	      
+	  {0x82,  0x88,  0x83,  0x82,  0x88,  0x83,  0x83 }, //  REG_NDAC    =
+	  {0x82,  0x84,  0x82,  0x84,  0x84,  0x84,  0x81 }, //  REG_MDAC    = --R12
+	  {0x80,  0x40,  0x80,  0x80,  0x80,  0x80,  0x00 }, //  REG_DOSR    = --R13-14
+	  {0x84,  0x88,  0x88,  0x90,  0x90,  0x90,  0xA0 }, //  REG_BCLK_DIV=  --R30   
+	  {0x82,  0x88,  0x83,  0x82,  0x88,  0x83,  0x86 }, //  REG_NADC    = 
+	  {0x84,  0x82,  0x84,  0x84,  0x82,  0x84,  0x84 }, //  REG_MADC    = 
+	  {0x00,  0x80,  0x40,  0x80,  0x00,  0x80,  0x80 }, //REG_AOSR    =  --R20
+	  //{3.072M, 2.8224M, 2.048M, 3.072M, 2.8224M, 2.048M, 1.024M},//     --PDMCLK   :       
+	  {0x00,  0x03,  0x00,  0x00,  0x03,  0x00,  0x00 }, //CLK_MUX     =  --Select CODEC_CLKIN R4
+	  {0,     1,     0,     0,     1,    0,     0}, //PLL_EN      = 
+	  {0, 	  1,     0,     0,     1,    0,     0}, //PLL_R       = 
+	  {0,     2,     0,     0,     2,    0,     0}, //PLL_P       = 
+	  {0,     7,     0,     0,     7,    0,     0}, //PLL_J       = 
+	  {0,     3500,  0,     0,     3500, 0,     0}  //PLL_D       = 
+    },
+    
+   /*
+    {
+          //I2S format
+          //BCLK = 16 * 2 * FCLK = 32 * FCLK
+	  //parameter for MCLK = 12.288MHz 
+   
+          {48000, 44100, 32000, 24000, 22050, 16000, 8000 }, //SR	      
+	  {0x82,  0x88,  0x83,  0x82,  0x88,  0x83,  0x83 }, //  REG_NDAC    =
+	  {0x81,  0x82,  0x81,  0x82,  0x82,  0x82,  0x84 }, //  REG_MDAC    = --R12
+	  {0x80,  0x40,  0x80,  0x80,  0x80,  0x80,  0x00 }, //  REG_DOSR    = --R13-14
+	  {0x84,  0x82,  0x84,  0x84,  0x84,  0x84,  0x84 }, //  REG_BCLK_DIV=  --R30   84
+	  {0x81,  0x88,  0x83,  0x82,  0x88,  0x83,  0x83 }, //  REG_NADC    = 
+	  {0x84,  0x82,  0x82,  0x84,  0x82,  0x84,  0x84 }, //  REG_MADC    = 
+	  {0x00,  0x80,  0x40,  0x00,  0x00,  0x40,  0x80 }, //REG_AOSR    =  --R20
+	  //{3.072M, 2.8224M, 2.048M, 3.072M, 2.8224M, 2.048M, 1.024M},//     --PDMCLK   :       
+	  {0x00,  0x03,  0x00,  0x00,  0x03,  0x00,  0x00 }, //CLK_MUX     =  --Select CODEC_CLKIN
+	  {0,     1,     0,     0,     1,    0,     0}, //PLL_EN      = 
+	  {0, 	  1,     0,     0,     1,    0,     0}, //PLL_R       = 
+	  {0,     2,     0,     0,     2,    0,     0}, //PLL_P       = 
+	  {0,     7,     0,     0,     7,    0,     0}, //PLL_J       = 
+	  {0,     3500,  0,     0,     3500, 0,     0}  //PLL_D       = 
+    },
+    */
+    
+    {
+          //mode 4
+          //TDM 4slot 32bit
+         //BCLK = 32 * 4 * FCLK = 128 * FCLK
+	 //parameter for MCLK = 24.576MHz 
+          {48000, 44100, 32000, 24000, 22050, 16000, 8000 }, //SR	      
+	  {0x82,  0x88,  0x83,  0x82,  0x88,  0x83,  0x83 }, //  REG_NDAC    =
+	  {0x82,  0x84,  0x82,  0x84,  0x84,  0x84,  0x81 }, //  REG_MDAC    = --R12
+	  {0x80,  0x40,  0x80,  0x80,  0x80,  0x80,  0x00 }, //  REG_DOSR    = --R13-14
+	  {0x82,  0x82,  0x82,  0x84,  0x84,  0x84,  0x88 }, //  REG_BCLK_DIV=  --R30   
+	  {0x82,  0x88,  0x83,  0x82,  0x88,  0x83,  0x86 }, //  REG_NADC    = 
+	  {0x84,  0x82,  0x84,  0x84,  0x82,  0x84,  0x84 }, //  REG_MADC    = 
+	  {0x00,  0x80,  0x40,  0x80,  0x00,  0x80,  0x80 }, //REG_AOSR    =  --R20
+	  //{3.072M, 2.8224M, 2.048M, 3.072M, 2.8224M, 2.048M, 1.024M},//     --PDMCLK   :       
+	  {0x00,  0x03,  0x00,  0x00,  0x03,  0x00,  0x00 }, //CLK_MUX     =  --Select CODEC_CLKIN
+	  {0,     1,     0,     0,     1,    0,     0}, //PLL_EN      = 
+	  {0, 	  1,     0,     0,     1,    0,     0}, //PLL_R       = 
+	  {0,     2,     0,     0,     2,    0,     0}, //PLL_P       = 
+	  {0,     7,     0,     0,     7,    0,     0}, //PLL_J       = 
+	  {0,     3500,  0,     0,     3500, 0,     0}  //PLL_D       = 
+          
+    }
+};
+
+unsigned char audio_interface[] = { 
+          0x0c,   //I2S mode,16bit,master
+          0x00,   //I2S mode,16bit,Slave
+          0x4c,   //DSP mode,16bit,master
+          0x40,   //DSP mode,16bit,Slave
+          0xcc,   //LJF mode,16bit,master
+          0X8c,   //RJF mode,16bit,master
     
 };
 
-unsigned short BCLK_SOURCE[] = { 
-          1, //I2S format
-          0, //TDM16 format
-          0  //TDM32 format
+unsigned short BCLK_SOURCE[] = { //reg29 0:DAC_CLK  1: DAC_MOD_CLK
+          1, //I2S 16bit format
+          0, //TDM 16bit format
+          0, //TDM 32bit format
+		  0, //I2S 32bit format
+          0  //TDM 32bit 4slot format
 };
           
 
@@ -658,21 +735,29 @@ unsigned char config_aic3204[][2] = {
 
 
 
-#define CFG_PARA_NUM  14
+#define CFG_PARA_NUM  15
 
 static unsigned int  codec_saved_sr;
 static unsigned char codec_saved_sample_length;
 static unsigned char codec_saved_format;
 
-unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length, unsigned char format ) 
+//format=0 i2s 
+//format=1 tdm
+//format=2 pcm
+unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length, unsigned char format, unsigned char slot_num ,unsigned char master_or_slave ) 
 {
     unsigned char err;
     unsigned char mode;
     unsigned char reg_data[CFG_PARA_NUM];
     unsigned char sr_index = 255; 
+    unsigned char audio_interface_index =0;
     unsigned char reg_index[CFG_PARA_NUM] = {
-        4, 5, 6, 7, 8, 11, 12, 13, 14, 18, 19, 20, 29, 30
+        4, 5, 6, 7, 8, 11, 12, 13, 14, 18, 19, 20, 29, 30, 27
     };
+    //  sr=48000;
+    //  sample_length=32;
+    //  format=1;
+    //  slot_num=4;
     
     if( (sr == codec_saved_sr)  &&\
         (sample_length == codec_saved_sample_length) &&\
@@ -697,24 +782,55 @@ unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length, unsigned
         return CODEC_SR_NOT_SUPPORT_ERR;
     }
     
+    if(master_or_slave==0 && (format != 2)){//1388slave
+        audio_interface_index=0;
+    }else if(master_or_slave==1 && (format != 2)){
+        audio_interface_index=1;
+    }else if (master_or_slave==0 && (format == 2)){
+        audio_interface_index=2;
+    }else {
+        audio_interface_index=3;
+    }
+           
+    // audio_interface_index =0;//I2S mode,16bit,master
     if( format == 0 ) { //Standard I2S
-        mode = 0;
-    } else { 
-        if( sample_length == 16 ) { //TDM 16
-            mode = 1;
+       if( sample_length == 32 )
+          mode = 3;//I2S32
+       else 
+       {
+          mode =0;//I2S16
+       }
+       
+    } else if ( format == 1 ) { 
+        if( sample_length == 16 && slot_num==8) { //TDM 16
+            mode = 1;//TDM 8slot  16 bit 
             //mode = 0; //for iM401
-        } else {//if(sample_length == 32 ) { //TDM32
-            mode = 2;
-        } //else {
-            //return CODEC_SR_LEN_NOT_SUPPORT_ERR;
-        //}
+        } else if(sample_length == 32 && slot_num==8 ) { //TDM32
+            mode = 2;  //TDM 8slot  32 bit 
+        } else if  (sample_length == 32 && slot_num==4 ){
+            mode =4;  //TDM 4slot  32 bit
+        }else {
+            return CODEC_FUNC_NOT_SUPPORT;
+        }
+        
+    } else {//pcm
+        if(sample_length == 32 ) {
+            mode = 3;//32bit
+        }else {
+            mode =0;//16bit
+         //   audio_interface_index =2;//DSP mode,16bit,master
+        }
     }
     
     reg_data[0] = CODEC_PARA_TABLE[mode][8][sr_index];
-    reg_data[1] = CODEC_PARA_TABLE[mode][10][sr_index]*128+CODEC_PARA_TABLE[mode][12][sr_index]*16+ CODEC_PARA_TABLE[mode][11][sr_index];
-    reg_data[2] = CODEC_PARA_TABLE[mode][13][sr_index];
-    reg_data[3] = CODEC_PARA_TABLE[mode][14][sr_index]>>8;
-    reg_data[4] = CODEC_PARA_TABLE[mode][14][sr_index];    
+//  reg_data[1] = CODEC_PARA_TABLE[mode][10][sr_index]*128+CODEC_PARA_TABLE[mode][12][sr_index]*16+ CODEC_PARA_TABLE[mode][11][sr_index];
+    reg_data[1] = CODEC_PARA_TABLE[mode][9][sr_index]*128+CODEC_PARA_TABLE[mode][11][sr_index]*16+ CODEC_PARA_TABLE[mode][10][sr_index];
+//  reg_data[2] = CODEC_PARA_TABLE[mode][13][sr_index];
+    reg_data[2] = CODEC_PARA_TABLE[mode][12][sr_index];
+//  reg_data[3] = CODEC_PARA_TABLE[mode][14][sr_index]>>8;
+//  reg_data[4] = CODEC_PARA_TABLE[mode][14][sr_index];    
+    reg_data[3] = CODEC_PARA_TABLE[mode][13][sr_index]>>8;
+    reg_data[4] = CODEC_PARA_TABLE[mode][13][sr_index];
     reg_data[5] = CODEC_PARA_TABLE[mode][1][sr_index];
     reg_data[6] = CODEC_PARA_TABLE[mode][2][sr_index];    
     reg_data[7] = CODEC_PARA_TABLE[mode][3][sr_index]>>8;
@@ -724,6 +840,7 @@ unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length, unsigned
     reg_data[11] = CODEC_PARA_TABLE[mode][7][sr_index]; 
     reg_data[12] = BCLK_SOURCE[mode];
     reg_data[13] = CODEC_PARA_TABLE[mode][4][sr_index];
+    reg_data[14] = audio_interface[audio_interface_index];
         
     for( unsigned char i = 0 ; i< sizeof(config_aic3204)>>1 ; i++ ) {    
         err = I2CWrite_Codec_AIC3204(config_aic3204[i][0],config_aic3204[i][1]);

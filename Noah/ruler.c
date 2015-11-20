@@ -190,7 +190,11 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_SET_AUDIO_CFG,\
         pAudioCfg->type, pAudioCfg->channels,\
        (pAudioCfg->sr)&0xFF, ((pAudioCfg->sr)>>8)&0xFF, pAudioCfg->bit_length,\
-        0, 0, pAudioCfg->gpio_rec_bit_mask           
+        0, 0, pAudioCfg->gpio_rec_bit_mask,  \
+        pAudioCfg->format ,    pAudioCfg->cki, pAudioCfg->delay,pAudioCfg->start , \
+        pAudioCfg->master_or_slave
+        //11~14    pAudioCfg->format 1:  I2S  2:  TDM   3:   PCM   
+        //pAudioCfg->master_or_slave  15  1:1388 master  0: 1388 slave          
     };
     
     //APP_TRACE_INFO(("Setup_Audio [%s]:[%d SR]:[%d CH]: %s\r\n",(pAudioCfg->type == 0) ? "REC " : "PLAY", pAudioCfg->sr, pAudioCfg->channels,((pAudioCfg->type == 0) && (pAudioCfg->lin_ch_mask == 0)) ? "LIN Disabled" : "LIN Enabled"));
@@ -278,6 +282,10 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
     } else {
         i2s_tdm_sel = 1;
     }
+    if( pAudioCfg->format == 3 ){
+        global_i2s_tdm_sel[pAudioCfg->type] = 2 ;//PCM
+        i2s_tdm_sel = 2;
+    }
     //Dump_Data(buf, sizeof(buf));
     
     UART2_Mixer(3); 
@@ -293,7 +301,7 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
     }
     
     I2C_Mixer(I2C_MIX_FM36_CODEC);
-    err = Init_CODEC( pAudioCfg->sr,  pAudioCfg->bit_length, i2s_tdm_sel);
+    err = Init_CODEC( pAudioCfg->sr,  pAudioCfg->bit_length, i2s_tdm_sel, buf[4], buf[15]);
     I2C_Mixer(I2C_MIX_UIF_S);
     if( err != NO_ERR ) {
         APP_TRACE_INFO(("\r\nSetup_Audio Init_CODEC ERROR: %d\r\n",err)); 
@@ -1873,7 +1881,7 @@ void AB_POST( void )
 
     APP_TRACE_INFO(("\r\n1. CODEC... \r\n"));
     I2C_Mixer(I2C_MIX_FM36_CODEC);
-    err = Init_CODEC( SAMPLE_RATE_DEF,  SAMPLE_LENGTH, 1); //TDM  
+    err = Init_CODEC( SAMPLE_RATE_DEF,  SAMPLE_LENGTH, 1, 8, 0); //TDM  
     I2C_Mixer(I2C_MIX_UIF_S);
     if( err != NO_ERR ) {
         Global_Bridge_POST = POST_ERR_CODEC;

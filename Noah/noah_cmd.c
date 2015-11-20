@@ -780,9 +780,19 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             PCCmd.audio_cfg.lin_ch_mask = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 5, 0);            
             PCCmd.audio_cfg.bit_length = (CPU_INT08U)temp; 
-            temp = emb_get_attr_int(&root, 6, 0);   
-            if( temp == -1 ) { temp = 0 ;}
+            temp = emb_get_attr_int(&root, 6, 0);          
             PCCmd.audio_cfg.gpio_rec_bit_mask = (CPU_INT08U)temp; 
+            
+            temp = emb_get_attr_int(&root, 7, 1); //default 1, choose TDM    
+            PCCmd.audio_cfg.format = (CPU_INT08U)temp;
+            temp = emb_get_attr_int(&root, 8, (PCCmd.audio_cfg.type == 0)? 1:0 ); // default 0: falling egde send for sending, 1: rising edge lock for receiving   
+            PCCmd.audio_cfg.cki = (CPU_INT08U)temp;
+            temp = emb_get_attr_int(&root, 9, 1);   //default 1 cycle delay          
+            PCCmd.audio_cfg.delay = (CPU_INT08U)temp;
+            temp = emb_get_attr_int(&root, 10, 4);  //default 4: falling edge trigger for low left          
+            PCCmd.audio_cfg.start = (CPU_INT08U)temp;
+            temp = emb_get_attr_int(&root, 11, 0);   //default 0: as master      
+            PCCmd.audio_cfg.master_or_slave = (CPU_INT08U)temp;
             err = Setup_Audio( &PCCmd.audio_cfg );
 
         break ;

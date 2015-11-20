@@ -43,7 +43,9 @@ unsigned char Get_Codec(unsigned char codec_control_type, unsigned char reg, uns
 
 unsigned char Codec_Mixer(unsigned char i2c_channel );
 //unsigned char Init_CODEC( unsigned int sample_rate );
-unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length, unsigned char format ) ;
+
+unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length, unsigned char format ,unsigned char slot_num,unsigned char master_or_slave) ;
+
 
 unsigned char Set_AIC3204_DSP_Offset( unsigned char slot_index ) ;
 unsigned char Init_CODEC_AIC3204( unsigned int sample_rate ) ;

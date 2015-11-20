@@ -49,11 +49,11 @@ void Demo_Sine_Gen( unsigned char *pdata, unsigned int size, unsigned int REC_SR
 
     while( sample_index < (size>>1) ) {     
         
-      for( i = 0; i < channel_num; i++ ) {
+        for( i = 0; i < channel_num; i++ ) {
         
             *((unsigned short *)pdata + sample_index++) =  *(pVal+index) ;
-      }
-      index = ( index + table_lookup_step ) % SINE_1KHZ_TABLE_POINT ;
+        }
+        index = ( index + table_lookup_step ) % SINE_1KHZ_TABLE_POINT ;
       
     }  
     
