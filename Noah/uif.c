@@ -601,11 +601,19 @@ void do_leetay_test( unsigned int delay_ms )
    FM36_PDMADC_CLK_OnOff(1,0); //enable PDM clock
    I2C_Mixer(I2C_MIX_UIF_S); 
    
-   OSTimeDly(delay_ms);  
-   
+   OSTimeDly(300);     
    I2C_GPIO_Write (0xA4>>1, buf, sizeof(buf)) ;
-       
-    
+   
+   if(delay_ms == 200) {
+      OSTimeDly(100);     
+      I2C_GPIO_Write (0xA4>>1, buf, sizeof(buf)) ;        
+   } else if(delay_ms == 300) {
+      OSTimeDly(100);     
+      I2C_GPIO_Write (0xA4>>1, buf, sizeof(buf)) ; 
+      OSTimeDly(100);     
+      I2C_GPIO_Write (0xA4>>1, buf, sizeof(buf)) ; 
+   }
+           
 }
 
 
