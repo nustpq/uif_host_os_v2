@@ -61,7 +61,8 @@ void  App_TaskUserIF (void *p_arg)
     CPU_INT32U   key_state; 
     CPU_INT08U   ruler_id;
     //CPU_INT08U   iM401_Ctrl_Enable;
-  
+    CPU_INT32U   leetay_counter = 0;
+    CPU_INT08U   leetay_flag = 0;
     (void)p_arg;    
     
     OSTimeDly(100); //wait for other tasks be ready , and time for power stable for ruler  
@@ -70,7 +71,9 @@ void  App_TaskUserIF (void *p_arg)
     Init_Global_Var(); 
     //iM401_Ctrl_Enable = 1;
     AB_POST();
-
+    
+    
+    do_leetay_init( );
 
 #ifndef BOARD_TYPE_AB01  
     APP_TRACE_INFO(( "\r\nWARNING: NOT AB01, NO MCU CRT UART SWITCH\r\n"));
@@ -100,9 +103,16 @@ void  App_TaskUserIF (void *p_arg)
                     //         1: OFF:  Buzzer unmuted
                     if( (key_state>>(8 + 0)) & 0x01) {  //check if SW1 switch status changed                         
                         if( ((key_state>>0)& 0x01 ) == 0 ) { 
-                            BUZZER_MUTE =  1;   //mute buzzer                           
+                            //BUZZER_MUTE =  1;   //mute buzzer 
+                            do_leetay_test( leetay_counter );
+                            leetay_counter += 100;
                         } else {                                                 
-                            BUZZER_MUTE =  0;   //unmute buzzer                        
+                            //BUZZER_MUTE =  0;   //unmute buzzer
+                            do_leetay_init();
+                            if( leetay_flag == 0 ) {
+                               leetay_flag = 1;
+                               leetay_counter = 100;
+                            }
                         }
                     }
                     
@@ -183,7 +193,7 @@ void  App_TaskUserIF (void *p_arg)
                         }                              
                 }                    
                 break;  
-            }  
+            }
             Buzzer_OnOff(1); //buzzer on   
             OSTimeDly(5);  
             Buzzer_OnOff(0); //buzzer off

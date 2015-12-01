@@ -38,7 +38,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:H:V2.55]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:H:V2.551]"; //fixed size string 
 
 #ifdef  BOARD_TYPE_AB01
 const CPU_CHAR hw_version[]  = "[HW:V1.0]"; 
@@ -1633,7 +1633,7 @@ void Head_Info ( void )
     APP_TRACE_INFO(("----             EVM Unified Interface Board          -----\r\n"));
     APP_TRACE_INFO(("----   %20s-%s             -----\r\n", hw_model, fw_version));
     APP_TRACE_INFO(("----   Compile date:  %12s, %8s, by PQ   -----\r\n", __DATE__, __TIME__));
-    APP_TRACE_INFO(("-----------------------------------------------------------\r\n"));
+    APP_TRACE_INFO(("--------------  for Leetay iM205 test  --------------------\r\n"));
     APP_TRACE_INFO(("\r\n"));                
     //APP_TRACE_INFO(("------------------------------------------------------------------------------------------------------------------------------------\r\n"));  
     APP_TRACE_INFO(("Micrium uC/OS-II on the Atmel AT91SAM7A3. Version : V%d.%d \r\n",(OSVersion()/ 100),(OSVersion() % 100)  ));

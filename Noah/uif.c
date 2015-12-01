@@ -580,5 +580,32 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
 
 
 
+ 
+void do_leetay_init( void )
+{    
+   
+   I2C_GPIO_Init( 100 * 1000, 8, 9  );  
+   
+   I2C_Mixer(I2C_MIX_FM36_CODEC);
+   FM36_PDMADC_CLK_OnOff(0,0); //disable PDM clock
+   I2C_Mixer(I2C_MIX_UIF_S); 
+    
+    
+}
+
+void do_leetay_test( unsigned int delay_ms )
+{
+   unsigned char buf[] = {0x02,0x08};
+   
+   I2C_Mixer(I2C_MIX_FM36_CODEC);
+   FM36_PDMADC_CLK_OnOff(1,0); //enable PDM clock
+   I2C_Mixer(I2C_MIX_UIF_S); 
+   
+   OSTimeDly(delay_ms);  
+   
+   I2C_GPIO_Write (0xA4>>1, buf, sizeof(buf)) ;
+       
+    
+}
 
 

@@ -132,8 +132,7 @@ void  App_TaskJoy (void *p_arg)
                 while ( OSMboxPost(App_UserIF_Mbox, &data) == OS_ERR_MBOX_FULL ) {
                     OSTimeDly(10);  //
                     
-                };  
-                
+                };               
                 
             }
         }
