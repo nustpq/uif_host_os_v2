@@ -579,6 +579,25 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
 }
 
 
-
+unsigned char GPIO_Session( GPIO_SESSION *p_gpio_session )
+{
+    
+   unsigned char err;
+   unsigned char i;
+   
+   err = 0;
+   
+   for( i=0; i<p_gpio_session->gpio_num; i++ )   {
+      GPIOPIN_Set( GET_BYTE_HIGH_4BIT(p_gpio_session->gpio_value[i]), GET_BYTE_LOW_4BIT(p_gpio_session->gpio_value[i]) );
+      if( p_gpio_session->delay_us[i] < 2000 ) {
+          delay_us( p_gpio_session->delay_us[i] );
+      }else{
+          OSTimeDly( p_gpio_session->delay_us[i] );
+      }
+   } 
+   
+   return err;
+   
+}
 
 

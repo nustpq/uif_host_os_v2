@@ -60,6 +60,6 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write );
 unsigned char Raw_Read( RAW_READ *p_raw_read );
 unsigned char Write_Burst( BURST_WRITE nurst_write );
 void Dump_Data ( unsigned char *pdata, unsigned int size );
-
+unsigned char GPIO_Session( GPIO_SESSION *p_gpio_session );
 
 #endif

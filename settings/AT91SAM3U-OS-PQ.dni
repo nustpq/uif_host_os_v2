@@ -33,7 +33,7 @@ Stop=1
 Freq=10000000
 MultiCoreRunAll=1
 [DebugChecksum]
-Checksum=330215543
+Checksum=-1392162822
 [JLinkDriver]
 CStepIntDis=_ 0
 [Exceptions]
@@ -63,6 +63,21 @@ Fmt3={W}0:mem_addr	4	0
 Fmt4={W}0:pChar	4	0
 Fmt5={W}0:pRecvPtr	4	0
 Fmt6={W}0:temp	4	0
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
+[CallStackLog]
+Enabled=0
+[DriverProfiling]
+Enabled=0
+Mode=0
+Graph=0
+Symbiont=0
+Exclusions=
 [Disassemble mode]
 mode=0
 [Breakpoints2]
@@ -72,33 +87,19 @@ Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.206.13" 0 0 1 "" 0 "" 0
 Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\spi.c}.584.5" 0 0 1 "" 0 "" 0
 Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\APP\task_uart_rx.c}.103.14" 0 0 1 "" 0 "" 0
 Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\spi.c}.286.5" 0 0 1 "" 0 "" 0
-Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.384.9" 0 0 1 "" 0 "" 0
+Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.385.9" 0 0 1 "" 0 "" 0
 Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.177.23" 0 0 1 "" 0 "" 0
 Bp8=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.251.5" 0 0 1 "" 0 "" 0
 Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.540.13" 0 0 1 "" 0 "" 0
-Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.854.13" 0 0 1 "" 0 "" 0
+Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.855.13" 0 0 1 "" 0 "" 0
 Bp11=_ 1 "EMUL_CODE" "{$PROJ_DIR$\APP\task_user_if.c}.177.37" 0 0 1 "" 0 "" 0
 Bp12=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Noah\ruler.c}.292.5" 0 0 1 "" 0 "" 0
-Bp13=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.770.13" 0 0 1 "" 0 "" 0
-Count=14
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
+Bp13=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.771.13" 0 0 1 "" 0 "" 0
+Bp14=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Driver\gpio.c}.97.5" 0 0 1 "" 0 "" 0
+Count=15
 [Aliases]
 A0=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Ports\ARM-Cortex-M3\Generic\IAR\os_cpu_c.c" ""
 A1=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Source\os_core.c" ""
 A2=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Source\os_task.c" ""
 Count=3
 SuppressDialog=1
-[CallStackLog]
-Enabled=0
-[DriverProfiling]
-Enabled=0
-Mode=0
-Graph=0
-Symbiont=0
-Exclusions=

@@ -319,7 +319,11 @@ typedef struct {
     unsigned char    if_type;//1: I2C, 2:SPI
 }SET_VEC_CFG ;  
    
-
+typedef struct {
+    unsigned char    gpio_num;   
+    unsigned char    gpio_value[7];
+    unsigned int     delay_us[7];
+}GPIO_SESSION ; 
 
 
 

@@ -37,6 +37,7 @@
 extern EMB_BUF   Emb_Buf_Cmd;
 extern EMB_BUF   Emb_Buf_Data;
 
+static bool      Session_En = false;
 
 /*
 *********************************************************************************************************
@@ -994,7 +995,7 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
 //              
 //        break;
         
-        case PC_CMD_TO_IM501_CMD:
+        case PC_CMD_TO_IM501_CMD: 
             temp = emb_get_attr_int(&root, 1, -1); //To iM501 cmd id
             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }           
             temp2 = emb_get_attr_int(&root, 2, -1);//cmd attribute, 2 bytes
@@ -1007,6 +1008,36 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             err = Request_Enter_PSM();              
               
         break;        
+    
+        case PC_CMD_GPIO_SESSION :
+            temp = emb_get_attr_int(&root, 1, -1); //delay time
+            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; } 
+            PCCmd.gpio_session.gpio_num =  (CPU_INT08U)temp;
+            for(unsigned int i = 0; i<temp; i++ ){
+                temp2 = emb_get_attr_int(&root, 2+i*2, -1);
+                if(temp2 == -1 ) { Send_GACK(EMB_CMD_ERR); break; } 
+                PCCmd.gpio_session.gpio_value[i] = temp2;
+                if( i == temp-1 ) {
+                    break;
+                }
+                temp2 = emb_get_attr_int(&root, 3+i*2, -1);
+                if(temp2 == -1 ) { Send_GACK(EMB_CMD_ERR); break; } 
+                PCCmd.gpio_session.delay_us[i] = temp2;
+            }
+            err = GPIO_Session( &PCCmd.gpio_session );  
+        
+        break;
+        
+/*        
+        case PC_CMD_SESSION :
+            if( Session_En ) {
+                Session_En = false;
+            } else {
+                Session_En = true;
+            }            
+        break ;
+*/
+        
 /***************************************************************************
         
 //        case PC_CMD_BURST_WRITE :
