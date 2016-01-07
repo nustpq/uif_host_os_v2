@@ -542,7 +542,7 @@ unsigned char Rec_Voice_Buffer_Start( VOICE_BUF_CFG *pv_b_cfg )
     
     Global_SPI_Record = 1; //set flag for SPI rec
     
-    return 0 ;   
+    return 0 ;
 }
 
 /*

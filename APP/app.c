@@ -202,7 +202,7 @@ static  void  App_TaskStart (void *p_arg)
 //        LED_Set( LED_DS1 );        
 //        OSTimeDlyHMSM(0, 0, 0, 30);         
 //        LED_Clear( LED_DS1 );
-//        OSTimeDlyHMSM(0, 0, 1, 740);         
+//        OSTimeDlyHMSM(0, 0, 1, 740);       
         counter++;
         if(counter&0xFF) {
             LED_Set( LED_DS1 );   

@@ -38,7 +38,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:H:V2.56]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:H:V2.57]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB01
 const CPU_CHAR hw_version[]  = "[HW:V1.0]"; 
@@ -1633,7 +1633,7 @@ void Head_Info ( void )
     APP_TRACE_INFO(("-----------------------------------------------------------\r\n"));
     APP_TRACE_INFO(("\r\n"));                
     //APP_TRACE_INFO(("------------------------------------------------------------------------------------------------------------------------------------\r\n"));  
-    APP_TRACE_INFO(("Micrium uC/OS-II on the Atmel AT91SAM7A3. Version : V%d.%d \r\n",(OSVersion()/ 100),(OSVersion() % 100)  ));
+    APP_TRACE_INFO(("Micrium uC/OS-II on the Atmel AT91SAM3U4C. Version : V%d.%d \r\n",(OSVersion()/ 100),(OSVersion() % 100)  ));
     APP_TRACE_INFO(("CPU Usage = %d%%, CPU Speed = %3d MHz, Tick_Per_Second = %6d ticks/sec  \r\n", OSCPUUsage,  (BSP_CPU_ClkFreq() / 1000000L),OS_TICKS_PER_SEC ));
     APP_TRACE_INFO(("#Ticks = %8d, #CtxSw = %8d \r\n", OSTime, OSCtxSwCtr )); 
     Get_Uptime();

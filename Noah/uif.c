@@ -155,9 +155,10 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         break ;
         
         case UIF_TYPE_SPI :
-            if( Global_SPI_Record == 1 ) {
+            if( Global_SPI_Record == 1 ) { //in case last SPI record not ended normally 
                 Global_SPI_Record = 0;
                 Enable_SPI_Port();
+                Stop_Audio();//in case audio not stopped normally                
             }
             if( Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].speed  == temp &&\
                 Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].attribute == temp2 ) {

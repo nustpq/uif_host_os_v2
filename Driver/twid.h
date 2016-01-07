@@ -99,5 +99,8 @@ extern OS_EVENT *TWI_Sem_done; //sem for TWI
 
 extern void TWI_Init_Re( void );
 
+void Disable_TWI_Port( void );
+void Enable_TWI_Port( void );
+
 #endif //#ifndef TWID_H
 

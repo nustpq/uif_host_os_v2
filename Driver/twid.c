@@ -57,8 +57,8 @@
 
 
 /// Pio pins to configure.
-static const Pin twi_pins[] = {PINS_TWI};
-
+static const Pin twi_pins[] = {PINS_TWI0};
+static const Pin twi_pins_dis[] = {PINS_TWI0_DIS};
 /// TWI driver instance.
 Twid  twid;
 
@@ -492,5 +492,17 @@ void TWI_Init_Re( void )
 }
 
 
+
+void Enable_TWI_Port( void )// unsigned int spi_clk, unsigned char format )
+{
+    //SPI_Init(spi_clk,format);
+    PIO_Configure(twi_pins, PIO_LISTSIZE(twi_pins) ); 
+}
+
+
+void Disable_TWI_Port( void )
+{
+    PIO_Configure(twi_pins_dis, PIO_LISTSIZE(twi_pins_dis) ); 
+}        
 
 

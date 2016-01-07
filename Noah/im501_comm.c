@@ -955,15 +955,17 @@ void Service_To_iM501_IRQ( void )
             FM36_PDMADC_CLK_OnOff(1,1); //Enable PDM clock fast switch
             I2C_Mixer(I2C_MIX_UIF_S); 
             
-            im501_change_if_speed(2,1); //change SPI speed to high speed 
-            Disable_SPI_Port(); //disabled host mcu SPI
-                    
+            im501_change_if_speed(2,1); //change SPI speed to high speed          
+            Disable_SPI_Port(); //disabled host mcu SPI  
+            
             voice_buf_cfg.spi_mode = Global_UIF_Setting[1].speed;
             voice_buf_cfg.spi_speed = Global_UIF_Setting[1].attribute;
             voice_buf_cfg.gpio_irq = im501_irq_gpio;    
             
-            Rec_Voice_Buffer_Start( &voice_buf_cfg ); //send CMD to Audio MCU 
-                        
+            err = Rec_Voice_Buffer_Start( &voice_buf_cfg ); //send CMD to Audio MCU 
+            if( err != NULL ) {
+                Enable_SPI_Port(); //Enabled host mcu SPI if failed to get resp from audio mcu
+            }            
         }  
         
     }

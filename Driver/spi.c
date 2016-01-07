@@ -492,7 +492,7 @@ unsigned char SPI_WriteReadBuffer_API(  void *buffer_r,  void *buffer_w, unsigne
 {      
     unsigned char state;
     unsigned char err = 0; 
-    unsigned int  couter_ms  = 1 ; 
+    unsigned int  couter_ms  = 0 ; 
     unsigned int  couter_us  = 0 ; 
    
     //GPIOPIN_Set_Fast(7,0);

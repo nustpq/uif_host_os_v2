@@ -1027,7 +1027,22 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             err = GPIO_Session( &PCCmd.gpio_session );  
         
         break;
+
+        case PC_CMD_SPI_REC :  //for FM1388 test
+                        
+            VOICE_BUF_CFG voice_buf_cfg;        
+            voice_buf_cfg.spi_mode = Global_UIF_Setting[1].speed;
+            voice_buf_cfg.spi_speed = Global_UIF_Setting[1].attribute;
+            voice_buf_cfg.gpio_irq = 2;//useless for FM1388 //im501_irq_gpio;    
+            Disable_SPI_Port(); //disabled host mcu SPI  
+            err = Rec_Voice_Buffer_Start( &voice_buf_cfg ); //send CMD to Audio MCU 
+            if( err != NULL ) {
+                Enable_SPI_Port(); //Enabled host mcu SPI if failed to get resp from audio mcu
+            }
         
+        break;
+                       
+            
 /*        
         case PC_CMD_SESSION :
             if( Session_En ) {
@@ -1037,6 +1052,19 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             }            
         break ;
 */
+  
+       case PC_CMD_IF_ONOFF : //turn on/off SPI TWI interface for power leakage test
+            temp = emb_get_attr_int(&root, 1, -1); 
+            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; } 
+            if( temp == 0 ) {
+                Disable_SPI_Port(); 
+                Disable_TWI_Port();
+            } else {
+                Enable_SPI_Port(); 
+                Enable_TWI_Port();
+            }            
+        break ;       
+         
         
 /***************************************************************************
         

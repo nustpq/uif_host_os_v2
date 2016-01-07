@@ -236,6 +236,8 @@
 #define  PC_CMD_TO_IM501_CMD         44
 #define  PC_CMD_ENTER_PSM            45
 #define  PC_CMD_GPIO_SESSION         46
+#define  PC_CMD_SPI_REC              47
+#define  PC_CMD_IF_ONOFF             48
 
 #define  PC_CMD_DOWNLOAD_RULER_FW    100
 #define  PC_CMD_UPDATE_RULER_FW      101
