@@ -952,7 +952,7 @@ void Service_To_iM501_IRQ( void )
             Disable_GPIO_Interrupt( im501_irq_gpio ); //disable IRQ interrupt
                     
             I2C_Mixer(I2C_MIX_FM36_CODEC);           
-            FM36_PDMADC_CLK_OnOff(1,1); //Enable PDM clock fast switch
+            FM36_PDMADC_CLK_OnOff(1,0); //Should Enable PDM clock fast switch, but this will cause pop sound 
             I2C_Mixer(I2C_MIX_UIF_S); 
             
             im501_change_if_speed(2,1); //change SPI speed to high speed          

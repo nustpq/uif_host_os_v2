@@ -794,6 +794,10 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             PCCmd.audio_cfg.start = (CPU_INT08U)temp;
             temp = emb_get_attr_int(&root, 11, 0);   //default 0: as master      
             PCCmd.audio_cfg.master_or_slave = (CPU_INT08U)temp;
+            
+            temp = emb_get_attr_int(&root, 12, 0);   //default 0: no SPI recording    
+            PCCmd.audio_cfg.spi_rec_num = (CPU_INT08U)temp;
+           
             err = Setup_Audio( &PCCmd.audio_cfg );
 
         break ;

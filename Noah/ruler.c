@@ -191,8 +191,8 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         pAudioCfg->type, pAudioCfg->channels,\
        (pAudioCfg->sr)&0xFF, ((pAudioCfg->sr)>>8)&0xFF, pAudioCfg->bit_length,\
         0, 0, pAudioCfg->gpio_rec_bit_mask,  \
-        pAudioCfg->format ,    pAudioCfg->cki, pAudioCfg->delay,pAudioCfg->start , \
-        pAudioCfg->master_or_slave
+        pAudioCfg->format, pAudioCfg->cki, pAudioCfg->delay,pAudioCfg->start , \
+        pAudioCfg->master_or_slave, pAudioCfg->spi_rec_num, pAudioCfg->spi_rec_start_index
         //11~14    pAudioCfg->format 1:  I2S  2:  TDM   3:   PCM   
         //pAudioCfg->master_or_slave  15  1:1388 master  0: 1388 slave          
     };
@@ -264,7 +264,9 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
     if ( pAudioCfg->type == 0 ) {
         buf[8] = Get_Mask_Num( pAudioCfg->gpio_rec_bit_mask ); //gpio num
         buf[9] = buf[4];  //gpio start index
-        buf[4] += buf[8]; //add gpio num to channel 
+        buf[4] += buf[8]; //add gpio num to channel
+        buf[17] = buf[4]; //spi start index
+        buf[4] += buf[16]; //add spi num to channel
         if(  buf[4] > 8 ) {
             APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO Rec channel num(=%d) > 8 NOT allowed for AB03\r\n", buf[4]));
             return AUD_CFG_MIC_NUM_MAX_ERR ;
@@ -325,7 +327,9 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
 //            APP_TRACE_INFO(("\r\nSetup_Audio Init AIC3204 ERROR: %d\r\n",err)); 
 //        }
 //    }
-    
+    if( buf[16] != 0) {
+        Global_SPI_Record = 1; //set flag for SPI rec
+    }
     return err ; 
 }
 
@@ -353,15 +357,26 @@ unsigned char Start_Audio( START_AUDIO start_audio )
 #if OS_CRITICAL_METHOD == 3u
     OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
 #endif 
+    if( Global_SPI_Record == 1 ) {        
+        Disable_SPI_Port();
+    }
     APP_TRACE_INFO(("\r\nStart_Audio : type = [%d], padding = [0x%X]\r\n", start_audio.type, start_audio.padding));
     UART2_Mixer(3); 
     USART_SendBuf( AUDIO_UART, buf,  sizeof(buf) );    
     err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM );  
-    if( err != NO_ERR ) { 
+    if( err != NO_ERR ) {
+        if( Global_SPI_Record == 1 ) {   
+            Global_SPI_Record = 0;
+            Enable_SPI_Port();
+        }
         APP_TRACE_INFO(("\r\nStart_Audio ERROR: Timeout : %d\r\n",err));
         return err;
     }
     if( data != NO_ERR ) {
+        if( Global_SPI_Record == 1 ) {  
+            Global_SPI_Record = 0;
+            Enable_SPI_Port();
+        }
         APP_TRACE_INFO(("\r\nStart_Audio ERROR: Data : %d\r\n ",data)); 
         return data; 
     } else {

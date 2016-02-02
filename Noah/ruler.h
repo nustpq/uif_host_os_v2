@@ -177,7 +177,10 @@ typedef struct {
     unsigned char    delay;
     unsigned char    start;
     unsigned char    master_or_slave;
+    unsigned char    spi_rec_num;
+    unsigned char    spi_rec_start_index;
 }AUDIO_CFG ;
+
 
 
 //typedef struct {
