@@ -36,6 +36,15 @@
 #define   TDM16_MODE   3
 
  
+typedef struct {
+    unsigned short sr; // 8000 ~ 48000   
+    unsigned char  sample_len ; //16 or 32 only 
+    unsigned char  format; // 0 : i2s, 1 : pcm
+    unsigned char  slot_num ; //2, 4, 8
+    unsigned char  m_s_sel; //0 : master, 1 : slave;
+    unsigned char  flag;  // flag if received audio_cfg command
+    unsigned char  reserved;
+}CODEC_SETS ;
 
 /****************************************/
 unsigned char Set_Codec(unsigned char codec_control_type, unsigned char size_para, unsigned char *pdata);
@@ -44,8 +53,8 @@ unsigned char Get_Codec(unsigned char codec_control_type, unsigned char reg, uns
 unsigned char Codec_Mixer(unsigned char i2c_channel );
 //unsigned char Init_CODEC( unsigned int sample_rate );
 
-unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length, unsigned char format ,unsigned char slot_num,unsigned char master_or_slave) ;
-
+//unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length, unsigned char format ,unsigned char slot_num,unsigned char master_or_slave) ;
+unsigned char Init_CODEC( CODEC_SETS codec_set ) ;
 
 unsigned char Set_AIC3204_DSP_Offset( unsigned char slot_index ) ;
 unsigned char Init_CODEC_AIC3204( unsigned int sample_rate ) ;

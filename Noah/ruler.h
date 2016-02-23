@@ -164,7 +164,7 @@ typedef struct {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-
+/*
 typedef struct {    
     unsigned short   sr ;    //16000, 48000 
     unsigned char    type ;  //rec = 0,  play = 1
@@ -172,13 +172,33 @@ typedef struct {
     unsigned char    lin_ch_mask;
     unsigned char    bit_length;//16, 24, 32
     unsigned char    gpio_rec_bit_mask;
-    unsigned char    format;
-    unsigned char    cki;
+    unsigned char    spi_rec_bit_mask;
+    unsigned char    format; //0 : PDM, 1: I2S, 2:TDM (not used), 3 : PCM
+    unsigned char    cki; 
     unsigned char    delay;
     unsigned char    start;
-    unsigned char    master_or_slave;
+    unsigned char    master_or_slave;    
 }AUDIO_CFG ;
-
+*/
+typedef struct { 
+  unsigned char  type;//Rec =0, Play =1
+  unsigned char  channel_num; //1~8  
+  unsigned short sample_rate; //16000, 48000 
+  unsigned char  bit_length; // 16, 24, 32
+  unsigned char  lin_ch_mask;
+  unsigned char  gpio_rec_num;
+  unsigned char  gpio_rec_start_index;
+  unsigned char  gpio_rec_bit_mask;
+  unsigned char  spi_rec_num;
+  unsigned char  spi_rec_start_index;
+  unsigned char  spi_rec_bit_mask;
+  unsigned char  sample_format;  //1:I2S  2:PDM  3:PCM/TDM  
+  unsigned char  sample_cki;
+  unsigned char  sample_delay;
+  unsigned char  sample_start;
+  unsigned char  master_slave; 
+  unsigned char  reserved[3];
+}AUDIO_CFG;
 
 //typedef struct {
 //  
@@ -342,6 +362,7 @@ extern volatile unsigned char Global_SPI_Record;
 extern SET_VEC_CFG  Global_VEC_Cfg;
 
 extern void          Init_Global_Var( void );
+extern unsigned char Update_Audio( void );
 extern unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg );
 extern unsigned char Start_Audio( START_AUDIO start_audio  );
 extern unsigned char Stop_Audio( void );  

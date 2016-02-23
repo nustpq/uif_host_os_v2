@@ -16,7 +16,7 @@
 *
 *                                        COMMUNICATION COMMANDS REALIZATION
 *
-*                                          Atmel AT91SAM7A3
+*                                          Atmel AT91SAM3U4C
 *                                               on the
 *                                      Unified EVM Interface Board
 *
@@ -773,10 +773,10 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             PCCmd.audio_cfg.type = (CPU_INT08U)temp;            
             temp = emb_get_attr_int(&root, 2, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
-            PCCmd.audio_cfg.sr = (CPU_INT16U)temp;            
+            PCCmd.audio_cfg.sample_rate = (CPU_INT16U)temp;            
             temp = emb_get_attr_int(&root, 3, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
-            PCCmd.audio_cfg.channels = (CPU_INT08U)temp; 
+            PCCmd.audio_cfg.channel_num = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 4, 0);            
             PCCmd.audio_cfg.lin_ch_mask = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 5, 0);            
@@ -785,15 +785,18 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             PCCmd.audio_cfg.gpio_rec_bit_mask = (CPU_INT08U)temp; 
             
             temp = emb_get_attr_int(&root, 7, 1); //default 1, choose TDM    
-            PCCmd.audio_cfg.format = (CPU_INT08U)temp;
+            PCCmd.audio_cfg.sample_format = (CPU_INT08U)temp;
             temp = emb_get_attr_int(&root, 8, (PCCmd.audio_cfg.type == 0)? 1:0 ); // default 0: falling egde send for sending, 1: rising edge lock for receiving   
-            PCCmd.audio_cfg.cki = (CPU_INT08U)temp;
+            PCCmd.audio_cfg.sample_cki = (CPU_INT08U)temp;
             temp = emb_get_attr_int(&root, 9, 1);   //default 1 cycle delay          
-            PCCmd.audio_cfg.delay = (CPU_INT08U)temp;
+            PCCmd.audio_cfg.sample_delay = (CPU_INT08U)temp;
             temp = emb_get_attr_int(&root, 10, 4);  //default 4: falling edge trigger for low left          
-            PCCmd.audio_cfg.start = (CPU_INT08U)temp;
-            temp = emb_get_attr_int(&root, 11, 0);   //default 0: as master      
-            PCCmd.audio_cfg.master_or_slave = (CPU_INT08U)temp;
+            PCCmd.audio_cfg.sample_start = (CPU_INT08U)temp;
+            temp = emb_get_attr_int(&root, 11, 0);  //default 0: as master      
+            PCCmd.audio_cfg.master_slave = (CPU_INT08U)temp;
+            
+            temp = emb_get_attr_int(&root, 12, 0);          
+            PCCmd.audio_cfg.spi_rec_bit_mask = (CPU_INT08U)temp;
             err = Setup_Audio( &PCCmd.audio_cfg );
 
         break ;
@@ -825,7 +828,13 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             err = Reset_Audio(); 
          
         break ; 
-                
+        
+        case PC_CMD_UPDATE_AUDIO :
+                   
+            err = Update_Audio(); 
+         
+        break ; 
+        
         ////////////////////////////////////////////////////////////////////////        
         
         case PC_CMD_SET_IF_CFG :
@@ -1276,7 +1285,6 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
              Send_GACK(err);               
         break ;         
 *************************************************************************/  
-        
         
         default :            
             err = CMD_NOT_SURRPORT ;   

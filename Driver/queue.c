@@ -16,7 +16,7 @@
 *
 *                                         UART data buffering queue related
 *
-*                                          Atmel AT91SAM7A3
+*                                          Atmel AT91SAM3U4C
 *                                                on the
 *                                     Unified EVM Interface Board
 *

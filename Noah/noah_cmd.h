@@ -77,8 +77,8 @@
 #define AUD_CFG_PLAY_CH_ERR            200u
 #define AUD_CFG_MIC_NUM_DISMATCH_ERR   201u
 #define AUD_CFG_PLAY_CH_ZERO_ERR       202u
-
-#define UIF_TYPE_NOT_SUPPORT           203u
+#define AUD_CFG_ERR                    203u
+#define UIF_TYPE_NOT_SUPPORT           204u
 
 #define FW_BIN_STATE_ERR         211u
 #define FW_BIN_STATE_0_ERR       212u
@@ -98,15 +98,16 @@
 #define FM36_CHECK_FLAG_ERR      227u
 #define FM36_DMIC_PGA_GAIN_ERR   228u
 
-#define CODEC_WR_REG_ERR         230u
-#define CODEC_SETVOL_RANGE_ERR   231u
-#define CODEC_SETFCLK_RANGE_ERR  232u
-#define CODEC_SETMODE_RANGE_ERR  233u
-#define CODEC_SR_NOT_SUPPORT_ERR 234u
-#define CODEC_SR_LEN_NOT_SUPPORT_ERR 235u
-#define CODEC_FUNC_NOT_SUPPORT   236u
-
-
+#define CODEC_WR_REG_ERR              230u
+#define CODEC_SETVOL_RANGE_ERR        231u
+#define CODEC_SETFCLK_RANGE_ERR       232u
+#define CODEC_SETMODE_RANGE_ERR       233u
+#define CODEC_SR_NOT_SUPPORT_ERR      234u
+#define CODEC_SR_LEN_NOT_SUPPORT_ERR  235u
+#define CODEC_FUNC_NOT_SUPPORT        236u
+#define CODEC_BIT_LEN_NOT_SUPPORT_ERR 237u
+#define CODEC_FORMAT_NOT_SUPPORT_ERR  238u
+#define CODEC_CH_NUM_NOT_SUPPORT_ERR  239u
 
 
 //ERROR CODE from 245~ 255 reserved for Audio MCU
@@ -221,6 +222,7 @@
 #define  PC_CMD_RESET_MIC            13
 #define  PC_CMD_SET_VOLUME           14
 #define  PC_CMD_RESET_AUDIO          15
+#define  PC_CMD_UPDATE_AUDIO         16
 
 #define  PC_CMD_SET_IF_CFG           30
 #define  PC_CMD_RAW_WRITE            31

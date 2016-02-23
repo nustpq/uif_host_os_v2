@@ -1,6 +1,6 @@
 /*
 *********************************************************************************************************
-*                               UIF BOARD APP PACKAGE
+*                                        UIF BOARD APP PACKAGE
 *
 *                            (c) Copyright 2013 - 2016; Fortemedia Inc.; Nanjing, China
 *
@@ -16,7 +16,7 @@
 *
 *                                        FM36 DSP Based Signal Path Setup
 *
-*                                          Atmel AT91SAM7A3
+*                                          Atmel AT91SAM3U4C
 *                                               on the
 *                                      Unified EVM Interface Board
 *
@@ -32,7 +32,7 @@
 #include <includes.h>
 
 
-//Note: This routine do NOT support reentrance
+//Note: This routine do  reentrance
 
 static bool flag_power_lose  = true;
 static bool flag_state_pwd   = false;
