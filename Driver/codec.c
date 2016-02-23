@@ -680,8 +680,8 @@ unsigned char config_aic3204[][2] = {
 			  //-set DAC channels
 		      63,0xE8, //DAC Channel Setup :  0xD4: L2L, R2R; 0xE8: L2R, R2L
 		      64,0X00, // 	 
-		      65,( 0X100+2*( -8 ) )%0x100, //DAC Volume L set -8dB  : [-63.5,+24] @ 0.5dB
-		      66,( 0X100+2*( -8 ) )%0x100, //DAC Volume R set -8dB  : [-63.5,+24] @ 0.5dB
+		      65,( 0X100+2*( 0 ) )%0x100, //DAC Volume L set 0dB  : [-63.5,+24] @ 0.5dB
+		      66,( 0X100+2*( 0 ) )%0x100, //DAC Volume R set 0dB  : [-63.5,+24] @ 0.5dB
 		      
 		      //-set dmic data pin setting
 		      55,0X0e,   // Set MISO as PDM CLK ouput pin
@@ -722,8 +722,8 @@ unsigned char config_aic3204[][2] = {
 		      //-set DAC output gains
 		      16,( 0X40+( 12 ) )% 0x50 ,  //HPL +12db gain :  [-6,+29] @ 1dB
 		      17,( 0X40+( 12 ) )% 0x50 ,  //HPR +12db gain :  [-6,+29] @ 1dB
-		      18,( 0X40+( -6 ) )% 0x50 ,  //LOL -6db gain   :  [-6,+29] @ 1dB
-		      19,( 0X40+( -6 ) )% 0x50 ,  //LOR -6db gain   :  [-6,+29] @ 1dB
+		      18,( 0X00+( 0 ) )% 0x50 ,  //LOL -6db gain   :  [0,+29] @ 1dB
+		      19,( 0X00+( 0 ) )% 0x50 ,  //LOR -6db gain   :  [0,+29] @ 1dB
 		      		       
 		      //-set MIC PGA Gain
 		      59,0X00,  //L_MICPGA 0db gain
