@@ -38,7 +38,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:H:V2.571]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:H:V2.572]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB01
 const CPU_CHAR hw_version[]  = "[HW:V1.0]"; 
@@ -955,8 +955,8 @@ void  BSP_Init (void)
     Timer_Init();  
           
     //Init ADCs
-  //  Init_ADC_Voltage() ; 
- //   Init_ADC_Current() ;   
+    //Init_ADC_Voltage() ; 
+    //Init_ADC_Current() ;   
     
                             /* Initialize uC/OS-II's Tick Rate and DEBUG UART                          */
 
@@ -1153,7 +1153,7 @@ void  BSP_Ser_Init (CPU_INT32U baud_rate)
     if( Debug_COM_Sel == 0 ) {
       
     AT91C_BASE_PIOA->PIO_PDR   |= BSP_GPIOA_DBG;                 /* Set GPIOA pins 9 and 10 as DBGU UART pins                */
-    AT91C_BASE_PIOA->PIO_ABSR  &= ~BSP_GPIOA_DBG;   //PQ              /* Select GPIOA attached peripheral (DBGU)                  */
+    AT91C_BASE_PIOA->PIO_ABSR  &= ~BSP_GPIOA_DBG;   //PQ         /* Select GPIOA attached peripheral (DBGU)                  */
     
     AT91C_BASE_PMC->PMC_PCER   = (1 << AT91C_ID_DBGU);
      
@@ -1221,7 +1221,7 @@ void  BSP_Ser_Init (CPU_INT32U baud_rate)
 
 void BSP_Ser_WrByte(CPU_CHAR tx_byte)
 {
-  
+    
     unsigned char   err;  
     
     OSSemPend( Bsp_Ser_Tx_Sem_lock, 0, &err );  

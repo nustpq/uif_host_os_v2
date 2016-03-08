@@ -110,12 +110,14 @@ typedef struct {
     unsigned int   index;
     unsigned char *pdata;
     unsigned char  done;
+    unsigned char  reserved[3];
 }VOICE_BUF ;
 
 typedef struct {
   unsigned int   spi_speed;
   unsigned char  spi_mode;  
-  unsigned char  gpio_irq; 
+  unsigned char  gpio_irq;
+  unsigned char  reserved[2];
 }VOICE_BUF_CFG;
 
 //extern unsigned char iM401_Bypass( void );

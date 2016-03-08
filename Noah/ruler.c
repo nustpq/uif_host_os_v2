@@ -276,16 +276,22 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
             APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO+SPI Rec channel num(=%d) > 8 NOT allowed for AB03\r\n", pAudioCfg->channel_num));
             return AUD_CFG_MIC_NUM_MAX_ERR ;
         }
+        
+        if( pAudioCfg->spi_rec_num == 0 ) {
+            Global_SPI_Record = 0; //clear flag as No SPI rec
+        } else {
+            Global_SPI_Record = 1; //set flag for SPI rec
+        }
     }
 #endif
     flag_bypass_fm36 = 1;  //bypass FM36
     if( pAudioCfg->sample_format == 1 && pAudioCfg->channel_num == 2 ){ //I2S
         format = 0 ;//I2S
     } else if( pAudioCfg->sample_format == 2 ){ //PDM       
-        format = 0; //I2S-TDM
+        format = 1; //I2S-TDM
         flag_bypass_fm36 = 0; //not bypass FM36 for PDM mode
     } else if( pAudioCfg->sample_format == 3 ) { //PCM/TDM
-        format = 1; //PCM/TDM
+        format = 2; //PCM/TDM
     } else {
         return CODEC_FORMAT_NOT_SUPPORT_ERR;
     }
@@ -304,8 +310,8 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         return data; 
     }
        
-    codec_set[pAudioCfg->type].flag = 1;  //cfg received
-    codec_set[pAudioCfg->type].sr   = pAudioCfg->sample_rate;
+    codec_set[pAudioCfg->type].flag       = 1;  //cfg received
+    codec_set[pAudioCfg->type].sr         = pAudioCfg->sample_rate;
     codec_set[pAudioCfg->type].sample_len = pAudioCfg->bit_length;
     codec_set[pAudioCfg->type].format     = format;
     codec_set[pAudioCfg->type].slot_num   = pAudioCfg->channel_num;
@@ -424,7 +430,12 @@ unsigned char Start_Audio( START_AUDIO start_audio )
     OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
 #endif 
     APP_TRACE_INFO(("\r\nStart_Audio : type = [%d], padding = [0x%X]\r\n", start_audio.type, start_audio.padding));
-        
+    
+    //check if it is in SPI recording mode
+    if( Global_SPI_Record == 1 ) {
+        Disable_SPI_Port(); //disabled host mcu SPI 
+    } 
+    
     UART2_Mixer(3); 
     USART_SendBuf( AUDIO_UART, buf,  sizeof(buf) );    
     err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM );  
@@ -578,28 +589,30 @@ unsigned char Get_Audio_Version( void )
 }
 
 
-
+    
 unsigned char Rec_Voice_Buffer_Start( VOICE_BUF_CFG *pv_b_cfg )
 {   
     unsigned char err   = 0xFF;  
     unsigned char data  = 0xFF;
-   
-    unsigned char buf[] = {   CMD_DATA_SYNC1, CMD_DATA_SYNC2,\
-                              RULER_CMD_START_RD_VOICE_BUF,\
+    
+    unsigned char buf[] = {   CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_START_RD_VOICE_BUF };
+    
+    /*
                               (pv_b_cfg->spi_speed) & 0xFF, ((pv_b_cfg->spi_speed)>>8) & 0xFF,\
                               ((pv_b_cfg->spi_speed)>>16) & 0xFF, ((pv_b_cfg->spi_speed)>>24) & 0xFF,\
                               pv_b_cfg->spi_mode, pv_b_cfg->gpio_irq }; 
-    
+    */    
     APP_TRACE_INFO(("\r\nRec_Voice_Buffer_Start : gpio_irq = [%d], spi mode = %d, spi speed = %d MHz\r\n", pv_b_cfg->gpio_irq, pv_b_cfg->spi_mode, pv_b_cfg->spi_speed / 1000000 ));
     
     if( pv_b_cfg->gpio_irq < 2 ) {
         APP_TRACE_INFO(("\r\nIRQ gpio support: UIF_GPIO_2 ~ UIF_GPIO_9 only!\r\n ",data)); 
         return UIF_TYPE_NOT_SUPPORT;
     } 
-    buf[8] = pv_b_cfg->gpio_irq - 2 ;//Cause UIF_GPIO connecting to Host is differnt from Audio
+    pv_b_cfg->gpio_irq -= 2 ;//'cause UIF_GPIO connecting to Host is differnt from Audio
     
     UART2_Mixer(3); 
-    USART_SendBuf( AUDIO_UART, buf,  sizeof(buf) );    
+    USART_SendBuf( AUDIO_UART, buf,  sizeof(buf) ); 
+    USART_SendBuf( AUDIO_UART, (unsigned char *)pv_b_cfg, sizeof(VOICE_BUF_CFG)) ; 
     err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM );  
     if( err != NO_ERR ) { 
         //APP_TRACE_INFO(("\r\nRec_Voice_Buffer_Start ERROR: Timeout : %d\r\n",err));
@@ -1806,7 +1819,7 @@ unsigned char Set_Volume(  SET_VOLUME *pdata )
         I2C_Mixer(I2C_MIX_UIF_S); 
         return err;    
     }
-    err = CODEC_Set_Volume( pdata->spk, pdata->lout );
+    err = CODEC_Set_Volume( pdata->spk, pdata->lout, pdata->lin );
     if( OS_ERR_NONE != err ) {    
         APP_TRACE_INFO(( "FAIL [0x%X]\r\n", err )); 
         I2C_Mixer(I2C_MIX_UIF_S); 

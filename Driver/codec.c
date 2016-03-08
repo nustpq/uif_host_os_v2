@@ -449,44 +449,87 @@ unsigned char CODEC_LOUT_Small_Gain_En( bool small_gain )
 }
 
 
-unsigned char CODEC_Set_Volume( unsigned int vol_spk, unsigned int vol_lin )
+unsigned char encode(signed char value)
 {
-    /*
+  signed char temp;
+  if(value >=0){
+      return value;
+  }
+  else{
+      temp= ~(abs(value)-1);
+      return temp;
+  }
+}
+
+unsigned char CODEC_Set_Volume( float vol_spk, float vol_lout, float vol_lin )
+{
     unsigned char err;
-    unsigned char temp;
-    
-    temp = 0xF0;
-    err = Codec_DAC_Attenuation(DAC1L_Volume, vol_spk );    
-    if( OS_ERR_NONE != err ){
-        return err;
-    }
-    err = Codec_DAC_Attenuation(DAC1R_Volume, vol_spk );
-    if( OS_ERR_NONE != err ){
-        return err;
-    }
-    
-    err = Codec_DAC_Attenuation(DAC2L_Volume, vol_lin );
-    if( OS_ERR_NONE != err ){
-        return err;
-    }   
-    err = Codec_DAC_Attenuation(DAC2R_Volume, vol_lin );
-    if( OS_ERR_NONE != err ){
-        return err;
-    }
      
-    if( vol_spk == SET_VOLUME_MUTE ) {
-        temp += (3<<0);
+    vol_spk= vol_spk/10;
+    vol_lout=vol_lout/10;
+    vol_lin=vol_lin/10;
+    
+    float temp=0;
+    unsigned char flag=0;
+    unsigned char Mic_PGA=0,ADC_GAIN=0;
+    for(unsigned char i=0;i<95+1;i++){
+      for(signed char j=-24;j<40+1;j++){
+          temp=i*0.5+j*0.5;
+          if(temp==vol_lin){
+              Mic_PGA=encode(i);
+              ADC_GAIN=encode(j);//now not support negative
+              flag=1;
+          }
+       if(flag==1)break;   
+      }
+    if(flag==1)break; 
     }
-    if( vol_lin == SET_VOLUME_MUTE ) {
-        temp += (3<<2);
+    flag=0;
+    err = I2CWrite_Codec_AIC3204(0,1); //switch to Page1
+    if( OS_ERR_NONE != err ) {
+        err = CODEC_WR_REG_ERR;
+        return err ;
+    } 
+    I2CWrite_Codec_AIC3204(59,Mic_PGA); 
+    I2CWrite_Codec_AIC3204(60,Mic_PGA); 
+    I2CWrite_Codec_AIC3204(0,0); //switch to Page0
+    I2CWrite_Codec_AIC3204(83,ADC_GAIN); 
+    I2CWrite_Codec_AIC3204(84,ADC_GAIN); 
+   
+    signed char DAC_GAIN=0 ,HPL_GAIN=0 ,LOL_GAIN=0;
+    unsigned char flag1=0,flag2=0;
+    for(signed char k=-127;k<48+1;k++){
+      for(signed char m=-6;m<29+1;m++){
+          temp=k*0.5+m;
+          if(temp==vol_lout && flag1==0){
+              DAC_GAIN=encode(k);
+              HPL_GAIN=encode(m);
+              flag1=1;
+          }
+          if(temp==vol_spk && flag2==0 ){
+              DAC_GAIN=encode(k);
+              LOL_GAIN=encode(m);
+              flag2=1;
+          }
+          if(flag1==1 && flag2==1)break;    
+      }
+      if(flag1==1 && flag2==1)break;    
     }
-    err = I2CWrite_Codec(DAC_Mute,temp);
+    flag1=0;
+    flag2=0;
+    I2CWrite_Codec_AIC3204(0,0); //switch to Page0
+    I2CWrite_Codec_AIC3204(65,DAC_GAIN); 
+    I2CWrite_Codec_AIC3204(66,DAC_GAIN); 
+    I2CWrite_Codec_AIC3204(0,1); //switch to Page1
+    I2CWrite_Codec_AIC3204(16,HPL_GAIN); 
+    I2CWrite_Codec_AIC3204(17,HPL_GAIN);
+    I2CWrite_Codec_AIC3204(18,LOL_GAIN); 
+    I2CWrite_Codec_AIC3204(19,LOL_GAIN);
     
     return err;
-    */
-    return 0;
     
 }
+
 
 unsigned char Set_AIC3204_DSP_Offset( unsigned char slot_index ) 
 {
@@ -962,6 +1005,8 @@ unsigned char Set_Codec_PLL( unsigned int sr, unsigned char sample_length, unsig
         0x0C,0x80|MDAC,
         0x0D,DOSR_H,
         0x0E,DOSR_L,
+        0x12,0x80|NDAC,
+        0x13,0x80|MDAC,
         0x1E,0x80|BCLK_N_divider
     };
     
@@ -1021,9 +1066,9 @@ unsigned char Init_CODEC( CODEC_SETS codec_set )
         return CODEC_BIT_LEN_NOT_SUPPORT_ERR;
     }
     
-    if( codec_set.format == 0) { //I2S
+    if( codec_set.format == 0 || codec_set.format == 1) { //I2S || TDM-I2S
         if_set += 0x00;
-    } else if( codec_set.format == 1){   //PCM DSP
+    } else if( codec_set.format == 2){   //PCM DSP
         if_set += 0x40;
     } else {
         return CODEC_FORMAT_NOT_SUPPORT_ERR;

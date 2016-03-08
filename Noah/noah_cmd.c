@@ -956,13 +956,16 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
           
             temp = emb_get_attr_int(&root, 1, -1);
             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
-            PCCmd.set_volume.mic = (CPU_INT32U)temp;
+            PCCmd.set_volume.mic = (CPU_INT32S)temp;
             temp = emb_get_attr_int(&root, 2, -1);
             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
-            PCCmd.set_volume.lout = (CPU_INT32U)temp;
+            PCCmd.set_volume.lout = (CPU_INT32S)temp;
             temp = emb_get_attr_int(&root, 3, -1);
             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
-            PCCmd.set_volume.spk = (CPU_INT32U)temp;      
+            PCCmd.set_volume.spk = (CPU_INT32S)temp;     
+            temp = emb_get_attr_int(&root, 4, -1);
+            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
+            PCCmd.set_volume.lin = (CPU_INT32S)temp;  
             err = Set_Volume( &PCCmd.set_volume ) ;
               
         break ;      
