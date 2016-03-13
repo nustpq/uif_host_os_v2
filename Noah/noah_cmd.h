@@ -224,6 +224,8 @@
 #define  PC_CMD_RESET_AUDIO          15
 #define  PC_CMD_UPDATE_AUDIO         16
 
+#define  PC_CMD_AB_POST              20
+
 #define  PC_CMD_SET_IF_CFG           30
 #define  PC_CMD_RAW_WRITE            31
 #define  PC_CMD_RAW_READ             32

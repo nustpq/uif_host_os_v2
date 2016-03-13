@@ -731,11 +731,13 @@ static unsigned char Config_SP0IN_to_SP1Out( void )
 *                                       Init_FM36_AB03()
 *
 * Description : Initialize FM36 DSP on AB03 board.
-* Argument(s) : sr        : sample rate : 8000 ~ 48000 
-*               bit_length: 16bit/32bit mode
+* Argument(s) : sr        : sample rate : 8000 ~ 48000               
 *               mic_num   : 0~6
 *               lin_sp_index  : line in data source: 0 ~ 1
 *               start_slot_index: line in data slot: 0 ~ 7
+*               bit_length: 16bit/32bit mode
+*               i2s_tdm_sel: 0 - I2S, 1 - TDM-I2S
+*               force_reset: 1 - force reset FM36 
 * Return(s)   : NO_ERR :   execute successfully
 *               others :   =error code .  
 *

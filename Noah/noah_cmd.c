@@ -784,7 +784,7 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             temp = emb_get_attr_int(&root, 6, 0);          
             PCCmd.audio_cfg.gpio_rec_bit_mask = (CPU_INT08U)temp; 
             
-            temp = emb_get_attr_int(&root, 7, 1); //default 1, choose TDM    
+            temp = emb_get_attr_int(&root, 7, 1); //default 1, choose I2S  
             PCCmd.audio_cfg.sample_format = (CPU_INT08U)temp;
             temp = emb_get_attr_int(&root, 8, (PCCmd.audio_cfg.type == 0)? 1:0 ); // default 0: falling egde send for sending, 1: rising edge lock for receiving   
             PCCmd.audio_cfg.sample_cki = (CPU_INT08U)temp;
@@ -823,11 +823,17 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
            
         break ;    
         
-        case PC_CMD_RESET_AUDIO :
-                   
-            err = Reset_Audio(); 
-         
-        break ; 
+//        case PC_CMD_RESET_AUDIO :
+//                   
+//            err = Reset_Audio(); 
+//         
+//        break ; 
+        
+        case PC_CMD_AB_POST : //do UIF POST, to reset on board devices
+        
+            err = AB_POST();
+            
+        break;
         
         case PC_CMD_UPDATE_AUDIO :
                    

@@ -284,18 +284,7 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         }
     }
 #endif
-    flag_bypass_fm36 = 1;  //bypass FM36
-    if( pAudioCfg->sample_format == 1 && pAudioCfg->channel_num == 2 ){ //I2S
-        format = 0 ;//I2S
-    } else if( pAudioCfg->sample_format == 2 ){ //PDM       
-        format = 1; //I2S-TDM
-        flag_bypass_fm36 = 0; //not bypass FM36 for PDM mode
-    } else if( pAudioCfg->sample_format == 3 ) { //PCM/TDM
-        format = 2; //PCM/TDM
-    } else {
-        return CODEC_FORMAT_NOT_SUPPORT_ERR;
-    }
-               
+                  
     //Dump_Data(buf, sizeof(buf)); 
     UART2_Mixer(3); 
     USART_SendBuf( AUDIO_UART, buf, sizeof(buf)) ; 
@@ -309,7 +298,20 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         APP_TRACE_INFO(("\r\nSetup_Audio ERROR: %d\r\n ",data)); 
         return data; 
     }
-       
+    
+    flag_bypass_fm36 = 1;  //bypass FM36
+    if( pAudioCfg->sample_format == 1 && pAudioCfg->channel_num == 2 ){ //I2S
+        format = 0 ;//I2S
+    } else if( pAudioCfg->sample_format == 2 ){ //PDM       
+        format = 1; //I2S-TDM
+        pAudioCfg->channel_num = 8; //make sure 8 slots enabled when used FM36 to record PDM
+        flag_bypass_fm36 = 0; //not bypass FM36 for PDM mode
+    } else if( pAudioCfg->sample_format == 3 ) { //PCM/TDM
+        format = 2; //PCM/TDM
+    } else {
+        return CODEC_FORMAT_NOT_SUPPORT_ERR;
+    }
+    
     codec_set[pAudioCfg->type].flag       = 1;  //cfg received
     codec_set[pAudioCfg->type].sr         = pAudioCfg->sample_rate;
     codec_set[pAudioCfg->type].sample_len = pAudioCfg->bit_length;
@@ -1952,16 +1954,17 @@ void Ruler_Port_LED_Service( void )
 * Description : Audio bridge Power-On-Self-Test use. 
 *
 * Argument(s) : None.
-* Return(s)   : None.
+* Return(s)   : error number.
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void AB_POST( void )
+unsigned char AB_POST( void )
 {
     unsigned char  err;  
     APP_TRACE_INFO(("\r\nStart Audio Bridge POST :\r\n"));    
     //Enable_FPGA();
-
+    
+    ///////////////////////////
     APP_TRACE_INFO(("\r\n1. CODEC... \r\n"));
     I2C_Mixer(I2C_MIX_FM36_CODEC);
     codec_set[0].sr = SAMPLE_RATE_DEF;
@@ -1976,18 +1979,18 @@ void AB_POST( void )
     if( err != NO_ERR ) {
         Global_Bridge_POST = POST_ERR_CODEC;
         APP_TRACE_INFO(("\r\n---Error : %d\r\n",err));
-        //return ;
+        return Global_Bridge_POST;
     } else {
         APP_TRACE_INFO(("\r\n---OK\r\n"));
     }
-    
+    ////////////////////////////
     APP_TRACE_INFO(("\r\n2. FM36 DSP... \r\n"));
 #ifdef BOARD_TYPE_AB03   
     err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, 0, 1, 0 ); //Lin from SP1.Slot0
 #elif defined BOARD_TYPE_UIF
     I2C_Mixer(I2C_MIX_FM36_CODEC);
-    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH, 1, 0  ); 
-    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH, 1, 0  ); //Lin from SP1.Slot0
+    //err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH, 1, 1  ); 
+    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH, 1, 1  ); //force reset FM36, Lin from SP1.Slot0
     I2C_Mixer(I2C_MIX_UIF_S);
 #else 
     err = Init_FM36( SAMPLE_RATE_DEF );
@@ -1995,17 +1998,23 @@ void AB_POST( void )
     if( err != NO_ERR ) {
         Global_Bridge_POST = POST_ERR_FM36;
         APP_TRACE_INFO(("\r\n---Error : %d\r\n",err));
-        //return ;
+        return Global_Bridge_POST;
     } else {
         APP_TRACE_INFO(("\r\n---OK\r\n"));
     }  
-    
+    //////////////////////////////
     APP_TRACE_INFO(("\r\n3. AUDIO MCU... \r\n"));
+    err = Stop_Audio();
+    if( err != NO_ERR ) {
+        Global_Bridge_POST = POST_ERR_AUDIO;
+        APP_TRACE_INFO(("\r\n---Error : %d\r\n",err));
+        return Global_Bridge_POST;
+    }
     err = Get_Audio_Version();
     if( err != NO_ERR ) {
         Global_Bridge_POST = POST_ERR_AUDIO;
         APP_TRACE_INFO(("\r\n---Error : %d\r\n",err));
-        //return ;
+        return Global_Bridge_POST;
     } else {
         APP_TRACE_INFO(("\r\n---OK\r\n"));
     }    

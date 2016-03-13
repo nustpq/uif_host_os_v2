@@ -463,15 +463,34 @@ unsigned char encode(signed char value)
 
 unsigned char CODEC_Set_Volume( float vol_spk, float vol_lout, float vol_lin )
 {
-    unsigned char err;
-     
-    vol_spk= vol_spk/10;
-    vol_lout=vol_lout/10;
-    vol_lin=vol_lin/10;
-    
-    float temp=0;
+    unsigned char err;            
+    float temp = 0;
     unsigned char flag=0;
     unsigned char Mic_PGA=0,ADC_GAIN=0;
+    
+    vol_spk= (vol_spk - (int)vol_spk%5)/10;
+    vol_lout=(vol_lout - (int)vol_lout%5)/10;
+    vol_lin=(vol_lin - (int)vol_lin%5)/10;
+       
+    if (vol_lin < -12){
+        vol_lin=-12;
+    }
+    if(vol_lin > 67.5){
+        vol_lin=67.5;
+    }
+    if (vol_spk < -69.5){
+        vol_spk=-69.5;  
+    }
+    if(vol_spk > 53){
+         vol_spk=53;
+    }
+     if (vol_lout < -69.5){
+        vol_lout=-69.5;  
+    }
+    if(vol_lout > 53){
+         vol_lout=53;
+    }
+        
     for(unsigned char i=0;i<95+1;i++){
       for(signed char j=-24;j<40+1;j++){
           temp=i*0.5+j*0.5;
@@ -563,9 +582,6 @@ unsigned char Check_SR_Support( unsigned int sample_rate )
    return CODEC_SR_NOT_SUPPORT_ERR;  //SR not support
     
 }
-
-
-
 
 
 /*
@@ -838,8 +854,17 @@ unsigned char Generate_BCLK( unsigned int codec_clkin ,unsigned int BCLK, unsign
 
 unsigned char Set_Codec_PLL( unsigned int sr, unsigned char sample_length, unsigned char slot_num )
 {
+    unsigned char err,i;
+    unsigned char flag=0;
+    unsigned char NDAC ,MDAC, NADC, MADC;
+    unsigned int  DOSR ;
+    unsigned char DOSR_H,DOSR_L;
+    unsigned char BCLK_N_divider;
+    unsigned int  BCLK;
+    
     unsigned int codec_clkin=73728;
     unsigned char codec_para[6][2];
+    
     unsigned char codec_para1[][2] = {
         0x04 ,0x03 , // PLL is codec_clkin
         0x05 ,0xC3 , // PLL power up , P=4, R=1
@@ -897,6 +922,7 @@ unsigned char Set_Codec_PLL( unsigned int sr, unsigned char sample_length, unsig
         0x08 ,0xE2 , // D=1250
         0x1D ,0x00 , //BCLK source=DAC_CLK
     };//make sure codec_clkin=169.334M  length=16,32bit slot_num=1,2,4,6,8
+    
     if((sample_length==16 || sample_length==32) && (slot_num==1 || slot_num==2 || slot_num==4 || slot_num==6 ||  slot_num==8)){
          for( unsigned char i = 0 ; i< sizeof(codec_para1)>>1 ; i++ ) { 
             codec_para[i][0]=codec_para1[i][0];  
@@ -954,15 +980,7 @@ unsigned char Set_Codec_PLL( unsigned int sr, unsigned char sample_length, unsig
             codec_para[i][1]=codec_para7[i][1];     
          }
          codec_clkin=169344;
-    }
-    
-    unsigned char err,i;
-    unsigned char NDAC ,MDAC ,NADC ,MADC;
-    unsigned int  DOSR , AOSR;
-    unsigned char DOSR_H,DOSR_L;
-    unsigned char BCLK_N_divider;
-    unsigned int  BCLK;
-    unsigned char flag=0;
+    } 
     
     BCLK= sr * sample_length * slot_num;
     for(NDAC=1;NDAC<129;NDAC++) {
@@ -990,23 +1008,23 @@ unsigned char Set_Codec_PLL( unsigned int sr, unsigned char sample_length, unsig
         DOSR_H=DOSR/256;
         DOSR_L=DOSR%256;
     }
-   
+    NADC  = NDAC ;
+    MADC  = MDAC ;
        
     for( i = 0 ; i< sizeof(codec_para)>>1 ; i++ ) {    
         err = I2CWrite_Codec_AIC3204(codec_para[i][0],codec_para[i][1]);
         if( OS_ERR_NONE != err ){
           return err;
         }
-    }
-    
-    
+    }   
+
     unsigned char reg_data[][2] = {
         0x0B,0x80|NDAC,
         0x0C,0x80|MDAC,
         0x0D,DOSR_H,
         0x0E,DOSR_L,
-        0x12,0x80|NDAC,
-        0x13,0x80|MDAC,
+        0x12,0x80|NADC,
+        0x13,0x80|MADC,
         0x1E,0x80|BCLK_N_divider
     };
     
@@ -1016,6 +1034,8 @@ unsigned char Set_Codec_PLL( unsigned int sr, unsigned char sample_length, unsig
           return err;
         }
     }
+    
+    return err;
   
 }
 
@@ -1073,7 +1093,9 @@ unsigned char Init_CODEC( CODEC_SETS codec_set )
     } else {
         return CODEC_FORMAT_NOT_SUPPORT_ERR;
     }
-    
+    if( codec_set.format == 1 ) {
+        codec_set.slot_num = 8;
+    }
 //    if( codec_set.sample_len == 16 ) {
 //        if( codec_set.slot_num == 2 ) {
 //            mode = 0;

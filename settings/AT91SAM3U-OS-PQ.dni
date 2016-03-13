@@ -33,7 +33,7 @@ Stop=1
 Freq=10000000
 MultiCoreRunAll=1
 [DebugChecksum]
-Checksum=804803833
+Checksum=821862027
 [JLinkDriver]
 CStepIntDis=_ 0
 [Exceptions]
@@ -75,7 +75,7 @@ Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\spi.c}.286.5" 0 0 1 "" 0 "" 0
 Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.385.9" 0 0 1 "" 0 "" 0
 Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.178.23" 0 0 1 "" 0 "" 0
 Bp8=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.541.13" 0 0 1 "" 0 "" 0
-Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.859.13" 0 0 1 "" 0 "" 0
+Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.865.13" 0 0 1 "" 0 "" 0
 Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\ruler.c}.281.13" 0 0 1 "" 0 "" 0
 Bp11=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\gpio.c}.97.5" 0 0 1 "" 0 "" 0
 Count=12

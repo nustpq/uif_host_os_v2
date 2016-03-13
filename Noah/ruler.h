@@ -382,9 +382,9 @@ extern unsigned char Read_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned ch
 extern unsigned char Write_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic_id);
 extern unsigned char Ruler_Active_Control( unsigned char active_state );
 extern unsigned char Reset_Mic_Mask(  unsigned int *pInt );
-extern unsigned char Set_Volume(  SET_VOLUME *pdata );
+extern unsigned char Set_Volume( SET_VOLUME *pdata );
 extern unsigned char Get_Ruler_Version( unsigned char ruler_id );
-extern void          AB_POST( void );
+extern unsigned char AB_POST( void );
 extern unsigned char Ruler_POST( unsigned char ruler_id );
 extern void          simple_test_use( void );
 
