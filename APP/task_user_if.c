@@ -70,6 +70,9 @@ void  App_TaskUserIF (void *p_arg)
     Init_Global_Var(); 
     //iM401_Ctrl_Enable = 1;
     AB_POST();
+    
+    
+    FM1388_DOA_Test();
 
 
 #ifndef BOARD_TYPE_AB01  

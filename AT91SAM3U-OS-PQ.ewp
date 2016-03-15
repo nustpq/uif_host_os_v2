@@ -2179,6 +2179,12 @@
       <name>$PROJ_DIR$\Noah\emb.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\Noah\fm1388.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Noah\fm1388.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\Noah\im501_comm.c</name>
     </file>
     <file>

@@ -35,7 +35,7 @@
 INTERFACE_CFG   Global_UIF_Setting[ UIF_TYPE_CMD_NUM ];     //ruler type = 3
 unsigned char   Reg_RW_Data[ EMB_BUF_SIZE ];
 
-
+/*
 //disabled endian reverse, as PC scripts will do it!
 void Reverse_Endian( unsigned char *pdata, unsigned char size ) 
 {
@@ -52,7 +52,7 @@ void Reverse_Endian( unsigned char *pdata, unsigned char size )
     }     
     
 }
-
+*/
 /*
 *********************************************************************************************************
 *                                           Dump_Data()
