@@ -15,7 +15,7 @@
 
 //Global_UIF_Setting CMD:  num = 7
 //note: CMD nums must not exceed boundary
-#define   UIF_TYPE_CMD_NUM      8
+#define   UIF_TYPE_CMD_NUM      9
 
 #define   UIF_TYPE_I2C          1
 #define   UIF_TYPE_SPI          2
@@ -25,7 +25,9 @@
 #define   UIF_TYPE_I2C_Mixer    6
 #define   UIF_TYPE_FM36_PDMCLK  7
 #define   UIF_TYPE_GPIO_CLK     8
+#define   UIF_CHIP_TYPE_SELECT  9
 
+#define   CHIP_TYPE_IM501                      51
 
 #define   ATTRI_I2C_IM501_LOAD_CODE_IRAM       52
 #define   ATTRI_I2C_IM501_LOAD_CODE_DRAM       51

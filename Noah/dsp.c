@@ -755,6 +755,13 @@ unsigned char Init_FM36_AB03( unsigned short sr,
     unsigned short addr, val; 
     unsigned char  err ;     
     
+    //added for iM501 PCM clock pause issue
+    APP_TRACE_INFO(("\r\nInit_FM36_AB03:\r\n"));  
+    if( Global_UIF_Setting[ UIF_CHIP_TYPE_SELECT - 1 ].attribute == CHIP_TYPE_IM501 ) {
+        mic_num = 4 ;
+    }
+    APP_TRACE_INFO(("UIF_CHIP_TYPE_SELECT = %d\r\n", Global_UIF_Setting[ UIF_CHIP_TYPE_SELECT - 1 ].attribute)); 
+    
     if( sr               == sr_saved  &&  \
         mic_num          == mic_num_saved && \
         lin_sp_index     == lin_sp_index_saved && \

@@ -401,7 +401,7 @@ unsigned char I2C_Mixer( unsigned char index )
         pinsGpios[12+i].type = (index == i) ? PIO_OUTPUT_0 : PIO_OUTPUT_1 ; ////lowe level truned to high after NPN to control switch OE pin
     }
     PIO_Configure(&pinsGpios[13], 3);     
-    APP_TRACE_INFO(("\r\nI2C_Mixer switch to: %d ", index ));  
+    //APP_TRACE_INFO(("\r\nI2C_Mixer switch to: %d ", index ));  
     
     OSSemPost( GPIO_Sem_I2C_Mixer );
     
@@ -469,7 +469,7 @@ void Pin_Reset_Codec( void )
 
 void Pin_Reset_FM36( void )
 {
-    
+    APP_TRACE_INFO(("Reset FM36\r\n"));
     PIO_Clear(&pinsGpios[11]);
     OSTimeDly(20) ;
     PIO_Set(&pinsGpios[11]);

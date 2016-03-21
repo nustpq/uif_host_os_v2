@@ -202,7 +202,10 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         case UIF_TYPE_GPIO_CLK :       
             CS_GPIO_Init( pInterface_Cfg->attribute );
         break ;   
-
+    
+        case UIF_CHIP_TYPE_SELECT:
+  
+        break;
         default:
             err = UIF_TYPE_NOT_SUPPORT;
         break;
@@ -411,7 +414,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
         
         case UIF_TYPE_SPI:
               //FM1388              
-              if( Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].attribute == ATTRI_SPI_FM1388_LOAD_CODE ) {
+              if( Global_UIF_Setting[ UIF_CHIP_TYPE_SELECT - 1 ].attribute == ATTRI_SPI_FM1388_LOAD_CODE ) {
                   size = p_raw_write->data_len / FM1388_ALLOWED_DATA_PACK_SIZE ;                
                   for( i = 0 ; i < size ; i++ ) {
                       state =  SPI_WriteBuffer_API( p_raw_write->pdata, FM1388_ALLOWED_DATA_PACK_SIZE ); 

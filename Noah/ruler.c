@@ -432,6 +432,8 @@ unsigned char Stop_Audio( void )
         Global_SPI_Record = 0;
         Enable_SPI_Port();
     }
+    Disable_Interrupt_For_iM501_IRQ();
+    
    
 //    err = Init_CODEC( 0 );
 //    if( err != NO_ERR ) {

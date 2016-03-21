@@ -153,4 +153,8 @@ void Service_To_iM501_IRQ( void );
 
 void ISR_iM501_IRQ( void );
 
+void Enable_Interrupt_For_iM501_IRQ( void );
+
+void Disable_Interrupt_For_iM501_IRQ( void );
+
 #endif

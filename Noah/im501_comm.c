@@ -37,7 +37,7 @@ VOICE_BUF  voice_buf_data;
 static unsigned int im501_irq_counter;
 static unsigned int im501_irq_gpio;
 static unsigned int im501_key_words_detect;
-
+static unsigned int im501_service_int_enabled;
 
 /*
 *********************************************************************************************************
@@ -837,7 +837,8 @@ void Wait_Keywords_Detect( unsigned char gpio_irq )
     im501_irq_gpio = gpio_irq ; 
     
     //set gpio interruption
-    Config_GPIO_Interrupt( im501_irq_gpio, ISR_iM501_IRQ );    
+    Enable_Interrupt_For_iM501_IRQ();
+    
     //PP_TRACE_INFO(("\r\n::Record voice buffer time cost: %d ms\r\n",time_rec));    
     
 }
@@ -936,11 +937,13 @@ void Service_To_iM501_IRQ( void )
         err = im501_read_dram_spi( TO_HOST_CMD_ADDR, (unsigned char *)&cmd );
         if( err != NO_ERR ){ 
             return ;
-        }    
+        }
+    
         err = parse_to_host_command( cmd );
         if( err != NO_ERR ){ 
-            return ;
-        }    
+            APP_TRACE_INFO(("\r\nparse_to_host_command : undefined cmd = 0x%x",cmd.cmd_byte));
+        } 
+        
         cmd.status = 0;
         err = im501_write_dram_spi( TO_HOST_CMD_ADDR, (unsigned char *)&cmd );
         if( err != NO_ERR ){ 
@@ -948,9 +951,9 @@ void Service_To_iM501_IRQ( void )
         }
     
         if( im501_key_words_detect == 1 ) {
+       
+            Disable_Interrupt_For_iM501_IRQ();//disable IRQ interrupt
             
-            Disable_GPIO_Interrupt( im501_irq_gpio ); //disable IRQ interrupt
-                    
             I2C_Mixer(I2C_MIX_FM36_CODEC);           
             FM36_PDMADC_CLK_OnOff(1,0); //Should Enable PDM clock fast switch, but this will cause pop sound 
             I2C_Mixer(I2C_MIX_UIF_S); 
@@ -973,7 +976,7 @@ void Service_To_iM501_IRQ( void )
     
 }
 
-                          
+
 /*
 *********************************************************************************************************
 *                                           ISR_iM501_IRQ()
@@ -996,5 +999,24 @@ void ISR_iM501_IRQ( void )
     }
     //Service_To_iM501_IRQ();
     
+}
+
+
+void Enable_Interrupt_For_iM501_IRQ( void )
+{
+    
+    Config_GPIO_Interrupt( im501_irq_gpio, ISR_iM501_IRQ ) ;
+    im501_service_int_enabled = 1;
+   
+}
+  
+        
+void Disable_Interrupt_For_iM501_IRQ( void )
+{
+    if( im501_service_int_enabled ) { 
+        im501_service_int_enabled = 0;
+        Disable_GPIO_Interrupt( im501_irq_gpio ); //disable IRQ interrupt
+    }
+   
 }
 
