@@ -1462,7 +1462,7 @@ unsigned char Save_DSP_VEC( MCU_FLASH *p_dsp_vec )
     flash_info.f_w_state = FW_DOWNLAD_STATE_FINISHED ;
     flash_info.f_w_counter++;
     flash_info.s_w_counter++;
-    flash_info.bin_size   = p_dsp_vec->data_len ;
+    flash_info.bin_size  = p_dsp_vec->data_len ;
     strcpy(flash_info.bin_name, (char const*)(p_dsp_vec->pStr)); 
           
     err = Write_Flash_State( &flash_info,  FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * index ); 
@@ -1498,6 +1498,7 @@ unsigned char Save_DSP_VEC( MCU_FLASH *p_dsp_vec )
 unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
 {  
     unsigned char err; 
+    OS_SEM_DATA  sem_data;
     
     err = NO_ERR;
     
@@ -1514,10 +1515,17 @@ unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
     Global_VEC_Cfg.trigger_en  = p_dsp_vec_cfg->trigger_en; 
     Global_VEC_Cfg.pdm_clk_off = p_dsp_vec_cfg->pdm_clk_off; 
     Global_VEC_Cfg.if_type     = p_dsp_vec_cfg->if_type; 
-    
+        
     if( Global_VEC_Cfg.trigger_en ) {
         err = MCU_Load_Vec(1);
-    } else {    
+    } else {
+        //check if it's in MCU_Load_Vec() now
+        OSSemQuery(Load_Vec_Sem_lock, &sem_data);
+        if( sem_data.OSCnt == 0 ) {
+            OSTimeDlyResume(APP_CFG_TASK_USER_IF_PRIO);
+            OSSemPend( Load_Vec_Sem_lock, 0, &err );
+            OSSemPost( Load_Vec_Sem_lock );
+        }
         I2C_Mixer(I2C_MIX_FM36_CODEC);
         err = FM36_PDMADC_CLK_OnOff(1,0); //enable PDM clock
         I2C_Mixer(I2C_MIX_UIF_S); 

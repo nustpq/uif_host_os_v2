@@ -79,6 +79,8 @@ extern OS_EVENT *ACK_Sem_PCUART;
 extern OS_EVENT *ACK_Sem_RulerUART;
 extern OS_EVENT *Done_Sem_RulerUART;
 extern OS_EVENT *UART_MUX_Sem_lock;
+extern OS_EVENT *UART_MUX_Sem_lock;
+extern OS_EVENT *Load_Vec_Sem_lock;
 
 extern CPU_INT08U DBG_UART_Send_Buffer[];
 

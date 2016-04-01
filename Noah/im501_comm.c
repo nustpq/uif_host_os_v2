@@ -39,6 +39,8 @@ static unsigned int im501_irq_gpio;
 static unsigned int im501_key_words_detect;
 static unsigned int im501_service_int_enabled;
 
+OS_EVENT  *Load_Vec_Sem_lock ;
+
 /*
 *********************************************************************************************************
 *                                           im501_change_if_speed()
@@ -147,9 +149,9 @@ unsigned char im501_check_pll_ready( void )
     unsigned char err;
      
     if( Global_VEC_Cfg.if_type == 1 ) { //I2C interface         
-        err =  im501_read_dram_i2c(0x0FFFFF34, (unsigned char*)&data );         
+        err =  im501_read_dram_i2c( CHECK_PLL_READY_ADDR, (unsigned char*)&data );         
     } else if(Global_VEC_Cfg.if_type == 2 ) { //SPI         
-        err =  im501_read_dram_spi(0x0FFFFF34, (unsigned char*)&data );
+        err =  im501_read_dram_spi( CHECK_PLL_READY_ADDR, (unsigned char*)&data );
     } else {
         err = 1;
     }
@@ -189,7 +191,7 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
     unsigned char dev_addr, data_num;
     FLASH_INFO    flash_info;   
     
-    err = NO_ERR;
+    err = NO_ERR;    
     
     if( Global_VEC_Cfg.type == 41 ) {
         APP_TRACE_INFO(("\r\nLoad iM401 vec stored in MCU flash...\r\n"));
@@ -207,6 +209,8 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
         return FW_VEC_SET_CFG_ERR;
     }
     
+    OSSemPend( Load_Vec_Sem_lock, 0, &err );
+    
     if( firsttime == 0 ) {   //not first time pwd
         
         index = Global_VEC_Cfg.vec_index_a ; //Power up
@@ -219,6 +223,7 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
             Read_Flash_State(&flash_info, FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * index  );
             if( flash_info.f_w_state != FW_DOWNLAD_STATE_FINISHED ) {    
               APP_TRACE_INFO(("\r\nvec data state error...\r\n"));
+              OSSemPost( Load_Vec_Sem_lock );
               return FW_VEC_SAVE_STATE_ERR;
             }   
             APP_TRACE_INFO(("Load vec[%d] (%d Bytes) ...\r\n",index,flash_info.bin_size));
@@ -230,6 +235,7 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
                     err =  TWID_Write(  dev_addr>>1, 0, 0, pChar + i + 1 , data_num, NULL); 
                     i += ( data_num + 1 );               
                     if ( err != SUCCESS )  {
+                        OSSemPost( Load_Vec_Sem_lock );
                         return (I2C_BUS_ERR) ;
                     }
                 }
@@ -237,6 +243,7 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
                 for( i = 0; i < flash_info.bin_size ;  ) {
                     data_num = *(pChar+i) ;
                     if(data_num > sizeof(buf)) {
+                        OSSemPost( Load_Vec_Sem_lock );
                         return (SPI_BUS_ERR);
                     }
                     for(j = 0; j < data_num ; j++) {
@@ -245,6 +252,7 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
                     err = SPI_WriteBuffer_API( &buf, data_num );                  
                     i += ( data_num + 1 );
                     if (err != SUCCESS) {
+                        OSSemPost( Load_Vec_Sem_lock );
                         return (SPI_BUS_ERR);
                     }
                 }
@@ -252,7 +260,10 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
         }  
         
         OSTimeDly( Global_VEC_Cfg.delay );  //Delay mSecond
-        
+        if( Global_VEC_Cfg.trigger_en == 0 ) {
+            OSSemPost( Load_Vec_Sem_lock ); 
+            return err; 
+        }
     }
     
     index = Global_VEC_Cfg.vec_index_b ; // Power down
@@ -261,6 +272,7 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
         if( flash_info.f_w_state != FW_DOWNLAD_STATE_FINISHED ) {
           err = FW_VEC_SAVE_STATE_ERR;
           APP_TRACE_INFO(("\r\nvec data state error...\r\n"));
+          OSSemPost( Load_Vec_Sem_lock );
           return err;
         }       
         APP_TRACE_INFO(("Load vec[%d] (%d Bytes) ...\r\n",index,flash_info.bin_size));
@@ -271,6 +283,7 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
                 err =  TWID_Write(  dev_addr>>1, 0, 0, pChar + i + 1 , data_num, NULL); 
                 i += ( data_num + 1 );     
                 if ( err != SUCCESS )  {
+                    OSSemPost( Load_Vec_Sem_lock );
                     return(I2C_BUS_ERR) ;
                 }
             }
@@ -278,6 +291,7 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
             for( i = 0; i < flash_info.bin_size ;  ) {
                 data_num = *(pChar+i) ; 
                 if(data_num > sizeof(buf)) {
+                    OSSemPost( Load_Vec_Sem_lock );
                     return (SPI_BUS_ERR);
                 }
                 for(j = 0; j < data_num ; j++) {
@@ -286,6 +300,7 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
                 err = SPI_WriteBuffer_API( &buf, data_num ); 
                 i += ( data_num + 1 );
                 if (err != SUCCESS) {
+                    OSSemPost( Load_Vec_Sem_lock );
                     return (SPI_BUS_ERR);
                 }
             }           
@@ -308,7 +323,8 @@ unsigned char MCU_Load_Vec( unsigned char firsttime )
        FM36_PDMADC_CLK_OnOff(0,0); //disable PDM clock
        I2C_Mixer(I2C_MIX_UIF_S);          
     }     
-     
+    
+    OSSemPost( Load_Vec_Sem_lock );
     return err;     
     
 }

@@ -36,6 +36,9 @@
 #define  HW_BUF_RX_L                     (0x0FFFE000)  //1kB
 #define  HW_BUF_RX_R                     (0x0FFFE400)  //1kB
 #define  HW_BUF_RX_SIZE                  (2048)
+
+#define  CHECK_PLL_READY_ADDR            (0x0FFFFF34)
+
 #define  TO_HOST_CMD_OFFSET_ATTR( x )     ( (x) & 0xFFFF )
 #define  TO_HOST_CMD_OFFSET_CMD( x )      ( ((x) & 0xFF) << 16 )
 #define  TO_HOST_CMD_OFFSET_STAT( x )     ( ((x) & 0xFF) << 24 )

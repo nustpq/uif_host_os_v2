@@ -33,7 +33,7 @@ Stop=1
 Freq=10000000
 MultiCoreRunAll=1
 [DebugChecksum]
-Checksum=1808155960
+Checksum=927633257
 [JLinkDriver]
 CStepIntDis=_ 0
 [Exceptions]
@@ -63,6 +63,21 @@ Fmt3={W}0:mem_addr	4	0
 Fmt4={W}0:pChar	4	0
 Fmt5={W}0:pRecvPtr	4	0
 Fmt6={W}0:temp	4	0
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
+[CallStackLog]
+Enabled=0
+[DriverProfiling]
+Enabled=0
+Mode=0
+Graph=0
+Symbiont=0
+Exclusions=
 [Disassemble mode]
 mode=0
 [Breakpoints2]
@@ -80,24 +95,9 @@ Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.855.13" 0 0 1 "" 0 "" 0
 Bp11=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\ruler.c}.293.5" 0 0 1 "" 0 "" 0
 Bp12=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\gpio.c}.97.5" 0 0 1 "" 0 "" 0
 Count=13
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
 [Aliases]
 A0=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Ports\ARM-Cortex-M3\Generic\IAR\os_cpu_c.c" ""
 A1=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Source\os_core.c" ""
 A2=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Source\os_task.c" ""
 Count=3
 SuppressDialog=1
-[CallStackLog]
-Enabled=0
-[DriverProfiling]
-Enabled=0
-Mode=0
-Graph=0
-Symbiont=0
-Exclusions=

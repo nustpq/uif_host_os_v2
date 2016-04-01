@@ -546,6 +546,8 @@ INT8U  OSSemQuery (OS_EVENT     *pevent,
     OS_EXIT_CRITICAL();
     return (OS_ERR_NONE);
 }
+
+
 #endif                                                     /* OS_SEM_QUERY_EN                          */
 
 /*$PAGE*/
