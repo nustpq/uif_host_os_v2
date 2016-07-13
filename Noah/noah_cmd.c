@@ -16,7 +16,7 @@
 *
 *                                        COMMUNICATION COMMANDS REALIZATION
 *
-*                                          Atmel AT91SAM7A3
+*                                          Atmel AT91SAM3U4C
 *                                               on the
 *                                      Unified EVM Interface Board
 *
@@ -555,7 +555,7 @@ CPU_INT08U  Noah_CMD_Parse_Ruler (NOAH_CMD    *pNoahCmd,
         break;
         
         default :
-            err = CMD_NOT_SURRPORT ;
+            err = CMD_NOT_SUPPORT ;
         break ;
         
     }
@@ -696,18 +696,18 @@ CPU_INT08U  EMB_Data_Build (  CPU_INT16U   cmd_type,
             *p_emb_length = pos;   
         break;
         
-        case PC_CMD_FETCH_VOICE_BUFFER :
-            pos = emb_init_builder(pChar, EMB_BUF_SIZE, cmd_type, &builder);
-            pos = emb_append_attr_uint(&builder, pos, 1, pPcCmdData->voice_buf_data.done); //package status is finished?
-            pos = emb_append_attr_uint(&builder, pos, 2, pPcCmdData->voice_buf_data.index); //package index               
-            pos = emb_append_attr_binary(&builder, pos, 3, pPcCmdData->voice_buf_data.pdata, pPcCmdData->voice_buf_data.length);
-            pos = emb_append_end(&builder, pos);
-            *p_emb_length = pos;   
-        break;
+//        case PC_CMD_FETCH_VOICE_BUFFER :
+//            pos = emb_init_builder(pChar, EMB_BUF_SIZE, cmd_type, &builder);
+//            pos = emb_append_attr_uint(&builder, pos, 1, pPcCmdData->voice_buf_data.done); //package status is finished?
+//            pos = emb_append_attr_uint(&builder, pos, 2, pPcCmdData->voice_buf_data.index); //package index               
+//            pos = emb_append_attr_binary(&builder, pos, 3, pPcCmdData->voice_buf_data.pdata, pPcCmdData->voice_buf_data.length);
+//            pos = emb_append_end(&builder, pos);
+//            *p_emb_length = pos;   
+//        break;
         
         
         default:
-            err = CMD_NOT_SURRPORT ;    
+            err = CMD_NOT_SUPPORT ;    
             
         break ;       
     } 
@@ -773,10 +773,10 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             PCCmd.audio_cfg.type = (CPU_INT08U)temp;            
             temp = emb_get_attr_int(&root, 2, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
-            PCCmd.audio_cfg.sr = (CPU_INT16U)temp;            
+            PCCmd.audio_cfg.sample_rate = (CPU_INT16U)temp;            
             temp = emb_get_attr_int(&root, 3, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
-            PCCmd.audio_cfg.channels = (CPU_INT08U)temp; 
+            PCCmd.audio_cfg.channel_num = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 4, 0);            
             PCCmd.audio_cfg.lin_ch_mask = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 5, 0);            
@@ -784,19 +784,20 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             temp = emb_get_attr_int(&root, 6, 0);          
             PCCmd.audio_cfg.gpio_rec_bit_mask = (CPU_INT08U)temp; 
             
-            temp = emb_get_attr_int(&root, 7, 1); //default 1, choose TDM    
+            temp = emb_get_attr_int(&root, 7, 1); //default 1, choose I2S  
             PCCmd.audio_cfg.format = (CPU_INT08U)temp;
             temp = emb_get_attr_int(&root, 8, (PCCmd.audio_cfg.type == 0)? 1:0 ); // default 0: falling egde send for sending, 1: rising edge lock for receiving   
-            PCCmd.audio_cfg.cki = (CPU_INT08U)temp;
+            PCCmd.audio_cfg.ssc_cki = (CPU_INT08U)temp;
             temp = emb_get_attr_int(&root, 9, 1);   //default 1 cycle delay          
-            PCCmd.audio_cfg.delay = (CPU_INT08U)temp;
+            PCCmd.audio_cfg.ssc_delay = (CPU_INT08U)temp;
             temp = emb_get_attr_int(&root, 10, 4);  //default 4: falling edge trigger for low left          
-            PCCmd.audio_cfg.start = (CPU_INT08U)temp;
-            temp = emb_get_attr_int(&root, 11, 0);   //default 0: as master      
-            PCCmd.audio_cfg.master_or_slave = (CPU_INT08U)temp;
+            PCCmd.audio_cfg.ssc_start = (CPU_INT08U)temp;
+            temp = emb_get_attr_int(&root, 11, 0);  //default 0: as master      
+            PCCmd.audio_cfg.master_slave = (CPU_INT08U)temp;
             
-            temp = emb_get_attr_int(&root, 12, 0);   //default 0: no SPI recording    
-            PCCmd.audio_cfg.spi_rec_num = (CPU_INT08U)temp;
+            temp = emb_get_attr_int(&root, 12, 0);     //default 0: no SPI recording         
+            PCCmd.audio_cfg.spi_rec_bit_mask = (CPU_INT08U)temp;
+            
            
             err = Setup_Audio( &PCCmd.audio_cfg );
 
@@ -824,12 +825,24 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
            
         break ;    
         
-        case PC_CMD_RESET_AUDIO :
+//        case PC_CMD_RESET_AUDIO :
+//                   
+//            err = Reset_Audio(); 
+//         
+//        break ; 
+        
+        case PC_CMD_AB_POST : //do UIF POST, reset on board devices, for UIF.Reset() in script
+        
+            err = AB_POST();
+            
+        break;
+        
+        case PC_CMD_UPDATE_AUDIO :
                    
-            err = Reset_Audio(); 
+            err = Update_Audio(); 
          
         break ; 
-                
+        
         ////////////////////////////////////////////////////////////////////////        
         
         case PC_CMD_SET_IF_CFG :
@@ -842,7 +855,7 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             PCCmd.interface_cfg.speed = (CPU_INT16U)temp;   
             temp = emb_get_attr_int(&root, 3, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
-            PCCmd.interface_cfg.attribute = (CPU_INT08U)temp; 
+            PCCmd.interface_cfg.attribute = (CPU_INT16U)temp; 
             err = Setup_Interface( &PCCmd.interface_cfg );
             
         break ;
@@ -951,13 +964,16 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
           
             temp = emb_get_attr_int(&root, 1, -1);
             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
-            PCCmd.set_volume.mic = (CPU_INT32U)temp;
+            PCCmd.set_volume.mic = (CPU_INT32S)temp;
             temp = emb_get_attr_int(&root, 2, -1);
             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
-            PCCmd.set_volume.lout = (CPU_INT32U)temp;
+            PCCmd.set_volume.lout = (CPU_INT32S)temp;
             temp = emb_get_attr_int(&root, 3, -1);
             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
-            PCCmd.set_volume.spk = (CPU_INT32U)temp;      
+            PCCmd.set_volume.spk = (CPU_INT32S)temp;     
+            temp = emb_get_attr_int(&root, 4, -1);
+            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
+            PCCmd.set_volume.lin = (CPU_INT32S)temp;  
             err = Set_Volume( &PCCmd.set_volume ) ;
               
         break ;      
@@ -970,19 +986,10 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
                                       DATA_AB_INFO ) ;           
         break ; 
         
-        case PC_CMD_REC_VOICE_BUFFER:
+        case PC_CMD_REC_VOICE_BUFFER: 
             temp = emb_get_attr_int(&root, 1, -1); //irq gpio index
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
-//            PCCmd.voice_buf_cfg.gpio_irq = (CPU_INT08U)temp; 
-//            temp = emb_get_attr_int(&root, 2, -1); //spi mode
-//            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }  
-//            PCCmd.voice_buf_cfg.spi_mode = (CPU_INT08U)temp; 
-//            temp = emb_get_attr_int(&root, 3, -1); //spe speed
-//            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }  
-//            PCCmd.voice_buf_cfg.spi_mode = (CPU_INT32U)temp; 
-            
-            //err = Rec_Voice_Buffer_Start( &PCCmd.voice_buf_cfg );           
-              Wait_Keywords_Detect(temp);
+            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }                 
+            Start_Keywords_Detection( temp );
         break;
         
 //        case PC_CMD_REC_VOICE_BUFFER:
@@ -1013,7 +1020,7 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
               
         break;        
     
-        case PC_CMD_GPIO_SESSION :
+        case PC_CMD_GPIO_SESSION:
             temp = emb_get_attr_int(&root, 1, -1); //delay time
             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; } 
             PCCmd.gpio_session.gpio_num =  (CPU_INT08U)temp;
@@ -1031,21 +1038,15 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             err = GPIO_Session( &PCCmd.gpio_session );  
         
         break;
-
-        case PC_CMD_SPI_REC :  //for FM1388 test
-                        
-            VOICE_BUF_CFG voice_buf_cfg;        
-            voice_buf_cfg.spi_mode = Global_UIF_Setting[1].speed;
-            voice_buf_cfg.spi_speed = Global_UIF_Setting[1].attribute;
-            voice_buf_cfg.gpio_irq = 2;//useless for FM1388 //im501_irq_gpio;    
-            Disable_SPI_Port(); //disabled host mcu SPI  
-            err = Rec_Voice_Buffer_Start( &voice_buf_cfg ); //send CMD to Audio MCU 
-            if( err != NULL ) {
-                Enable_SPI_Port(); //Enabled host mcu SPI if failed to get resp from audio mcu
-            }
         
-        break;
-                       
+        case PC_CMD_SPI_REC:  //for FM1388 test                        
+            SPI_REC_CFG spi_rec_cfg;    
+            spi_rec_cfg.spi_mode  = Global_UIF_Setting[1].attribute;
+            spi_rec_cfg.spi_speed = Global_UIF_Setting[1].speed;
+            spi_rec_cfg.gpio_irq = 2;//useless for FM1388 //im501_irq_gpio;              
+            err = SPI_Rec_Start( &spi_rec_cfg ); //send CMD to Audio MCU 
+       
+        break;       
             
 /*        
         case PC_CMD_SESSION :
@@ -1281,9 +1282,8 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         break ;         
 *************************************************************************/  
         
-        
         default :            
-            err = CMD_NOT_SURRPORT ;   
+            err = CMD_NOT_SUPPORT ;   
         break ;
         
     }
@@ -1313,7 +1313,7 @@ CPU_INT08U  AB_Status_Change_Report (void)
     CPU_INT08U    err; 
     EMB_BUF      *pEBuf;   
     CPU_INT08U    flag; 
-    CPU_INT08U    i;   
+//    CPU_INT08U    i;   
     
     err   = NO_ERR;   
     pEBuf = &Emb_Buf_Cmd;

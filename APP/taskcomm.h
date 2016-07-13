@@ -16,7 +16,7 @@
 *
 *                                      TASKS HEADERS CONFIGURATION
 *
-*                                          Atmel AT91SAM7A3
+*                                          Atmel AT91SAM3U4C
 *                                               on the
 *                                      Unified EVM Interface Board
 *
@@ -110,7 +110,7 @@ void App_TaskDebugInfo    ( void *p_arg ) ;
 
 void Task_ReCreate_Shell( void );
 void Port_Detect_Enable( unsigned char on_off );
-
+void BSP_Ser_WrStr_To_Buffer( char *p_str );
 
 
 

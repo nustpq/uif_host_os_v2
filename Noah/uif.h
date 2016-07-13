@@ -15,36 +15,43 @@
 
 //Global_UIF_Setting CMD:  num = 7
 //note: CMD nums must not exceed boundary
-#define   UIF_TYPE_CMD_NUM      9
 
-#define   UIF_TYPE_I2C          1
-#define   UIF_TYPE_SPI          2
-#define   UIF_TYPE_GPIO         3
-#define   UIF_TYPE_FM36_PATH    4
-#define   UIF_TYPE_I2C_GPIO     5
-#define   UIF_TYPE_I2C_Mixer    6
-#define   UIF_TYPE_FM36_PDMCLK  7
-#define   UIF_TYPE_GPIO_CLK     8
-#define   UIF_CHIP_TYPE_SELECT  9
+//////////////////  UIF TYPE 
+#define   UIF_TYPE_CMD_NUM                     9
 
-#define   CHIP_TYPE_IM501                      51
-
+#define   UIF_TYPE_I2C                         1
+#define   UIF_TYPE_SPI                         2
+#define   UIF_TYPE_GPIO                        3
+#define   UIF_TYPE_FM36_PATH                   4
+#define   UIF_TYPE_I2C_GPIO                    5
+#define   UIF_TYPE_I2C_Mixer                   6
+#define   UIF_TYPE_FM36_PDMCLK                 7
+#define   UIF_TYPE_GPIO_CLK                    8
+#define   UIF_TYPE_DUT_ID                      9
+ 
+////////////////// UIF ATTRIBUTE
+ 
+#define   ATTRI_DUT_ID_IM501                   501
+#define   ATTRI_DUT_ID_FM1388                  1388
 #define   ATTRI_I2C_IM501_LOAD_CODE_IRAM       52
 #define   ATTRI_I2C_IM501_LOAD_CODE_DRAM       51
 #define   ATTRI_I2C_IM401_LOAD_CODE            41
 #define   ATTRI_SPI_FM1388_LOAD_CODE           31
 #define   ATTRI_I2C_FM1388_LOAD_EEPROM         21
 #define   ATTRI_I2C_IM205                      11
+
 #define   ATTRI_SPI_IM501_CPHA0_CPOL0          0 //iM501_CPHA_CPOL
 #define   ATTRI_SPI_IM501_CPHA0_CPOL1          1
 #define   ATTRI_SPI_IM501_CPHA1_CPOL0          2
 #define   ATTRI_SPI_IM501_CPHA1_CPOL1          3
 
-#define   FM1388_ALLOWED_DATA_PACK_SIZE    (240+6)
-#define   EEPROM_ALLOWED_DATA_PACK_SIZE    (128+2)
+#define   FM1388_ALLOWED_DATA_PACK_SIZE        (240+6)
+#define   EEPROM_ALLOWED_DATA_PACK_SIZE        (128+2)
 
 #define   ATTRI_FM36_PATH_NORMAL           0
 #define   ATTRI_FM36_PATH_PWD_BP           1
+
+//////////////////
 
 #define   GET_BYTE_LOW_4BIT( x )     ((x) & 0x0F) 
 #define   GET_BYTE_HIGH_4BIT( x )    (((x)>>4) & 0x0F) 

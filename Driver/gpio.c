@@ -387,7 +387,7 @@ unsigned char I2C_Mixer( unsigned char index )
     
     if( I2C_Mix_Index_Save == index ) { //no need re-set 
         OSSemPost( GPIO_Sem_I2C_Mixer );
-        return err;
+        return 0;
     }    
     I2C_Mix_Index_Save = index ;    
     
@@ -407,6 +407,7 @@ unsigned char I2C_Mixer( unsigned char index )
     
     //OSTimeDly(1);
 #endif
+    return 0;
     
 }
 

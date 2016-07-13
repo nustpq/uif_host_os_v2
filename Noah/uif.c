@@ -16,7 +16,7 @@
 *
 *                                        FM DSP W/R RELATED OPERATIONS
 *
-*                                          Atmel AT91SAM7A3
+*                                          Atmel AT91SAM3U4C
 *                                               on the
 *                                      Unified EVM Interface Board
 *
@@ -155,17 +155,16 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         break ;
         
         case UIF_TYPE_SPI :
-            if( Global_SPI_Record == 1 ) { //in case last SPI record not ended normally 
-                Global_SPI_Record = 0;
-                Enable_SPI_Port();
-                Stop_Audio();//in case audio not stopped normally                
+            if( Global_SPI_Rec_Start == 1 ) { //in case last SPI record not ended normally 
+                err = SET_SPI_ERR ;               
+                break;//in case audio not stopped normally                         
             }
             if( Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].speed  == temp &&\
                 Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].attribute == temp2 ) {
                 break;
             }            
             if( temp <= 48000 && temp >= 400) { 
-                SPI_Init(  temp * 1000, temp2 ); 
+                SPI_Init( temp * 1000, temp2 ); 
             }  else {
                 APP_TRACE_INFO(("\r\nERROR: SPI speed not support %d kHz\r\n",temp));
                 err= SET_SPI_ERR ;
@@ -203,7 +202,7 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
             CS_GPIO_Init( pInterface_Cfg->attribute );
         break ;   
     
-        case UIF_CHIP_TYPE_SELECT:
+        case UIF_TYPE_DUT_ID:
   
         break;
         default:
@@ -413,8 +412,12 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
         //////////////////////////////////////////////////////////
         
         case UIF_TYPE_SPI:
-              //FM1388              
-              if( Global_UIF_Setting[ UIF_CHIP_TYPE_SELECT - 1 ].attribute == ATTRI_SPI_FM1388_LOAD_CODE ) {
+              //FM1388 
+              if( Global_SPI_Rec_Start == 1 ) {
+                  err = SPI_BUS_ERR;
+                  return err;
+              }
+              if( Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].attribute == ATTRI_SPI_FM1388_LOAD_CODE ) {
                   size = p_raw_write->data_len / FM1388_ALLOWED_DATA_PACK_SIZE ;                
                   for( i = 0 ; i < size ; i++ ) {
                       state =  SPI_WriteBuffer_API( p_raw_write->pdata, FM1388_ALLOWED_DATA_PACK_SIZE ); 
@@ -540,7 +543,10 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
         break;
         
         case UIF_TYPE_SPI:                   
- 
+            if( Global_SPI_Rec_Start == 1 ) {
+                err = SPI_BUS_ERR;
+                return err;
+            }
             state =  SPI_WriteReadBuffer_API(  pbuf, 
                                                p_raw_read->pdata_write, 
                                                p_raw_read->data_len_read , 
@@ -551,8 +557,8 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
                   APP_TRACE_INFO(("\r\nSPI_ReadBuffer_API err = %d",state));
                   break;
               }    
-              
-              pbuf = pbuf + 1; //fix bug
+   
+              pbuf = pbuf + 1; //fix bug             
 //              for(unsigned int i=0; i<p_raw_read->data_len_read;i++){
 //                  *(pbuf+i)= i/64;
 //              }
@@ -574,7 +580,7 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
         
     } else {
         p_raw_read->pdata_read = pbuf ; //save data pointer
-        //Dump_Data( pbuf,  p_raw_read->data_len_read ); 
+        Dump_Data( pbuf,  p_raw_read->data_len_read ); 
         
     }
     

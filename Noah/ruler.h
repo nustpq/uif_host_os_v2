@@ -165,35 +165,38 @@ typedef struct {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-typedef struct {    
-    unsigned short   sr ;    //16000, 48000 
-    unsigned char    type ;  //rec = 0,  play = 1
-    unsigned char    channels ; //mic num 1~6 
-    unsigned char    lin_ch_mask;
-    unsigned char    bit_length;//16, 24, 32
-    unsigned char    gpio_rec_bit_mask;
-    unsigned char    format;
-    unsigned char    cki;
-    unsigned char    delay;
-    unsigned char    start;
-    unsigned char    master_or_slave;
-    unsigned char    spi_rec_num;
-    unsigned char    spi_rec_start_index;
-}AUDIO_CFG ;
+typedef struct { 
+  unsigned char  type;//Rec =0, Play =1
+  unsigned char  channel_num; //1~8  
+  unsigned short sample_rate; //16000, 48000 
 
+  unsigned char  bit_length; // 16, 24, 32
+  unsigned char  lin_ch_mask;
+  
+  unsigned char  gpio_rec_num;
+  unsigned char  gpio_rec_start_index;
+  unsigned char  gpio_rec_bit_mask;
+  
+  unsigned char  spi_rec_num;
+  unsigned char  spi_rec_start_index;
+  unsigned char  spi_rec_bit_mask;
+  
+  unsigned char  format;  //1:I2S  2:PDM  3:PCM/TDM  
+  unsigned char  ssc_cki;
+  unsigned char  ssc_delay;
+  unsigned char  ssc_start;
+  unsigned char  master_slave;
+  
+  unsigned char  reserved[3];
+}AUDIO_CFG;
 
-
-//typedef struct {
-//  
-//  unsigned char  type;//Rec: =0x00, Play: =0x01
-//  unsigned char  channel_num; //1~8
-//  unsigned short sample_rate;
-//  unsigned char  bit_length; // 16, 24, 32
-//  unsigned char  gpio_rec_num;
-//  unsigned char  gpio_rec_start_index;
-//  unsigned char  gpio_rec_bit_mask;  
-//}AUDIO_CFG;
-
+typedef struct {
+  unsigned int   spi_speed;
+  unsigned char  spi_mode;  
+  unsigned char  gpio_irq;
+  unsigned char  chip_id;
+  unsigned char  reserved[1];
+}SPI_REC_CFG;
 
 typedef struct {
     unsigned char    type;    //rec = 1,  play = 2, rec&play = 3   
@@ -227,9 +230,10 @@ typedef struct {
 }TOGGLE_MIC ;
 
 typedef struct {
-    unsigned int    mic;   
-    unsigned int    lout; 
-    unsigned int    spk;
+    signed int    mic;   
+    signed int    lout; 
+    signed int    spk;
+    signed int    lin; 
 }SET_VOLUME ;
 
 typedef struct {
@@ -259,8 +263,9 @@ typedef struct {
 
 
 typedef struct {
-    unsigned char    if_type;      
-    unsigned char    attribute;
+    unsigned char    if_type;
+    unsigned char    reserved[3];
+    unsigned short   attribute;
     unsigned short   speed;
 }INTERFACE_CFG ;
 
@@ -340,11 +345,13 @@ extern volatile unsigned char Global_Mic_State[];
 extern volatile unsigned char Global_Bridge_POST;
 extern volatile unsigned int  Global_Mic_Mask[];
 extern volatile unsigned char Ruler_Setup_Sync_Data;
-extern volatile unsigned char Global_SPI_Record;
+extern volatile unsigned char Global_SPI_Rec_Start;
+extern volatile unsigned char Global_SPI_Rec_En;
 
 extern SET_VEC_CFG  Global_VEC_Cfg;
 
 extern void          Init_Global_Var( void );
+extern unsigned char Update_Audio( void );
 extern unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg );
 extern unsigned char Start_Audio( START_AUDIO start_audio  );
 extern unsigned char Stop_Audio( void );  
@@ -363,9 +370,9 @@ extern unsigned char Read_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned ch
 extern unsigned char Write_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic_id);
 extern unsigned char Ruler_Active_Control( unsigned char active_state );
 extern unsigned char Reset_Mic_Mask(  unsigned int *pInt );
-extern unsigned char Set_Volume(  SET_VOLUME *pdata );
+extern unsigned char Set_Volume( SET_VOLUME *pdata );
 extern unsigned char Get_Ruler_Version( unsigned char ruler_id );
-extern void          AB_POST( void );
+extern unsigned char AB_POST( void );
 extern unsigned char Ruler_POST( unsigned char ruler_id );
 extern void          simple_test_use( void );
 
@@ -377,6 +384,6 @@ extern void Read_Flash_State( FLASH_INFO  *pFlash_Info, unsigned int flash_addre
 extern void Debug_Audio( void ) ;
 extern unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg );
 
-extern unsigned char Rec_Voice_Buffer_Start( VOICE_BUF_CFG *pv_b_cfg );
+extern unsigned char SPI_Rec_Start( SPI_REC_CFG *pSpi_rec_cfg );
 
 #endif

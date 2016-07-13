@@ -16,7 +16,7 @@
 *
 *                                           TASK PACKAGE
 *
-*                                          Atmel AT91SAM7A3
+*                                          Atmel AT91SAM3U4C
 *                                               on the
 *                                      Unified EVM Interface Board
 *
@@ -73,7 +73,7 @@ void  App_TaskUserIF (void *p_arg)
 
 
 #ifndef BOARD_TYPE_AB01  
-    APP_TRACE_INFO(( "\r\nWARNING: NOT AB01, NO MCU CRT UART SWITCH\r\n"));
+    APP_TRACE_INFO(( "\r\nWARNING: NOT AB01, NO MCU Ctrl UART SWITCH\r\n"));
 #endif
    
     while ( DEF_TRUE ) {                                          /* Task body, always written as an infinite loop.           */   

@@ -198,10 +198,10 @@ unsigned char DMAD_Configure_Buffer(unsigned char channel,
         // If source picture-in-picture mode is enabled, program the DMAC_SPIP.
         if(pip->pipSourceBoundarySize){
         // If destination picture-in-picture mode is enabled, program the DMAC_DPIP.
-            DMA_SPIPconfiguration(channel, pip->pipSourceHoleSize, pip->pipSourceBoundarySize);
+            DMA_SPIPconfiguration(channel, (unsigned int)(pip->pipSourceHoleSize), (unsigned int)(pip->pipSourceBoundarySize));
         }
         if(pip->pipDestBoundarySize){
-            DMA_DPIPconfiguration(channel, pip->pipDestHoleSize, pip->pipDestBoundarySize);
+            DMA_DPIPconfiguration(channel, (unsigned int)(pip->pipDestHoleSize), (unsigned int)(pip->pipDestBoundarySize));
         }
     }
     return 0;

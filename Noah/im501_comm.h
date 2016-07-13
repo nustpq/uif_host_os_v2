@@ -113,13 +113,10 @@ typedef struct {
     unsigned int   index;
     unsigned char *pdata;
     unsigned char  done;
+    unsigned char  reserved[3];
 }VOICE_BUF ;
 
-typedef struct {
-  unsigned int   spi_speed;
-  unsigned char  spi_mode;  
-  unsigned char  gpio_irq; 
-}VOICE_BUF_CFG;
+
 
 //extern unsigned char iM401_Bypass( void );
 //extern unsigned char iM401_Standby( void );
@@ -148,7 +145,7 @@ unsigned char test_send_cmd_to_im501( void );
 
 unsigned char Write_CMD_To_iM501( unsigned char cmd_index, unsigned short para );
 
-void Wait_Keywords_Detect( unsigned char gpio_irq );
+void Start_Keywords_Detection( unsigned char gpio_irq );
 
 unsigned char Request_Enter_PSM( void );
 

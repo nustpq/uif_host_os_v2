@@ -1,6 +1,6 @@
 /*
 *********************************************************************************************************
-*                               UIF BOARD APP PACKAGE
+*                                        UIF BOARD APP PACKAGE
 *
 *                            (c) Copyright 2013 - 2016; Fortemedia Inc.; Nanjing, China
 *
@@ -16,7 +16,7 @@
 *
 *                                        FM36 DSP Based Signal Path Setup
 *
-*                                          Atmel AT91SAM7A3
+*                                          Atmel AT91SAM3U4C
 *                                               on the
 *                                      Unified EVM Interface Board
 *
@@ -32,7 +32,7 @@
 #include <includes.h>
 
 
-//Note: This routine do NOT support reentrance
+//Note: This routine do NOT support  reentrance
 
 static bool flag_power_lose  = true;
 static bool flag_state_pwd   = false;
@@ -696,7 +696,7 @@ static unsigned short int fm36_para_table_tdm_aec[][2] =
 
 
 //I2S mode, in addition, bypass RX0.0 and RX0.1 to TX1.0 and TX1.1
-static unsigned short int fm36_para_table_i2s_aec[][2] =   
+static unsigned short int fm36_para_table_i2s_aec[][2] =  
 {
        //select aux2 - lin source 
       {0x229A, 0x0001}, //Aux2-in From SP0
@@ -731,11 +731,13 @@ static unsigned char Config_SP0IN_to_SP1Out( void )
 *                                       Init_FM36_AB03()
 *
 * Description : Initialize FM36 DSP on AB03 board.
-* Argument(s) : sr        : sample rate : 8000 ~ 48000 
-*               bit_length: 16bit/32bit mode
+* Argument(s) : sr        : sample rate : 8000 ~ 48000               
 *               mic_num   : 0~6
 *               lin_sp_index  : line in data source: 0 ~ 1
 *               start_slot_index: line in data slot: 0 ~ 7
+*               bit_length: 16bit/32bit mode
+*               i2s_tdm_sel: 0 - I2S, 1 - TDM-I2S
+*               force_reset: 1 - force reset FM36 
 * Return(s)   : NO_ERR :   execute successfully
 *               others :   =error code .  
 *
@@ -757,10 +759,10 @@ unsigned char Init_FM36_AB03( unsigned short sr,
     
     //added for iM501 PCM clock pause issue
     APP_TRACE_INFO(("\r\nInit_FM36_AB03:\r\n"));  
-    if( Global_UIF_Setting[ UIF_CHIP_TYPE_SELECT - 1 ].attribute == CHIP_TYPE_IM501 ) {
+    if( Global_UIF_Setting[ UIF_TYPE_DUT_ID - 1 ].attribute == ATTRI_DUT_ID_IM501 ) { //make sure no unwanted FM36 reset whihc will casued iM501 PDMCLKI on/off 
         mic_num = 4 ;
     }
-    APP_TRACE_INFO(("UIF_CHIP_TYPE_SELECT = %d\r\n", Global_UIF_Setting[ UIF_CHIP_TYPE_SELECT - 1 ].attribute)); 
+    APP_TRACE_INFO(("UIF_TYPE_DUT_ID = %d\r\n", Global_UIF_Setting[ UIF_TYPE_DUT_ID - 1 ].attribute)); 
     
     if( sr               == sr_saved  &&  \
         mic_num          == mic_num_saved && \

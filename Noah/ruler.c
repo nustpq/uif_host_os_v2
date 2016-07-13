@@ -16,7 +16,7 @@
 *
 *                                        RULER RELATED OPERATIONS REALIZATION
 *
-*                                          Atmel AT91SAM7A3
+*                                          Atmel AT91SAM3U4C
 *                                               on the
 *                                      Unified EVM Interface Board
 *
@@ -45,9 +45,12 @@ extern EMB_BUF   Emb_Buf_Data;
 extern EMB_BUF   Emb_Buf_Cmd;
 
 SET_VEC_CFG  Global_VEC_Cfg; 
+CODEC_SETS    codec_set[2];
 
-volatile unsigned char  Global_SPI_Record = 0;
+unsigned char flag_bypass_fm36;
 
+volatile unsigned char  Global_SPI_Rec_Start = 0;
+volatile unsigned char  Global_SPI_Rec_En = 0;
 /*
 *********************************************************************************************************
 *                                           Init_Global_Var()
@@ -179,34 +182,32 @@ void Check_UART_Mixer_Ready( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-static unsigned char global_i2s_tdm_sel[2];
+//We assume :
+//1. there must be a REC setup and a PLAY setup for each audio configuration
+//2. REC setup comes first and then PLAY setup 
 unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
 {
     unsigned char err; 
     unsigned char mic_num; 
     unsigned char data  = 0xFF;
-    unsigned char i2s_tdm_sel;
-    unsigned char buf[] = {         
-        CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_SET_AUDIO_CFG,\
-        pAudioCfg->type, pAudioCfg->channels,\
-       (pAudioCfg->sr)&0xFF, ((pAudioCfg->sr)>>8)&0xFF, pAudioCfg->bit_length,\
-        0, 0, pAudioCfg->gpio_rec_bit_mask,  \
-        pAudioCfg->format, pAudioCfg->cki, pAudioCfg->delay,pAudioCfg->start , \
-        pAudioCfg->master_or_slave, pAudioCfg->spi_rec_num, pAudioCfg->spi_rec_start_index
-        //11~14    pAudioCfg->format 1:  I2S  2:  TDM   3:   PCM   
-        //pAudioCfg->master_or_slave  15  1:1388 master  0: 1388 slave          
-    };
+    unsigned char format;
+    unsigned char polarity;
     
+    unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_SET_AUDIO_CFG  };
+        
     //APP_TRACE_INFO(("Setup_Audio [%s]:[%d SR]:[%d CH]: %s\r\n",(pAudioCfg->type == 0) ? "REC " : "PLAY", pAudioCfg->sr, pAudioCfg->channels,((pAudioCfg->type == 0) && (pAudioCfg->lin_ch_mask == 0)) ? "LIN Disabled" : "LIN Enabled"));
     if( pAudioCfg->type == 0 ) {
-        APP_TRACE_INFO(("\r\nSetup_Audio [REC ]:[%d SR]:[%d CH]:[%d-Bit]", pAudioCfg->sr, pAudioCfg->channels, pAudioCfg->bit_length));
+        APP_TRACE_INFO(("\r\nSetup_Audio [REC ]:[%d SR]:[%d CH]:[%d-Bit]", pAudioCfg->sample_rate, pAudioCfg->channel_num, pAudioCfg->bit_length));
+    } else if( pAudioCfg->type == 1 ){
+        APP_TRACE_INFO(("\r\nSetup_Audio [PLAY]:[%d SR]:[%d CH]:[%d-Bit]", pAudioCfg->sample_rate, pAudioCfg->channel_num, pAudioCfg->bit_length ));
     } else {
-        APP_TRACE_INFO(("\r\nSetup_Audio [PLAY]:[%d SR]:[%d CH]:[%d-Bit]", pAudioCfg->sr, pAudioCfg->channels, pAudioCfg->bit_length ));
+        APP_TRACE_INFO(("\r\nSetup_Audio ERROR: Unsupported pAudioCfg->type, %d\r\n",pAudioCfg->type));
+        return AUD_CFG_ERR;
     }
     
-    err = Check_SR_Support( pAudioCfg->sr );
+    err = Check_SR_Support( pAudioCfg->sample_rate );
     if( err != NO_ERR ) { 
-        APP_TRACE_INFO(("\r\nSetup_Audio ERROR: Sample rate NOT support!\r\n")); 
+        APP_TRACE_INFO(("\r\nSetup_Audio ERROR: Unsupported sample rate!\r\n")); 
         return err;
     }        
         
@@ -221,77 +222,74 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
 //        buf[4] = mic_num;
 //        return AUD_CFG_MIC_NUM_DISMATCH_ERR;
 //    } 
-    //check channel num    
-    if( (pAudioCfg->type == 1) && (pAudioCfg->channels == 0) ) {
-        APP_TRACE_INFO(("WARN:(Setup_Audio Play)pAudioCfg->channels =  0\r\n" ));        
-        //return AUD_CFG_PLAY_CH_ZERO_ERR;  UI not support
-    }  
-    if( (pAudioCfg->type == 0) && (pAudioCfg->channels == 0) ) {
-        APP_TRACE_INFO(("WARN:(Setup_Audio Rec)pAudioCfg->channels  =  0\r\n" ));        
-        //return AUD_CFG_PLAY_CH_ZERO_ERR; UI not support
-    }
+
 //    if( (pAudioCfg->type == 0) && (pAudioCfg->channels == 0) && (pAudioCfg->lin_ch_mask == 0) ) {
 //        APP_TRACE_INFO(("WARN:(Setup_Audio Rec)pAudioCfg->channels + ch_lin =  0\r\n" ));        
 //        //return AUD_CFG_PLAY_CH_ZERO_ERR; UI not support
 //    }
     //check sample rate
     //No add here!
-    //
-    //
     
-#ifdef BOARD_TYPE_AB03    
+#ifdef BOARD_TYPE_AB03   
     //check play ch num
-    if(  (pAudioCfg->type == 1) && ( pAudioCfg->channels > 4 ) ) { //for AB03
-        APP_TRACE_INFO(("ERROR:(Setup_Audio Play)pAudioCfg->channels(=%d) > 4 NOT allowed for AB03\r\n",pAudioCfg->channels));
+    if(  (pAudioCfg->type == 1) && ( pAudioCfg->channel_num > 4 ) ) { //for AB03
+        APP_TRACE_INFO(("ERROR:(Setup_Audio Play)pAudioCfg->channel_num(=%d) > 4 NOT allowed for AB03\r\n",pAudioCfg->channel_num));
         return AUD_CFG_PLAY_CH_ERR ;
     }
 #endif
     
 #ifdef BOARD_TYPE_UIF
     if( pAudioCfg->type == 0) {
-         mic_num = pAudioCfg->channels ;
-         Global_Mic_Mask[0] = mic_num;
+        mic_num = pAudioCfg->channel_num ;
+        Global_Mic_Mask[0] = mic_num;
     } else {
-         mic_num = Global_Mic_Mask[0]; //save mic num to ruler0
-    }
+        mic_num = Global_Mic_Mask[0]; //save mic num to ruler0
+    } 
 #endif   
     if ( (pAudioCfg->type == 0) && (pAudioCfg->lin_ch_mask != 0) ) {         
-         buf[4] += 2; //add 2 channel  
-         APP_TRACE_INFO(("Lin 2 channels added...%d\r\n",buf[4])); 
+        pAudioCfg->channel_num += 2; //add 2 channel for LINE IN
+        APP_TRACE_INFO(("Lin 2 channels added...%d\r\n",pAudioCfg->channel_num)); 
     }
 
 #ifdef BOARD_TYPE_UIF    
     if ( pAudioCfg->type == 0 ) {
-        buf[8] = Get_Mask_Num( pAudioCfg->gpio_rec_bit_mask ); //gpio num
-        buf[9] = buf[4];  //gpio start index
-        buf[4] += buf[8]; //add gpio num to channel
-        buf[17] = buf[4]; //spi start index
-        buf[4] += buf[16]; //add spi num to channel
-        if(  buf[4] > 8 ) {
-            APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO Rec channel num(=%d) > 8 NOT allowed for AB03\r\n", buf[4]));
+        
+        pAudioCfg->gpio_rec_num  = Get_Mask_Num( pAudioCfg->gpio_rec_bit_mask ); //gpio num
+        pAudioCfg->gpio_rec_start_index = pAudioCfg->channel_num;  //gpio start index
+        pAudioCfg->channel_num += pAudioCfg->gpio_rec_num; //add gpio num to channel 
+        
+        pAudioCfg->spi_rec_num   = Get_Mask_Num( pAudioCfg->spi_rec_bit_mask );  //spi num    
+        
+        Global_SPI_Rec_En = 0; //clear flag as No SPI rec
+        if( pAudioCfg->spi_rec_num  != 0 ){
+            if( pAudioCfg->channel_num != 0 ) {
+                APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO Rec conflict with SPI Rec\r\n"));
+                return AUD_CFG_SPI_REC_CONFLICT ;
+            }
+            pAudioCfg->channel_num = pAudioCfg->spi_rec_num;  //use spi num for rec channel  
+            Global_SPI_Rec_En = 1; //set flag for SPI rec            
+        }      
+        if(  pAudioCfg->channel_num > 8 ) {
+            APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO+SPI Rec channel num(=%d) > 8 NOT allowed for AB03\r\n", pAudioCfg->channel_num));
             return AUD_CFG_MIC_NUM_MAX_ERR ;
-        }
+        }  
+        
     }
 #endif
+    //check channel num    
+    if( (pAudioCfg->type == 1) && (pAudioCfg->channel_num == 0) ) {
+        APP_TRACE_INFO(("WARN:(Setup_Audio Play)pAudioCfg->channel_num =  0\r\n" ));        
+        //return AUD_CFG_PLAY_CH_ZERO_ERR;  UI not support
+    }  
+    if( (pAudioCfg->type == 0) && (pAudioCfg->channel_num == 0) ) {
+        APP_TRACE_INFO(("WARN:(Setup_Audio Rec)pAudioCfg->channel_num  =  0\r\n" ));        
+        //return AUD_CFG_PLAY_CH_ZERO_ERR; UI not support
+    }
     
-    if( buf[4] <= 2 ) { 
-        global_i2s_tdm_sel[pAudioCfg->type] = 0 ;//I2S
-    } else {
-        global_i2s_tdm_sel[pAudioCfg->type] = 1 ;//TDM
-    }
-    if( global_i2s_tdm_sel[0] + global_i2s_tdm_sel[1] == 0 ) {
-        i2s_tdm_sel = 0;
-    } else {
-        i2s_tdm_sel = 1;
-    }
-    if( pAudioCfg->format == 3 ){
-        global_i2s_tdm_sel[pAudioCfg->type] = 2 ;//PCM
-        i2s_tdm_sel = 2;
-    }
-    //Dump_Data(buf, sizeof(buf));
-    
+    //Dump_Data(buf, sizeof(buf)); 
     UART2_Mixer(3); 
     USART_SendBuf( AUDIO_UART, buf, sizeof(buf)) ; 
+    USART_SendBuf( AUDIO_UART, (unsigned char *)pAudioCfg, sizeof(AUDIO_CFG)) ; 
     err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM);
     if( err != NO_ERR ) { 
         APP_TRACE_INFO(("\r\nSetup_Audio ERROR: timeout\r\n")); 
@@ -302,36 +300,134 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         return data; 
     }
     
-    I2C_Mixer(I2C_MIX_FM36_CODEC);
-    err = Init_CODEC( pAudioCfg->sr,  pAudioCfg->bit_length, i2s_tdm_sel, buf[4], buf[15]);
-    I2C_Mixer(I2C_MIX_UIF_S);
+    flag_bypass_fm36 = 1;  //bypass FM36
+    if( pAudioCfg->format == 1 && pAudioCfg->channel_num == 2 ){ //I2S
+        format = 0 ;//I2S
+    } else if( pAudioCfg->format == 2 ){ //PDM       
+        format = 1; //I2S-TDM
+        pAudioCfg->channel_num = 8; //make sure 8 slots enabled when used FM36 to record PDM
+        flag_bypass_fm36 = 0; //not bypass FM36 for PDM mode
+    } else if( pAudioCfg->format == 3 ) { //PCM/TDM
+        format = 2; //PCM/TDM
+    } else {
+        return CODEC_FORMAT_NOT_SUPPORT_ERR;
+    }
+      
+//       pAudioCfg->type == 0 && pAudioCfg->ssc_start==4 && pAudioCfg->ssc_cki == 1
+//       pAudioCfg->type == 1 && pAudioCfg->ssc_start==4 && pAudioCfg->ssc_cki == 0    
+//       pAudioCfg->type == 0 && pAudioCfg->ssc_start==5 && pAudioCfg->ssc_cki == 0
+//       pAudioCfg->type == 1 && pAudioCfg->ssc_start==5 && pAudioCfg->ssc_cki == 1
+        
+    if( (pAudioCfg->type + pAudioCfg->ssc_cki) != 1 ) {
+        return CODEC_FORMAT_NOT_SUPPORT_ERR;
+    }
+    if( pAudioCfg->ssc_start==4 ) {    
+        polarity = 0;
+    } else if( pAudioCfg->ssc_start==5 ){
+        polarity = 1;    
+    } else {
+        return CODEC_FORMAT_NOT_SUPPORT_ERR;
+    }    
+  
+    codec_set[pAudioCfg->type].flag       = 1;  //cfg received
+    codec_set[pAudioCfg->type].sr         = pAudioCfg->sample_rate;
+    codec_set[pAudioCfg->type].sample_len = pAudioCfg->bit_length;
+    codec_set[pAudioCfg->type].format     = format;
+    codec_set[pAudioCfg->type].slot_num   = pAudioCfg->channel_num;
+    codec_set[pAudioCfg->type].m_s_sel    = pAudioCfg->master_slave;
+    codec_set[pAudioCfg->type].delay      = pAudioCfg->ssc_delay;
+    codec_set[pAudioCfg->type].bclk_polarity = polarity;
+    return err ; 
+}
+
+
+
+/*
+*********************************************************************************************************
+*                                           Update_Audio()
+*
+* Description : Update Audio path setting(CODEC and FM36) based on Setup_Audio() command .
+* Argument(s) : None.
+*             
+* Return(s)   : NO_ERR :   execute successfully
+*               others :   refer to error code defines.           
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+unsigned char Update_Audio( void )
+{   
+    unsigned char err;
+    unsigned char index ;  
+      
+    APP_TRACE_INFO(("\r\nUpdate_Audio : [REC] = %d [PLAY] = %d\r\n", codec_set[0].flag, codec_set[1].flag));
+    err = 0;     
+    if( (codec_set[0].flag == 1)  && (codec_set[1].flag == 1) ) {
+        if( (codec_set[0].sr !=  codec_set[1].sr) ||
+            (codec_set[0].sample_len !=  codec_set[1].sample_len) ||
+            (codec_set[0].format !=  codec_set[1].format)  ||
+            (codec_set[0].m_s_sel !=  codec_set[1].m_s_sel)  ) {
+            err = AUD_CFG_ERR;
+            APP_TRACE_INFO(("\r\nERROR: [REC] conflict [PLAY] audio settings!\r\n"));
+        }
+        if( codec_set[0].slot_num >= codec_set[1].slot_num ) {
+           index = 0; 
+        } else {
+           index = 1;
+        }
+    } else if( codec_set[0].flag == 1 ) {
+        index = 0;
+    } else if( codec_set[1].flag == 1 ) {
+        index = 1;
+    } else {        
+        err = AUD_CFG_ERR;
+    }    
+    codec_set[0].flag = 0; //reset Cfg flag
+    codec_set[1].flag = 0;
     if( err != NO_ERR ) {
-        APP_TRACE_INFO(("\r\nSetup_Audio Init_CODEC ERROR: %d\r\n",err)); 
-    } 
-#ifdef BOARD_TYPE_AB03  
-    err = Init_FM36_AB03( pAudioCfg->sr, mic_num, 1, 0, 1, 0 ); //Lin from SP1_RX, slot0~1
-#elif defined BOARD_TYPE_UIF
-    I2C_Mixer(I2C_MIX_FM36_CODEC);
-    err = Init_FM36_AB03( pAudioCfg->sr, mic_num, 1, 0, pAudioCfg->bit_length, i2s_tdm_sel, 0 ); //Lin from SP1_RX, slot0~1
-    I2C_Mixer(I2C_MIX_UIF_S);
-#else
-    err = ReInit_FM36( pAudioCfg->sr ); 
-#endif
-    if( err != NO_ERR ) {
-        APP_TRACE_INFO(("\r\nSetup_Audio ReInit_FM36 ERROR: %d\r\n",err)); 
+        return err;
     }
     
+    //codec_set[index].
+    I2C_Mixer(I2C_MIX_FM36_CODEC);    
+    err = Init_CODEC( codec_set[index] );    
+    //err = Init_CODEC( pAudioCfg->sr,  pAudioCfg->bit_length, i2s_tdm_sel, buf[4], buf[15]);
+    I2C_Mixer(I2C_MIX_UIF_S);
+    if( err != NO_ERR ) {
+        APP_TRACE_INFO(("\r\nUpdate_Audio Init_CODEC ERROR: %d\r\n",err)); 
+        return err;
+    } 
+#ifdef BOARD_TYPE_AB03  
+    err = Init_FM36_AB03( codec_set[index].sr, Global_Mic_Mask[0], 1, 0, 1, 0 ); //Lin from SP1_RX, slot0~1
+#elif defined BOARD_TYPE_UIF
+    I2C_Mixer(I2C_MIX_FM36_CODEC);
+    if( flag_bypass_fm36 == 0 ) {
+        err = Init_FM36_AB03( codec_set[index].sr, Global_Mic_Mask[0], 1, 0, codec_set[index].sample_len, codec_set[index].format, 0 ); //Lin from SP1_RX, slot0~1
+    } else{
+        err = FM36_PWD_Bypass(); 
+    }
+    I2C_Mixer(I2C_MIX_UIF_S);
+#endif
+    if( err != NO_ERR ) {
+        APP_TRACE_INFO(("\r\nUpdate_Audio ReInit_FM36 ERROR: %d\r\n",err)); 
+        return err;
+    }
+        
 //    if ( pAudioCfg->lin_ch_mask != 0 ) {
 //        err = Set_AIC3204_DSP_Offset( mic_num );
 //        if( err != NO_ERR ) {
 //            APP_TRACE_INFO(("\r\nSetup_Audio Init AIC3204 ERROR: %d\r\n",err)); 
 //        }
 //    }
-    if( buf[16] != 0) {
-        Global_SPI_Record = 1; //set flag for SPI rec
-    }
-    return err ; 
+//    if( buf[16] != 0) {
+//        Global_SPI_Record = 1; //set flag for SPI rec
+//    }
+    ////////////////////////////////////////////////////////////////////////////
+    
+    return 0 ; 
+    
 }
+
 
 
 /*
@@ -349,7 +445,7 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
 */
 unsigned char Start_Audio( START_AUDIO start_audio )
 {   
-    unsigned char err   = 0xFF;  
+    unsigned char err;  
     unsigned char data  = 0xFF; 
     unsigned char ruler_id;    
     unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_START_AUDIO, start_audio.type&0x03, start_audio.padding }; 
@@ -357,29 +453,18 @@ unsigned char Start_Audio( START_AUDIO start_audio )
 #if OS_CRITICAL_METHOD == 3u
     OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
 #endif 
-    if( Global_SPI_Record == 1 ) {        
-        Disable_SPI_Port();
-    }
-    APP_TRACE_INFO(("\r\nStart_Audio : type = [%d], padding = [0x%X]\r\n", start_audio.type, start_audio.padding));
+
+    APP_TRACE_INFO(("\r\nStart_Audio : type = [%d], padding = [0x%X]\r\n", start_audio.type, start_audio.padding));    
+    
     UART2_Mixer(3); 
     USART_SendBuf( AUDIO_UART, buf,  sizeof(buf) );    
     err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM );  
-    if( err != NO_ERR ) {
-        if( Global_SPI_Record == 1 ) {   
-            Global_SPI_Record = 0;
-            Enable_SPI_Port();
-        }
-        APP_TRACE_INFO(("\r\nStart_Audio ERROR: Timeout : %d\r\n",err));
-        return err;
-    }
-    if( data != NO_ERR ) {
-        if( Global_SPI_Record == 1 ) {  
-            Global_SPI_Record = 0;
-            Enable_SPI_Port();
-        }
-        APP_TRACE_INFO(("\r\nStart_Audio ERROR: Data : %d\r\n ",data)); 
+    if( err != NO_ERR  || data != 0  ) {         
+        APP_TRACE_INFO(("\r\nStart_Audio ERROR: timeout = %d, ack data = %d\r\n",err, data));        
         return data; 
+        
     } else {
+        
         OS_ENTER_CRITICAL(); 
         for( ruler_id = 0 ; ruler_id < 4 ; ruler_id++ ) {       
             if( Global_Ruler_State[ruler_id] ==  RULER_STATE_SELECTED ) {//given: if mic selected, then ruler used
@@ -389,6 +474,7 @@ unsigned char Start_Audio( START_AUDIO start_audio )
         OS_EXIT_CRITICAL();  
         
     }
+    
     return 0 ;   
 }
 
@@ -427,9 +513,10 @@ unsigned char Stop_Audio( void )
         APP_TRACE_INFO(("\r\nStop_Audio ERROR: %d\r\n ",data)); 
         return data; 
     } 
+    
     //check if it is in SPI recording mode
-    if( Global_SPI_Record == 1 ) {
-        Global_SPI_Record = 0;
+    if( Global_SPI_Rec_Start == 1 ) {
+        Global_SPI_Rec_Start = 0;
         Enable_SPI_Port();
     }
     Disable_Interrupt_For_iM501_IRQ();
@@ -524,44 +611,44 @@ unsigned char Get_Audio_Version( void )
 }
 
 
-
-unsigned char Rec_Voice_Buffer_Start( VOICE_BUF_CFG *pv_b_cfg )
+    
+unsigned char SPI_Rec_Start( SPI_REC_CFG *pSpi_rec_cfg )
 {   
     unsigned char err   = 0xFF;  
     unsigned char data  = 0xFF;
-   
-    unsigned char buf[] = {   CMD_DATA_SYNC1, CMD_DATA_SYNC2,\
-                              RULER_CMD_START_RD_VOICE_BUF,\
-                              (pv_b_cfg->spi_speed) & 0xFF, ((pv_b_cfg->spi_speed)>>8) & 0xFF,\
-                              ((pv_b_cfg->spi_speed)>>16) & 0xFF, ((pv_b_cfg->spi_speed)>>24) & 0xFF,\
-                              pv_b_cfg->spi_mode, pv_b_cfg->gpio_irq }; 
     
-    APP_TRACE_INFO(("\r\nRec_Voice_Buffer_Start : gpio_irq = [%d], spi mode = %d, spi speed = %d MHz\r\n", pv_b_cfg->gpio_irq, pv_b_cfg->spi_mode, pv_b_cfg->spi_speed / 1000000 ));
-    
-    if( pv_b_cfg->gpio_irq < 2 ) {
+    unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_START_RD_VOICE_BUF };
+           
+    if( pSpi_rec_cfg->gpio_irq < 2 ) {
         APP_TRACE_INFO(("\r\nIRQ gpio support: UIF_GPIO_2 ~ UIF_GPIO_9 only!\r\n ",data)); 
-        return UIF_TYPE_NOT_SUPPORT;
+        return AUD_CFG_SPI_REC_CONFLICT;
     } 
-    buf[8] = pv_b_cfg->gpio_irq - 2 ;//Cause UIF_GPIO connecting to Host is differnt from Audio
+    if( Global_SPI_Rec_En == 0 ) {
+       APP_TRACE_INFO(("\r\nGlobal_SPI_Rec channel = 0\r\n ",data)); 
+       return AUD_CFG_SPI_REC_CONFLICT;
+    }
+    pSpi_rec_cfg->gpio_irq -= 2 ;//'cause UIF_GPIO connecting to Host is differnt from Audio
+    
+    APP_TRACE_INFO(("\r\nSPI_Rec_Start : Chip ID = %d, IRQ = GPIO[%d], spi.mode = %d, spi.speed = %d MHz\r\n",\
+                         pSpi_rec_cfg->chip_id, pSpi_rec_cfg->gpio_irq, pSpi_rec_cfg->spi_mode, pSpi_rec_cfg->spi_speed / 1000000 ));
+    
+    Disable_SPI_Port(); //disabled host mcu SPI;
     
     UART2_Mixer(3); 
-    USART_SendBuf( AUDIO_UART, buf,  sizeof(buf) );    
+    USART_SendBuf( AUDIO_UART, buf,  sizeof(buf) ); 
+    USART_SendBuf( AUDIO_UART, (unsigned char *)pSpi_rec_cfg, sizeof(SPI_REC_CFG)) ; 
     err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM );  
-    if( err != NO_ERR ) { 
-        //APP_TRACE_INFO(("\r\nRec_Voice_Buffer_Start ERROR: Timeout : %d\r\n",err));
-        return err;
-    }
-    if( data != NO_ERR ) {
-        //APP_TRACE_INFO(("\r\nRec_Voice_Buffer_Start ERROR: Data : %d\r\n ",data)); 
+    if( err != NO_ERR  || data != 0  ) {         
+        APP_TRACE_INFO(("\r\nSPI_Rec_Start ERROR: timeout = %d, ack data = %d\r\n",err, data));  
+        Enable_SPI_Port(); //Enabled host mcu SPI if failed to get resp from audio mcu        
         return data; 
     }
-    //Disable_SPI_Port();
     
-    Global_SPI_Record = 1; //set flag for SPI rec
+    Global_SPI_Rec_Start = 1; //set flag for SPI rec
     
     return 0 ;
 }
-
+     
 /*
 *********************************************************************************************************
 *                                       Init_Ruler()
@@ -1760,7 +1847,7 @@ unsigned char Set_Volume(  SET_VOLUME *pdata )
         I2C_Mixer(I2C_MIX_UIF_S); 
         return err;    
     }
-    err = CODEC_Set_Volume( pdata->spk, pdata->lout );
+    err = CODEC_Set_Volume( pdata->spk, pdata->lout, pdata->lin );
     if( OS_ERR_NONE != err ) {    
         APP_TRACE_INFO(( "FAIL [0x%X]\r\n", err )); 
         I2C_Mixer(I2C_MIX_UIF_S); 
@@ -1785,7 +1872,7 @@ unsigned char Set_Volume(  SET_VOLUME *pdata )
 *                      1 - deactive all mics on this ruler
 *                      0 - do nothing. ignore the reset operation
 * Return(s)   : NO_ERR :   execute successfully
-*               others :   =error code .  
+*               others :   = error code .  
 *
 * Note(s)     : None.
 *********************************************************************************************************
@@ -1893,36 +1980,42 @@ void Ruler_Port_LED_Service( void )
 * Description : Audio bridge Power-On-Self-Test use. 
 *
 * Argument(s) : None.
-* Return(s)   : None.
+* Return(s)   : error number.
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void AB_POST( void )
+unsigned char AB_POST( void )
 {
-    unsigned char  err;
-    
+    unsigned char  err;  
     APP_TRACE_INFO(("\r\nStart Audio Bridge POST :\r\n"));    
     //Enable_FPGA();
-
+    
+    ///////////////////////////
     APP_TRACE_INFO(("\r\n1. CODEC... \r\n"));
     I2C_Mixer(I2C_MIX_FM36_CODEC);
-    err = Init_CODEC( SAMPLE_RATE_DEF,  SAMPLE_LENGTH, 1, 8, 0); //TDM  
+    codec_set[0].sr = SAMPLE_RATE_DEF;
+    codec_set[0].sample_len = SAMPLE_LENGTH;
+    codec_set[0].format = 0; //I2S
+    codec_set[0].slot_num = 8; //8 channels
+    codec_set[0].m_s_sel = 0; //master
+    codec_set[0].flag = 0; //reset Cfg flag
+    codec_set[1].flag = 0;
+    err = Init_CODEC( codec_set[0] );  
     I2C_Mixer(I2C_MIX_UIF_S);
     if( err != NO_ERR ) {
         Global_Bridge_POST = POST_ERR_CODEC;
         APP_TRACE_INFO(("\r\n---Error : %d\r\n",err));
-        //return ;
+        return Global_Bridge_POST;
     } else {
         APP_TRACE_INFO(("\r\n---OK\r\n"));
     }
-    
+    ////////////////////////////
     APP_TRACE_INFO(("\r\n2. FM36 DSP... \r\n"));
 #ifdef BOARD_TYPE_AB03   
     err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, 0, 1, 0 ); //Lin from SP1.Slot0
 #elif defined BOARD_TYPE_UIF
-    I2C_Mixer(I2C_MIX_FM36_CODEC);
-    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH, 1, 0  ); 
-    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH, 1, 0  ); //Lin from SP1.Slot0
+    I2C_Mixer(I2C_MIX_FM36_CODEC); 
+    err = Init_FM36_AB03( SAMPLE_RATE_DEF, 0, 1, 0, SAMPLE_LENGTH, 1, 1  ); //force reset FM36, Lin from SP1.Slot0
     I2C_Mixer(I2C_MIX_UIF_S);
 #else 
     err = Init_FM36( SAMPLE_RATE_DEF );
@@ -1930,20 +2023,26 @@ void AB_POST( void )
     if( err != NO_ERR ) {
         Global_Bridge_POST = POST_ERR_FM36;
         APP_TRACE_INFO(("\r\n---Error : %d\r\n",err));
-        //return ;
+        return Global_Bridge_POST;
     } else {
         APP_TRACE_INFO(("\r\n---OK\r\n"));
     }  
-    
+    //////////////////////////////
     APP_TRACE_INFO(("\r\n3. AUDIO MCU... \r\n"));
     err = Get_Audio_Version();
     if( err != NO_ERR ) {
         Global_Bridge_POST = POST_ERR_AUDIO;
         APP_TRACE_INFO(("\r\n---Error : %d\r\n",err));
-        //return ;
+        return Global_Bridge_POST;
     } else {
         APP_TRACE_INFO(("\r\n---OK\r\n"));
-    }    
+    }
+//    err = Stop_Audio();
+//    if( err != NO_ERR ) {
+//        Global_Bridge_POST = POST_ERR_AUDIO;
+//        APP_TRACE_INFO(("\r\n---Error : %d\r\n",err));
+//        return Global_Bridge_POST;
+//    }    
    
     //Config_PDM_PA();
     
@@ -1966,6 +2065,8 @@ void AB_POST( void )
 //        Global_Bridge_POST = POST_ERR_CODEC ;
 //        APP_TRACE_INFO(("\r\nPower Down CODEC ERROR: %d\r\n",err)); 
 //    }
+    
+    return err;
     
 }
 
@@ -2096,8 +2197,7 @@ unsigned char Ruler_Setup_Sync( unsigned char ruler_slot_id )
     }    
     OSSemPost( UART_MUX_Sem_lock );    
     return err ;    
-    
-    
+        
 }
 
 
@@ -2107,9 +2207,9 @@ void Debug_Audio( void )
    AUDIO_CFG    AudioCfg;
    START_AUDIO  start_audio;
    
-   AudioCfg.channels = 8;
+   AudioCfg.channel_num = 8;
    AudioCfg.bit_length = 32;
-   AudioCfg.sr = 16000;
+   AudioCfg.sample_rate = 16000;
    AudioCfg.type = 1; //play
    
    start_audio.type = 2; //play

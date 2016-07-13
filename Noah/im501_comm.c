@@ -767,7 +767,7 @@ unsigned char im501_write_dram_spi( unsigned int mem_addr, unsigned char *pdata 
 unsigned char parse_to_host_command( To_Host_CMD cmd )
 {
     unsigned char err; 
-    unsigned int address;
+//    unsigned int address;
        
     switch( cmd.cmd_byte ) {
         
@@ -834,7 +834,7 @@ unsigned char send_to_dsp_command( To_501_CMD cmd )
 
 /*
 *********************************************************************************************************
-*                                    Wait_Keywords_Detect()
+*                                    Start_Keywords_Detection()
 *
 * Description :  Configure GPIO interruption for iM501 IRQ
 *
@@ -845,9 +845,8 @@ unsigned char send_to_dsp_command( To_501_CMD cmd )
 * Note(s)     :  None.
 *********************************************************************************************************
 */
-void Wait_Keywords_Detect( unsigned char gpio_irq )
+void Start_Keywords_Detection( unsigned char gpio_irq )
 {
-    
     im501_irq_counter = 0;
     im501_key_words_detect = 0 ;
     im501_irq_gpio = gpio_irq ; 
@@ -886,9 +885,8 @@ unsigned char Request_Enter_PSM( void )
     
     I2C_Mixer(I2C_MIX_FM36_CODEC);
     FM36_PDMADC_CLK_OnOff(0,0); //Disable PDM clock
-    I2C_Mixer(I2C_MIX_UIF_S);
-    
-    //Wait_Keywords_Detect(2);
+    I2C_Mixer(I2C_MIX_UIF_S);    
+   
     
     return err;
     
@@ -944,7 +942,7 @@ void Service_To_iM501_IRQ( void )
     
     unsigned char err;    
     To_Host_CMD   cmd;
-    VOICE_BUF_CFG voice_buf_cfg;
+    SPI_REC_CFG   spi_rec_cfg;
     
     if ( im501_irq_counter ) {
         
@@ -972,19 +970,15 @@ void Service_To_iM501_IRQ( void )
             
             I2C_Mixer(I2C_MIX_FM36_CODEC);           
             FM36_PDMADC_CLK_OnOff(1,0); //Should Enable PDM clock fast switch, but this will cause pop sound 
-            I2C_Mixer(I2C_MIX_UIF_S); 
+            I2C_Mixer(I2C_MIX_UIF_S);             
+            im501_change_if_speed(2,1); //change SPI speed to high speed  
             
-            im501_change_if_speed(2,1); //change SPI speed to high speed          
-            Disable_SPI_Port(); //disabled host mcu SPI  
-            
-            voice_buf_cfg.spi_mode = Global_UIF_Setting[1].speed;
-            voice_buf_cfg.spi_speed = Global_UIF_Setting[1].attribute;
-            voice_buf_cfg.gpio_irq = im501_irq_gpio;    
-            
-            err = Rec_Voice_Buffer_Start( &voice_buf_cfg ); //send CMD to Audio MCU 
-            if( err != NULL ) {
-                Enable_SPI_Port(); //Enabled host mcu SPI if failed to get resp from audio mcu
-            }            
+            spi_rec_cfg.gpio_irq  = im501_irq_gpio; 
+            spi_rec_cfg.spi_mode  = Global_UIF_Setting[UIF_TYPE_SPI - 1].speed;
+            spi_rec_cfg.spi_speed = Global_UIF_Setting[UIF_TYPE_SPI - 1].attribute;               
+            spi_rec_cfg.chip_id   = Global_UIF_Setting[UIF_TYPE_DUT_ID - 1].attribute;
+            err = SPI_Rec_Start( &spi_rec_cfg ); //send start CMD to audio MCU 
+             
         }  
         
     }

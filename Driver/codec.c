@@ -1,3 +1,33 @@
+/*
+*********************************************************************************************************
+*                                           UIF BOARD DRIVER PACKAGE
+*
+*                            (c) Copyright 2013 - 2016; Fortemedia Inc.; Nanjing, China
+*
+*                   All rights reserved.  Protected by international copyright laws.
+*                   Knowledge of the source code may not be used to write a similar
+*                   product.  This file may only be used in accordance with a license
+*                   and should not be redistributed in any way.
+*********************************************************************************************************
+*/
+
+/*
+*********************************************************************************************************
+*
+*                                          CODEC TLV320AIC3204 Setup
+*
+*                                          Atmel AT91SAM3U4C
+*                                               on the
+*                                      Unified EVM Interface Board
+*
+* Filename      : codec.c
+* Version       : V2.0.0
+* Programmer(s) : PQ
+*********************************************************************************************************
+* Note(s)       :
+*********************************************************************************************************
+*/
+
 #include <bsp.h>
 #include <pio.h>
 #include <async.h>
@@ -74,9 +104,6 @@ unsigned char Codec_Mixer(unsigned char i2c_channel )
 
 
 
-
-
-
 unsigned char Set_Codec(unsigned char codec_control_type, unsigned char size_para, unsigned char *pdata)
 {
     unsigned char i, state = 0 ;
@@ -129,8 +156,6 @@ unsigned char I2CWrite_Codec_AIC3204( unsigned char reg,unsigned char data )
 /******************************      AD1937        ************************************/
 // OSC=12.288Mhz
 /*
-
-
 void ALL_POWER_ON(void)
 {
     I2CWrite_Codec(DAC_Control0,0x00);  //
@@ -424,53 +449,146 @@ unsigned char CODEC_LOUT_Small_Gain_En( bool small_gain )
 }
 
 
-unsigned char CODEC_Set_Volume( unsigned int vol_spk, unsigned int vol_lin )
+unsigned char encode(signed char value)
 {
-    /*
-    unsigned char err;
-    unsigned char temp;
+  signed char temp;
+  if(value >=0){
+      return value;
+  }
+  else{
+      temp= ~(abs(value)-1);
+      return temp;
+  }
+}
+
+unsigned char CODEC_Set_Volume( float vol_spk, float vol_lout, float vol_lin )
+{
+    unsigned char err;            
+    float temp = 0;
+    unsigned char flag=0;
+    unsigned char Mic_PGA=0,ADC_GAIN=0;
     
-    temp = 0xF0;
-    err = Codec_DAC_Attenuation(DAC1L_Volume, vol_spk );    
-    if( OS_ERR_NONE != err ){
-        return err;
+    vol_spk= (vol_spk - (int)vol_spk%5)/10;
+    vol_lout=(vol_lout - (int)vol_lout%5)/10;
+    vol_lin=(vol_lin - (int)vol_lin%5)/10;
+       
+    if (vol_lin < -12){
+        vol_lin=-12;
     }
-    err = Codec_DAC_Attenuation(DAC1R_Volume, vol_spk );
-    if( OS_ERR_NONE != err ){
-        return err;
+    if(vol_lin > 67.5){
+        vol_lin=67.5;
     }
-    
-    err = Codec_DAC_Attenuation(DAC2L_Volume, vol_lin );
-    if( OS_ERR_NONE != err ){
-        return err;
-    }   
-    err = Codec_DAC_Attenuation(DAC2R_Volume, vol_lin );
-    if( OS_ERR_NONE != err ){
-        return err;
+    if (vol_spk < -69.5){
+        vol_spk=-69.5;  
     }
-     
-    if( vol_spk == SET_VOLUME_MUTE ) {
-        temp += (3<<0);
+    if(vol_spk > 53){
+         vol_spk=53;
     }
-    if( vol_lin == SET_VOLUME_MUTE ) {
-        temp += (3<<2);
+     if (vol_lout < -69.5){
+        vol_lout=-69.5;  
     }
-    err = I2CWrite_Codec(DAC_Mute,temp);
+    if(vol_lout > 53){
+         vol_lout=53;
+    }
+        
+    for(unsigned char i=0;i<95+1;i++){
+      for(signed char j=-24;j<40+1;j++){
+          temp=i*0.5+j*0.5;
+          if(temp==vol_lin){
+              Mic_PGA=encode(i);
+              ADC_GAIN=encode(j);//now not support negative
+              flag=1;
+          }
+       if(flag==1)break;   
+      }
+    if(flag==1)break; 
+    }
+    flag=0;
+    err = I2CWrite_Codec_AIC3204(0,1); //switch to Page1
+    if( OS_ERR_NONE != err ) {
+        err = CODEC_WR_REG_ERR;
+        return err ;
+    } 
+    I2CWrite_Codec_AIC3204(59,Mic_PGA); 
+    I2CWrite_Codec_AIC3204(60,Mic_PGA); 
+    I2CWrite_Codec_AIC3204(0,0); //switch to Page0
+    I2CWrite_Codec_AIC3204(83,ADC_GAIN); 
+    I2CWrite_Codec_AIC3204(84,ADC_GAIN); 
+   
+    signed char DAC_GAIN=0 ,HPL_GAIN=0 ,LOL_GAIN=0;
+    unsigned char flag1=0,flag2=0;
+    for(signed char k=-127;k<48+1;k++){
+      for(signed char m=-6;m<29+1;m++){
+          temp=k*0.5+m;
+          if(temp==vol_lout && flag1==0){
+              DAC_GAIN=encode(k);
+              HPL_GAIN=encode(m);
+              flag1=1;
+          }
+          if(temp==vol_spk && flag2==0 ){
+              DAC_GAIN=encode(k);
+              LOL_GAIN=encode(m);
+              flag2=1;
+          }
+          if(flag1==1 && flag2==1)break;    
+      }
+      if(flag1==1 && flag2==1)break;    
+    }
+    flag1=0;
+    flag2=0;
+    I2CWrite_Codec_AIC3204(0,0); //switch to Page0
+    I2CWrite_Codec_AIC3204(65,DAC_GAIN); 
+    I2CWrite_Codec_AIC3204(66,DAC_GAIN); 
+    I2CWrite_Codec_AIC3204(0,1); //switch to Page1
+    I2CWrite_Codec_AIC3204(16,HPL_GAIN); 
+    I2CWrite_Codec_AIC3204(17,HPL_GAIN);
+    I2CWrite_Codec_AIC3204(18,LOL_GAIN); 
+    I2CWrite_Codec_AIC3204(19,LOL_GAIN);
     
     return err;
-    */
-    return 0;
     
 }
 
 
+unsigned char Set_AIC3204_DSP_Offset( unsigned char slot_index ) 
+{
+    
+    unsigned char err;
+    
+    if( slot_index >6 ) { //slot_index is for line in channels
+        return 0x99;
+    }      
+    err = I2CWrite_Codec_AIC3204( 28, slot_index << 5);
+    
+    return err;    
+    
+}
 
-
-/*****************************************************************************/
-
-unsigned short CODEC_PARA_TABLE[][14][7] = {
-    { //mode 0
+unsigned short CODEC_SUPPORT_SR[] = {
+    
+    48000, 44100, 32000, 24000, 22050, 16000, 8000
         
+};
+
+
+unsigned char Check_SR_Support( unsigned int sample_rate )
+{    
+   unsigned int i;
+   for( i = 0; i<sizeof(CODEC_SUPPORT_SR)>>1; i++ ) {
+       if( CODEC_SUPPORT_SR[i] == sample_rate ) {
+           return 0 ; //find the SR
+       }
+   }   
+   return CODEC_SR_NOT_SUPPORT_ERR;  //SR not support
+    
+}
+
+
+/*
+//CODEC PLL setting based on 24.576MHz MCLK 
+unsigned short CODEC_PLL_PARA_TABLE[][14][7] = {
+    
+    { //mode 0        
           //I2S format
           //BCLK = 16 * 2 * FCLK = 32 * FCLK
 	  //parameter for MCLK = 24.576MHz 
@@ -504,9 +622,9 @@ unsigned short CODEC_PARA_TABLE[][14][7] = {
 	  {0x82 , 0x82,  0x82,  0x84,  0x84,  0x84,  0x88 }, //  REG_BCLK_DIV=  --R30   
 	  {0x82,  0x88,  0x83,  0x82,  0x88,  0x83,  0x86 }, //  REG_NADC    = 
 	  {0x84,  0x82,  0x84 , 0x84,  0x82,  0x84,  0x84 }, //  REG_MADC    = 
-	  {0x00,  0x80,  0x40,  0x80,  0x00,  0x80,  0x80 }, //REG_AOSR    =  --R20
+	  {0x00,  0x80,  0x40,  0x80,  0x00,  0x80,  0x80 }, //  REG_AOSR    =  --R20
 	  //{3.072M, 2.8224M, 2.048M, 3.072M, 2.8224M, 2.048M, 1.024M},//     --PDMCLK   :       
-	  {0x00,  0x03,  0x00,  0x00,  0x03,  0x00,  0x00 }, //CLK_MUX     =  --Select CODEC_CLKIN
+	  {0x00,  0x03,  0x00,  0x00,  0x03,  0x00,  0x00 }, //  CLK_MUX     =  --Select CODEC_CLKIN
 	  {0,     1,     0,     0,     1,    0,     0}, //PLL_EN      = 
 	  {0, 	  1,     0,     0,     1,    0,     0}, //PLL_R       = 
 	  {0,     2,     0,     0,     2,    0,     0}, //PLL_P       = 
@@ -557,36 +675,11 @@ unsigned short CODEC_PARA_TABLE[][14][7] = {
 	  {0,     7,     0,     0,     7,    0,     0}, //PLL_J       = 
 	  {0,     3500,  0,     0,     3500, 0,     0}  //PLL_D       = 
     },
-    
-   /*
-    {
-          //I2S format
-          //BCLK = 16 * 2 * FCLK = 32 * FCLK
-	  //parameter for MCLK = 12.288MHz 
-   
-          {48000, 44100, 32000, 24000, 22050, 16000, 8000 }, //SR	      
-	  {0x82,  0x88,  0x83,  0x82,  0x88,  0x83,  0x83 }, //  REG_NDAC    =
-	  {0x81,  0x82,  0x81,  0x82,  0x82,  0x82,  0x84 }, //  REG_MDAC    = --R12
-	  {0x80,  0x40,  0x80,  0x80,  0x80,  0x80,  0x00 }, //  REG_DOSR    = --R13-14
-	  {0x84,  0x82,  0x84,  0x84,  0x84,  0x84,  0x84 }, //  REG_BCLK_DIV=  --R30   84
-	  {0x81,  0x88,  0x83,  0x82,  0x88,  0x83,  0x83 }, //  REG_NADC    = 
-	  {0x84,  0x82,  0x82,  0x84,  0x82,  0x84,  0x84 }, //  REG_MADC    = 
-	  {0x00,  0x80,  0x40,  0x00,  0x00,  0x40,  0x80 }, //REG_AOSR    =  --R20
-	  //{3.072M, 2.8224M, 2.048M, 3.072M, 2.8224M, 2.048M, 1.024M},//     --PDMCLK   :       
-	  {0x00,  0x03,  0x00,  0x00,  0x03,  0x00,  0x00 }, //CLK_MUX     =  --Select CODEC_CLKIN
-	  {0,     1,     0,     0,     1,    0,     0}, //PLL_EN      = 
-	  {0, 	  1,     0,     0,     1,    0,     0}, //PLL_R       = 
-	  {0,     2,     0,     0,     2,    0,     0}, //PLL_P       = 
-	  {0,     7,     0,     0,     7,    0,     0}, //PLL_J       = 
-	  {0,     3500,  0,     0,     3500, 0,     0}  //PLL_D       = 
-    },
-    */
-    
-    {
-          //mode 4
+       
+    {//mode 4
           //TDM 4slot 32bit
          //BCLK = 32 * 4 * FCLK = 128 * FCLK
-	 //parameter for MCLK = 24.576MHz 
+	 //parameter for MCLK = 24.576MHz
           {48000, 44100, 32000, 24000, 22050, 16000, 8000 }, //SR	      
 	  {0x82,  0x88,  0x83,  0x82,  0x88,  0x83,  0x83 }, //  REG_NDAC    =
 	  {0x82,  0x84,  0x82,  0x84,  0x84,  0x84,  0x81 }, //  REG_MDAC    = --R12
@@ -594,7 +687,7 @@ unsigned short CODEC_PARA_TABLE[][14][7] = {
 	  {0x82,  0x82,  0x82,  0x84,  0x84,  0x84,  0x88 }, //  REG_BCLK_DIV=  --R30   
 	  {0x82,  0x88,  0x83,  0x82,  0x88,  0x83,  0x86 }, //  REG_NADC    = 
 	  {0x84,  0x82,  0x84,  0x84,  0x82,  0x84,  0x84 }, //  REG_MADC    = 
-	  {0x00,  0x80,  0x40,  0x80,  0x00,  0x80,  0x80 }, //REG_AOSR    =  --R20
+	  {0x00,  0x80,  0x40,  0x80,  0x00,  0x80,  0x80 }, //  REG_AOSR    =  --R20
 	  //{3.072M, 2.8224M, 2.048M, 3.072M, 2.8224M, 2.048M, 1.024M},//     --PDMCLK   :       
 	  {0x00,  0x03,  0x00,  0x00,  0x03,  0x00,  0x00 }, //CLK_MUX     =  --Select CODEC_CLKIN
 	  {0,     1,     0,     0,     1,    0,     0}, //PLL_EN      = 
@@ -604,7 +697,9 @@ unsigned short CODEC_PARA_TABLE[][14][7] = {
 	  {0,     3500,  0,     0,     3500, 0,     0}  //PLL_D       = 
           
     }
+    
 };
+
 
 unsigned char audio_interface[] = { 
           0x0c,   //I2S mode,16bit,master
@@ -616,18 +711,17 @@ unsigned char audio_interface[] = {
     
 };
 
-unsigned short BCLK_SOURCE[] = { //reg29 0:DAC_CLK  1: DAC_MOD_CLK
-          1, //I2S 16bit format
-          0, //TDM 16bit format
-          0, //TDM 32bit format
-		  0, //I2S 32bit format
-          0  //TDM 32bit 4slot format
+unsigned short BCLK_SOURCE[] = { //reg29 0:DAC_CLK  1: DAC_MOD_CLK , D3 = 1 for bclk invert
+          0x9, //I2S 16bit format
+          0x8, //TDM 16bit format
+          0x8, //TDM 32bit format
+          0x8, //I2S 32bit format
+          0x8  //TDM 32bit 4slot format
 };
-          
+*/          
 
 
-unsigned char config_aic3204[][2] = {
-    
+unsigned char config_aic3204[][2] = {    
        
 		      0,0x00, //page0 
 
@@ -680,9 +774,8 @@ unsigned char config_aic3204[][2] = {
 			  //-set DAC channels
 		      63,0xE8, //DAC Channel Setup :  0xD4: L2L, R2R; 0xE8: L2R, R2L
 		      64,0X00, // 	 
-		      65,( 0X100+2*( 0 ) )%0x100, //DAC Volume L set 0dB  : [-63.5,+24] @ 0.5dB
-		      66,( 0X100+2*( 0 ) )%0x100, //DAC Volume R set 0dB  : [-63.5,+24] @ 0.5dB
-		      
+		      65,( 0X100+2*( 0 ) )%0x100, //DAC Volume L set 0 dB  : [-63.5,+24] @ 0.5dB
+		      66,( 0X100+2*( 0 ) )%0x100, //DAC Volume R set 0 dB  : [-63.5,+24] @ 0.5dB
 		      //-set dmic data pin setting
 		      55,0X0e,   // Set MISO as PDM CLK ouput pin
 		      56,0X02,   // SCLK pin is enabled		
@@ -720,11 +813,10 @@ unsigned char config_aic3204[][2] = {
 		      57,0X40, // CM1R to R_MICPGA 	      
 		         
 		      //-set DAC output gains
-		      16,( 0X40+( 12 ) )% 0x50 ,  //HPL +12db gain :  [-6,+29] @ 1dB
-		      17,( 0X40+( 12 ) )% 0x50 ,  //HPR +12db gain :  [-6,+29] @ 1dB
-		      18,( 0X00+( 0 ) )% 0x50 ,  //LOL -6db gain   :  [0,+29] @ 1dB
-		      19,( 0X00+( 0 ) )% 0x50 ,  //LOR -6db gain   :  [0,+29] @ 1dB
-		      		       
+		      16,( 0X40+( 0 ) )% 0x50 ,  //HPL 0 db gain :  [-6,+29] @ 1dB
+		      17,( 0X40+( 0 ) )% 0x50 ,  //HPR 0 db gain :  [-6,+29] @ 1dB
+		      18,( 0X40+( 0 ) )% 0x50 ,  //LOL 0 db gain :  [-6,+29] @ 1dB
+		      19,( 0X40+( 0 ) )% 0x50 ,  //LOR 0 db gain :  [-6,+29] @ 1dB		      		       
 		      //-set MIC PGA Gain
 		      59,0X00,  //L_MICPGA 0db gain
 		      60,0X00,  //R_MICPGA 0db gain	
@@ -734,161 +826,323 @@ unsigned char config_aic3204[][2] = {
 
 
 
+unsigned char Generate_FCLK( unsigned int codec_clkin ,unsigned int sr ,unsigned char NDAC ,unsigned char MDAC, unsigned int DOSR )
+{
+    unsigned int temp;
+    
+    temp= codec_clkin*1000/NDAC/MDAC/DOSR;
+    if(temp== sr){
+        return 1 ;
+    }
+    return 0;
+    
+}
 
-#define CFG_PARA_NUM  15
+unsigned char Generate_BCLK( unsigned int codec_clkin ,unsigned int BCLK, unsigned char NDAC, unsigned char BCLK_N_divider )
+{
+    unsigned int temp;
+    
+    temp= codec_clkin*1000/NDAC/BCLK_N_divider;
+    if(temp== BCLK){
+        return 1;
+    }
+    return 0;
+    
+}
 
-static unsigned int  codec_saved_sr;
-static unsigned char codec_saved_sample_length;
-static unsigned char codec_saved_format;
+unsigned char Set_Codec_PLL( unsigned int sr, unsigned char sample_length, unsigned char slot_num, unsigned char bclk_polarity )
+{
+    unsigned char err,i;
+    unsigned char flag=0;
+    unsigned char NDAC ,MDAC, NADC, MADC;
+    unsigned int  DOSR ;
+    unsigned char DOSR_H,DOSR_L;
+    unsigned char BCLK_N_divider;
+    unsigned int  BCLK;
+    
+    unsigned int codec_clkin=73728;
+    unsigned char codec_para[6][2];
+    
+    unsigned char codec_para1[][2] = {
+        0x04 ,0x03 , // PLL is codec_clkin
+        0x05 ,0xC3 , // PLL power up , P=4, R=1
+        0x06 ,0x04 , // J=4
+        0x07 ,0x00 , // D=0
+        0x08 ,0x00 , // D=0
+        0x1D ,0x00 , //BCLK source=DAC_CLK
+    };//make sure codec_clkin=73.728M  length=16bit 32bit slot_num=2,4,6,8
+    unsigned char codec_para2[][2] = {
+        0x04 ,0x03 , // PLL is codec_clkin
+        0x05 ,0xC1 , // PLL power up , P=4, R=1
+        0x06 ,0x03 , // J=3
+        0x07 ,0x00 , // D=0
+        0x08 ,0x00 , // D=0
+        0x1D ,0x00 , //BCLK source=DAC_CLK
+    };//make sure codec_clkin=18.432M  length=24bit slot_num=2,4,6,8
+    unsigned char codec_para3[][2] = {
+        0x04 ,0x03 , // PLL is codec_clkin
+        0x05 ,0xC2 , // PLL power up , P=4, R=2
+        0x06 ,0x0D , // J=13
+        0x07 ,0x04 , // D=1250
+        0x08 ,0xE2 , // D=1250
+        0x1D ,0x00 , //BCLK source=DAC_CLK
+    };
+    //make sure codec_clkin=161.28M  length=16,24,32bit slot_num=1,3,5,7
+     unsigned char codec_para4[][2] = {
+        0x04 ,0x03 , // PLL is codec_clkin
+        0x05 ,0x85 , // PLL power up , P=8, R=5
+        0x06 ,0x08 , // J=26
+        0x07 ,0x0A , // D=2688
+        0x08 ,0x80 , // D=2688
+        0x1D ,0x00 , //BCLK source=DAC_CLK
+    };//make sure codec_clkin=127.008M  length=24bit slot_num=1,2,4,6,8
+     unsigned char codec_para5[][2] = {
+        0x04 ,0x03 , // PLL is codec_clkin
+        0x05 ,0x81 , // PLL power up , P=8, R=1
+        0x06 ,0x30 , // J=48
+        0x07 ,0x09 , // D=2344
+        0x08 ,0x28 , // D=2344
+        0x1D ,0x00 , //BCLK source=DAC_CLK
+    };//make sure codec_clkin=148.176M  length=16,32bit slot_num=3,5,7
+     unsigned char codec_para6[][2] = {
+        0x04 ,0x03 , // PLL is codec_clkin
+        0x05 ,0x81 , // PLL power up , P=8, R=1
+        0x06 ,0x24 , // J=36
+        0x07 ,0x06 , // D=1758
+        0x08 ,0xDE , // D=1758
+        0x1D ,0x00 , //BCLK source=DAC_CLK
+    };//make sure codec_clkin=111.132M  length=24bit slot_num=3,5,7
+      unsigned char codec_para7[][2] = {
+        0x04 ,0x03 , // PLL is codec_clkin
+        0x05 ,0x81 , // PLL power up , P=8, R=1
+        0x06 ,0x37 , // J=55
+        0x07 ,0x04 , // D=1250
+        0x08 ,0xE2 , // D=1250
+        0x1D ,0x00 , //BCLK source=DAC_CLK
+    };//make sure codec_clkin=169.334M  length=16,32bit slot_num=1,2,4,6,8
+    
+    if((sample_length==16 || sample_length==32) && (slot_num==1 || slot_num==2 || slot_num==4 || slot_num==6 ||  slot_num==8)){
+         for( unsigned char i = 0 ; i< sizeof(codec_para1)>>1 ; i++ ) { 
+            codec_para[i][0]=codec_para1[i][0];  
+            codec_para[i][1]=codec_para1[i][1];            
+         }
+          codec_clkin=73728;
+    }
+    else if((sample_length==16 || sample_length==32) && (slot_num==3 || slot_num==5 || slot_num==7))
+    {
+         for( unsigned char i = 0 ; i< sizeof(codec_para3)>>1 ; i++ ) { 
+            codec_para[i][0]=codec_para3[i][0];  
+            codec_para[i][1]=codec_para3[i][1]; 
+            codec_clkin=161280;
+         }
+    }
+    if ((sample_length==24) && (slot_num==1 || slot_num==2 || slot_num==4 || slot_num==6 ||  slot_num==8)){
+         for( unsigned char i = 0 ; i< sizeof(codec_para2)>>1 ; i++ ) { 
+            codec_para[i][0]=codec_para2[i][0];  
+            codec_para[i][1]=codec_para2[i][1];     
+         }
+         codec_clkin=18432;
+    }
+    else if ((sample_length==24) && (slot_num==3 || slot_num==5 || slot_num==7)){
+         for( unsigned char i = 0 ; i< sizeof(codec_para3)>>1 ; i++ ) { 
+            codec_para[i][0]=codec_para3[i][0];  
+            codec_para[i][1]=codec_para3[i][1];     
+         }
+         codec_clkin=161280;
+    }
+    
+    if((sr == 22050 || sr == 44100) && sample_length==24 && (slot_num==1 || slot_num==2 || slot_num==4 || slot_num==6 ||  slot_num==8) ){
+         for( unsigned char i = 0 ; i< sizeof(codec_para4)>>1 ; i++ ) { 
+            codec_para[i][0]=codec_para4[i][0];  
+            codec_para[i][1]=codec_para4[i][1];     
+         }
+         codec_clkin=127008;
+    }
+    else if ((sr == 22050 || sr == 44100) && sample_length==32 && (slot_num==3 || slot_num==5 || slot_num==7)){
+         for( unsigned char i = 0 ; i< sizeof(codec_para5)>>1 ; i++ ) { 
+            codec_para[i][0]=codec_para5[i][0];  
+            codec_para[i][1]=codec_para5[i][1];     
+         }
+         codec_clkin=148176;
+    }
+     else if ((sr == 22050 || sr == 44100) && sample_length==24 && (slot_num==3 || slot_num==5 || slot_num==7)){
+         for( unsigned char i = 0 ; i< sizeof(codec_para6)>>1 ; i++ ) { 
+            codec_para[i][0]=codec_para6[i][0];  
+            codec_para[i][1]=codec_para6[i][1];     
+         }
+         codec_clkin=111132;
+    } 
+     else if ((sr == 22050 || sr == 44100) && sample_length==32 && (slot_num==1 || slot_num==2 || slot_num==4 || slot_num==6 ||  slot_num==8)){
+         for( unsigned char i = 0 ; i< sizeof(codec_para7)>>1 ; i++ ) { 
+            codec_para[i][0]=codec_para7[i][0];  
+            codec_para[i][1]=codec_para7[i][1];     
+         }
+         codec_clkin=169344;
+    } 
+    
+    BCLK= sr * sample_length * slot_num;
+    
+    for(NDAC=1;NDAC<129;NDAC++) {
+        for(MDAC=1;MDAC<129;MDAC++){    
+            for(DOSR=1;DOSR<1025;DOSR++){ 
+              if( Generate_FCLK(codec_clkin, sr ,NDAC ,MDAC ,DOSR)==1){
+                for(BCLK_N_divider=1; BCLK_N_divider <129;  BCLK_N_divider++){
+                  if(Generate_BCLK(codec_clkin, BCLK, NDAC, BCLK_N_divider)==1){     
+                      flag=1; 
+                  }
+                  if(flag==1)break;
+                }     
+              }   
+              if(flag==1)break;
+            }
+            if(flag==1)break;
+        }
+        if(flag==1)break;
+    }
+    flag=0; 
+    if(DOSR==1024){
+        DOSR_H=0;
+        DOSR_L=0;
+    } else{
+        DOSR_H=DOSR/256;
+        DOSR_L=DOSR%256;
+    }
+    NADC  = NDAC ;
+    MADC  = MDAC ;
+       
+    for( i = 0 ; i< sizeof(codec_para)>>1 ; i++ ) {  
+        if( (bclk_polarity == 0) && (codec_para[i][0] == 0x1D) ) {
+            codec_para[i][1] |= 0x08 ; //blck poarity inverted
+        }
+        err = I2CWrite_Codec_AIC3204(codec_para[i][0],codec_para[i][1]);
+        if( OS_ERR_NONE != err ){
+          return err;
+        }
+    }   
 
-//format=0 i2s 
-//format=1 tdm
-//format=2 pcm
-unsigned char Init_CODEC( unsigned int sr, unsigned char sample_length, unsigned char format, unsigned char slot_num ,unsigned char master_or_slave ) 
+    unsigned char reg_data[][2] = {
+        0x0B,0x80|NDAC,
+        0x0C,0x80|MDAC,
+        0x0D,DOSR_H,
+        0x0E,DOSR_L,
+        0x12,0x80|NADC,
+        0x13,0x80|MADC,
+        0x1E,0x80|BCLK_N_divider
+    };
+    
+    for( i = 0 ; i< sizeof(reg_data)>>1 ; i++ ) {    
+        err = I2CWrite_Codec_AIC3204(reg_data[i][0],reg_data[i][1]);
+        if( OS_ERR_NONE != err ){
+          return err;
+        }
+    }
+    
+    return err;
+  
+}
+
+
+CODEC_SETS codec_set_saved;
+ 
+unsigned char Init_CODEC( CODEC_SETS codec_set ) 
+
 {
     unsigned char err;
-    unsigned char mode;
-    unsigned char reg_data[CFG_PARA_NUM];
-    unsigned char sr_index = 255; 
-    unsigned char audio_interface_index =0;
-    unsigned char reg_index[CFG_PARA_NUM] = {
-        4, 5, 6, 7, 8, 11, 12, 13, 14, 18, 19, 20, 29, 30, 27
-    };
-    //  sr=48000;
-    //  sample_length=32;
-    //  format=1;
-    //  slot_num=4;
-    
-    if( (sr == codec_saved_sr)  &&\
-        (sample_length == codec_saved_sample_length) &&\
-        (format == codec_saved_format) ) {
+    unsigned char i, if_set;
+ 
+    //if( memcmp(&codec_set_saved,&codec_set_saved,sizeof(CODEC_SETS){
+    if( (codec_set_saved.sr == codec_set.sr)  &&\
+        (codec_set_saved.sample_len == codec_set.sample_len) &&\
+        (codec_set_saved.format == codec_set.format) &&\
+        (codec_set_saved.slot_num == codec_set.slot_num) &&\
+        (codec_set_saved.m_s_sel == codec_set.m_s_sel)   ) {
         APP_TRACE_INFO(("No need Re-Init CODEC\r\n"));
         return 0;
     } else {
-        codec_saved_sr = sr;
-        codec_saved_sample_length = sample_length;
-        codec_saved_format = format;
+        codec_set_saved = codec_set;  
     }
          
     Pin_Reset_Codec();
-    
-    for( unsigned char i = 0; i<sizeof(CODEC_PARA_TABLE[0][0])>>1; i++ ) {
-        if(CODEC_PARA_TABLE[0][0][i] == sr ) {
-            sr_index = i;
-            break;
-        }
-    }
-    if(sr_index == 255) {
-        return CODEC_SR_NOT_SUPPORT_ERR;
+    //OSTimeDly(2000); //test
+   
+    err = Check_SR_Support( codec_set.sr );
+    if( OS_ERR_NONE != err ){
+        return err;
     }
     
-    if(master_or_slave==0 && (format != 2)){//1388slave
-        audio_interface_index=0;
-    }else if(master_or_slave==1 && (format != 2)){
-        audio_interface_index=1;
-    }else if (master_or_slave==0 && (format == 2)){
-        audio_interface_index=2;
-    }else {
-        audio_interface_index=3;
+    if( codec_set.m_s_sel == 0 ) {
+        if_set = 0x0C; //master
+    } else {
+        if_set = 0;    //slave
     }
-           
-    // audio_interface_index =0;//I2S mode,16bit,master
-    if( format == 0 ) { //Standard I2S
-       if( sample_length == 32 )
-          mode = 3;//I2S32
-       else 
-       {
-          mode =0;//I2S16
-       }
+    
+    if( codec_set.sample_len == 16) {
+        if_set += 0x00;
+//    } else if(codec_set.sample_len == 20) //Not yet support 20/24bit on Audio MCU side
+//        if_set += 0x10;
+//    } else if(codec_set.sample_len == 24)
+//        if_set += 0x20;
+    } else if(codec_set.sample_len == 32) {
+        if_set += 0x30;
+    } else {
+        return CODEC_BIT_LEN_NOT_SUPPORT_ERR;
+    }
+    
+    if( codec_set.format == 0 || codec_set.format == 1) { //I2S || TDM-I2S
+        if_set += 0x00;
+    } else if( codec_set.format == 2){   //PCM DSP
+        if_set += 0x40;
+    } else {
+        return CODEC_FORMAT_NOT_SUPPORT_ERR;
+    }
+    if( codec_set.format == 1 ) {
+        codec_set.slot_num = 8;
+    }
+//    if( codec_set.sample_len == 16 ) {
+//        if( codec_set.slot_num == 2 ) {
+//            mode = 0;
+//        } else if( codec_set.slot_num == 8 ) {
+//            mode = 1;
+//        } else {
+//            return CODEC_CH_NUM_NOT_SUPPORT_ERR;
+//        }
+//        
+//    } else if( codec_set.sample_len == 32 ) {
+//        if( codec_set.slot_num == 8 ) {
+//            mode = 2;
+//        } else if( codec_set.slot_num == 2 ) {
+//            mode = 3;
+//        } else if( codec_set.slot_num == 4 ) {
+//            mode = 4;
+//        } else {
+//            return CODEC_CH_NUM_NOT_SUPPORT_ERR;
+//        }
+//        
+//    } else {
+//        return CODEC_BIT_LEN_NOT_SUPPORT_ERR;
+//        
+//    }
        
-    } else if ( format == 1 ) { 
-        if( sample_length == 16 && slot_num==8) { //TDM 16
-            mode = 1;//TDM 8slot  16 bit 
-            //mode = 0; //for iM401
-        } else if(sample_length == 32 && slot_num==8 ) { //TDM32
-            mode = 2;  //TDM 8slot  32 bit 
-        } else if  (sample_length == 32 && slot_num==4 ){
-            mode =4;  //TDM 4slot  32 bit
-        }else {
-            return CODEC_FUNC_NOT_SUPPORT;
-        }
-        
-    } else {//pcm
-        if(sample_length == 32 ) {
-            mode = 3;//32bit
-        }else {
-            mode =0;//16bit
-         //   audio_interface_index =2;//DSP mode,16bit,master
-        }
-    }
-    
-    reg_data[0] = CODEC_PARA_TABLE[mode][8][sr_index];
-//  reg_data[1] = CODEC_PARA_TABLE[mode][10][sr_index]*128+CODEC_PARA_TABLE[mode][12][sr_index]*16+ CODEC_PARA_TABLE[mode][11][sr_index];
-    reg_data[1] = CODEC_PARA_TABLE[mode][9][sr_index]*128+CODEC_PARA_TABLE[mode][11][sr_index]*16+ CODEC_PARA_TABLE[mode][10][sr_index];
-//  reg_data[2] = CODEC_PARA_TABLE[mode][13][sr_index];
-    reg_data[2] = CODEC_PARA_TABLE[mode][12][sr_index];
-//  reg_data[3] = CODEC_PARA_TABLE[mode][14][sr_index]>>8;
-//  reg_data[4] = CODEC_PARA_TABLE[mode][14][sr_index];    
-    reg_data[3] = CODEC_PARA_TABLE[mode][13][sr_index]>>8;
-    reg_data[4] = CODEC_PARA_TABLE[mode][13][sr_index];
-    reg_data[5] = CODEC_PARA_TABLE[mode][1][sr_index];
-    reg_data[6] = CODEC_PARA_TABLE[mode][2][sr_index];    
-    reg_data[7] = CODEC_PARA_TABLE[mode][3][sr_index]>>8;
-    reg_data[8] = CODEC_PARA_TABLE[mode][3][sr_index];    
-    reg_data[9] = CODEC_PARA_TABLE[mode][5][sr_index];
-    reg_data[10] = CODEC_PARA_TABLE[mode][6][sr_index];
-    reg_data[11] = CODEC_PARA_TABLE[mode][7][sr_index]; 
-    reg_data[12] = BCLK_SOURCE[mode];
-    reg_data[13] = CODEC_PARA_TABLE[mode][4][sr_index];
-    reg_data[14] = audio_interface[audio_interface_index];
-        
-    for( unsigned char i = 0 ; i< sizeof(config_aic3204)>>1 ; i++ ) {    
+    for( i = 0 ; i< sizeof(config_aic3204)>>1 ; i++ ) {    
         err = I2CWrite_Codec_AIC3204(config_aic3204[i][0],config_aic3204[i][1]);
         if( OS_ERR_NONE != err ){
           return err;
         }
     }
     
-    err = I2CWrite_Codec_AIC3204(0,0);
+    err = I2CWrite_Codec_AIC3204(0,0); //switch to Page0
     if( OS_ERR_NONE != err ){
        return err;
     }
     
-    for( unsigned char i = 0 ; i< CFG_PARA_NUM ; i++ ) {    
-        err = I2CWrite_Codec_AIC3204(reg_index[i],reg_data[i]);
+    err = I2CWrite_Codec_AIC3204( 27, if_set); //set format
         if( OS_ERR_NONE != err ){
-          return err;
-        }
+        return err;
     }
     
+    err = Set_Codec_PLL( codec_set.sr, codec_set.sample_len, codec_set.slot_num, codec_set.bclk_polarity );
+      
     return err;    
     
 }
 
-
-unsigned char Set_AIC3204_DSP_Offset( unsigned char slot_index ) 
-{
-    
-    unsigned char err;
-    
-    if( slot_index >6 ) { //slot_index is for line in channels
-        return 0x99;
-    }      
-    err = I2CWrite_Codec_AIC3204( 28, slot_index << 5);
-    
-    return err;    
-    
-}
-
-
-unsigned char Check_SR_Support( unsigned int sample_rate )
-{    
-   unsigned int i;
-   for( i = 0; i<sizeof(CODEC_PARA_TABLE[0][0])>>1; i++ ) {
-       if( CODEC_PARA_TABLE[0][0][i] == sample_rate ) {
-           return OS_ERR_NONE ; //find the SR
-       }
-   }   
-   return CODEC_SR_NOT_SUPPORT_ERR;  //SR not support
-    
-}

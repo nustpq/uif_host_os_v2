@@ -326,7 +326,7 @@ unsigned char SPI_ReadBuffer( AT91S_SPI *spi,
     AT91C_BASE_HDMA->HDMA_CH[BOARD_SPI_OUT_DMA_CHANNEL].HDMA_DADDR = (unsigned int)startDestAddr;
     
     AT91C_BASE_HDMA->HDMA_CH[BOARD_SPI_OUT_DMA_CHANNEL].HDMA_CTRLA = \
-                                        (length \
+                                        ((length) \
                                         | AT91C_HDMA_SRC_WIDTH_BYTE \
                                         | AT91C_HDMA_DST_WIDTH_BYTE \
                                         | AT91C_HDMA_SCSIZE_1 \

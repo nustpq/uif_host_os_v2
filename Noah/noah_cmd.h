@@ -42,7 +42,7 @@
 #define REPEAD_CMD_ERR           166u
 #define TIME_OUT                 167u
 #define CODEC_ERR                168u 
-#define CMD_NOT_SURRPORT         169u
+#define CMD_NOT_SUPPORT          169u
 #define GPIO_HIGHT_WTG           170u
 #define CHIP_BUFF_ERR            171u
 #define MMX_ERR                  172u
@@ -77,8 +77,9 @@
 #define AUD_CFG_PLAY_CH_ERR            200u
 #define AUD_CFG_MIC_NUM_DISMATCH_ERR   201u
 #define AUD_CFG_PLAY_CH_ZERO_ERR       202u
-
-#define UIF_TYPE_NOT_SUPPORT           203u
+#define AUD_CFG_ERR                    203u
+#define UIF_TYPE_NOT_SUPPORT           204u
+#define AUD_CFG_SPI_REC_CONFLICT       205u
 
 #define FW_BIN_STATE_ERR         211u
 #define FW_BIN_STATE_0_ERR       212u
@@ -98,15 +99,16 @@
 #define FM36_CHECK_FLAG_ERR      227u
 #define FM36_DMIC_PGA_GAIN_ERR   228u
 
-#define CODEC_WR_REG_ERR         230u
-#define CODEC_SETVOL_RANGE_ERR   231u
-#define CODEC_SETFCLK_RANGE_ERR  232u
-#define CODEC_SETMODE_RANGE_ERR  233u
-#define CODEC_SR_NOT_SUPPORT_ERR 234u
-#define CODEC_SR_LEN_NOT_SUPPORT_ERR 235u
-#define CODEC_FUNC_NOT_SUPPORT   236u
-
-
+#define CODEC_WR_REG_ERR              230u
+#define CODEC_SETVOL_RANGE_ERR        231u
+#define CODEC_SETFCLK_RANGE_ERR       232u
+#define CODEC_SETMODE_RANGE_ERR       233u
+#define CODEC_SR_NOT_SUPPORT_ERR      234u
+#define CODEC_SR_LEN_NOT_SUPPORT_ERR  235u
+#define CODEC_FUNC_NOT_SUPPORT        236u
+#define CODEC_BIT_LEN_NOT_SUPPORT_ERR 237u
+#define CODEC_FORMAT_NOT_SUPPORT_ERR  238u
+#define CODEC_CH_NUM_NOT_SUPPORT_ERR  239u
 
 
 //ERROR CODE from 245~ 255 reserved for Audio MCU
@@ -221,6 +223,9 @@
 #define  PC_CMD_RESET_MIC            13
 #define  PC_CMD_SET_VOLUME           14
 #define  PC_CMD_RESET_AUDIO          15
+#define  PC_CMD_UPDATE_AUDIO         16
+
+#define  PC_CMD_AB_POST              20
 
 #define  PC_CMD_SET_IF_CFG           30
 #define  PC_CMD_RAW_WRITE            31
@@ -231,12 +236,14 @@
 #define  PC_CMD_DELAY                36
 #define  PC_CMD_MCU_FLASH_WRITE      40
 #define  PC_CMD_SET_VEC_CFG          41
-#define  PC_CMD_REC_VOICE_BUFFER     42
-#define  PC_CMD_FETCH_VOICE_BUFFER   43
+
+#define  PC_CMD_REC_VOICE_BUFFER     42 //trigger SPI voice buf rec 
+//#define  PC_CMD_FETCH_VOICE_BUFFER   43
 #define  PC_CMD_TO_IM501_CMD         44
 #define  PC_CMD_ENTER_PSM            45
 #define  PC_CMD_GPIO_SESSION         46
-#define  PC_CMD_SPI_REC              47
+#define  PC_CMD_SPI_REC              47 //start SPI record
+
 #define  PC_CMD_IF_ONOFF             48
 
 #define  PC_CMD_DOWNLOAD_RULER_FW    100
@@ -325,7 +332,7 @@ typedef union  {
     MCU_FLASH             mcu_flash;
     SET_VEC_CFG           set_vec_cfg;
     VOICE_BUF             voice_buf_data;
-    VOICE_BUF_CFG         voice_buf_cfg;
+    SPI_REC_CFG           spi_rec_cfg;
     GPIO_SESSION          gpio_session;
 }PCCMDDAT, *pPCCMDDAT ;
 
