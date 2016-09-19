@@ -69,8 +69,10 @@ void  App_TaskUserIF (void *p_arg)
     //Ruler_Power_Switch(1);
     Init_Global_Var(); 
     //iM401_Ctrl_Enable = 1;
-    AB_POST();
-
+    OSTimeDly(100); 
+    if( AB_POST() )  {
+        Buzzer_Error();
+    }
 
 #ifndef BOARD_TYPE_AB01  
     APP_TRACE_INFO(( "\r\nWARNING: NOT AB01, NO MCU Ctrl UART SWITCH\r\n"));
@@ -211,6 +213,17 @@ void Port_Detect_Enable( unsigned char on_off )
     
     }
     
+}
+
+void Buzzer_Error( void )
+{
+   Buzzer_OnOff(1); //buzzer on   
+   OSTimeDly(100);  
+   Buzzer_OnOff(0); //buzzer off
+   OSTimeDly(50);
+   Buzzer_OnOff(1); //buzzer on   
+   OSTimeDly(100);  
+   Buzzer_OnOff(0); //buzzer off 
 }
 
 

@@ -84,7 +84,6 @@
 #define DEF_MODEL_STR_LEN               ( 7 + 1 )
 
 
-
 /////////////////  Flash store Vec file related defines  ///////////////////////
 
 #define FW_DOWNLAD_CMD_START           1
@@ -168,7 +167,7 @@ typedef struct {
 typedef struct { 
   unsigned char  type;//Rec =0, Play =1
   unsigned char  channel_num; //1~8  
-  unsigned short sample_rate; //16000, 48000 
+  unsigned short sample_rate; //8000, 16000, 24000, 32000, 48000 
 
   unsigned char  bit_length; // 16, 24, 32
   unsigned char  lin_ch_mask;
@@ -186,8 +185,9 @@ typedef struct {
   unsigned char  ssc_delay;
   unsigned char  ssc_start;
   unsigned char  master_slave;
+  unsigned char  bclk_polarity;  //0 or 1
   
-  unsigned char  reserved[3];
+  unsigned char  reserved[2];
 }AUDIO_CFG;
 
 typedef struct {

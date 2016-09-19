@@ -111,7 +111,7 @@ void App_TaskDebugInfo    ( void *p_arg ) ;
 void Task_ReCreate_Shell( void );
 void Port_Detect_Enable( unsigned char on_off );
 void BSP_Ser_WrStr_To_Buffer( char *p_str );
-
+void Buzzer_Error( void );
 
 
 

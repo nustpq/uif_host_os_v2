@@ -48,8 +48,8 @@
 #define   FM1388_ALLOWED_DATA_PACK_SIZE        (240+6)
 #define   EEPROM_ALLOWED_DATA_PACK_SIZE        (128+2)
 
-#define   ATTRI_FM36_PATH_NORMAL           0
-#define   ATTRI_FM36_PATH_PWD_BP           1
+#define   ATTRI_FM36_PATH_NORMAL           0 //normal mode: PDM path 
+#define   ATTRI_FM36_PATH_PWD_BP           1 //bypass mode : I2S/TDM/PCM path
 
 //////////////////
 

@@ -797,11 +797,11 @@ unsigned char config_aic3204[][2] = {
 		      9, 0XFF,  //All HPOUT,LOUT and Mixer Amplifier are Power up  
 		      //9, 0x3C,
 		      10,0X00,  //Set the Input Common Mode to 0.9V and Output Common Modefor Headphone to Input Common Mode
-	              20,0X00,  //headphone driver startup
+	          20,0X00,  //headphone driver startup
 
 		      //-set route settings
 		      //CODEC LO to FL124 LIN, single ended
-	              12,0X08, //HPL route on
+	          12,0X08, //HPL route on
 		      13,0X08, //HPR route on
 		      14,0X08, //LOL route on
 		      15,0X08, //LOR route on
@@ -1011,8 +1011,8 @@ unsigned char Set_Codec_PLL( unsigned int sr, unsigned char sample_length, unsig
     MADC  = MDAC ;
        
     for( i = 0 ; i< sizeof(codec_para)>>1 ; i++ ) {  
-        if( (bclk_polarity == 0) && (codec_para[i][0] == 0x1D) ) {
-            codec_para[i][1] |= 0x08 ; //blck poarity inverted
+        if( (bclk_polarity == 1) && (codec_para[i][0] == 0x1D) ) {
+            codec_para[i][1] |= 0x08 ; //blck poarity = 1, bclk inverted
         }
         err = I2CWrite_Codec_AIC3204(codec_para[i][0],codec_para[i][1]);
         if( OS_ERR_NONE != err ){
@@ -1050,11 +1050,13 @@ unsigned char Init_CODEC( CODEC_SETS codec_set )
     unsigned char err;
     unsigned char i, if_set;
  
+    APP_TRACE_INFO(("Init CODEC\r\n"));
     //if( memcmp(&codec_set_saved,&codec_set_saved,sizeof(CODEC_SETS){
     if( (codec_set_saved.sr == codec_set.sr)  &&\
         (codec_set_saved.sample_len == codec_set.sample_len) &&\
         (codec_set_saved.format == codec_set.format) &&\
         (codec_set_saved.slot_num == codec_set.slot_num) &&\
+        (codec_set_saved.bclk_polarity == codec_set.bclk_polarity) &&\
         (codec_set_saved.m_s_sel == codec_set.m_s_sel)   ) {
         APP_TRACE_INFO(("No need Re-Init CODEC\r\n"));
         return 0;
@@ -1088,10 +1090,11 @@ unsigned char Init_CODEC( CODEC_SETS codec_set )
         return CODEC_BIT_LEN_NOT_SUPPORT_ERR;
     }
     
-    if( codec_set.format == 0 || codec_set.format == 1) { //I2S || TDM-I2S
+    if( codec_set.format == 1 || codec_set.format == 2) { //PDM or I2S/TDM-I2S
         if_set += 0x00;
-    } else if( codec_set.format == 2){   //PCM DSP
+    } else if( codec_set.format == 3){   //PCM DSP
         if_set += 0x40;
+        codec_set.bclk_polarity ^= 1; //for PCM : TLV320AIC3204 polarity definition is different from FM1388
     } else {
         return CODEC_FORMAT_NOT_SUPPORT_ERR;
     }

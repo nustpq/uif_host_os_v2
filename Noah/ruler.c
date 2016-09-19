@@ -182,22 +182,24 @@ void Check_UART_Mixer_Ready( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-//We assume :
-//1. there must be a REC setup and a PLAY setup for each audio configuration
-//2. REC setup comes first and then PLAY setup 
 unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
 {
     unsigned char err; 
     unsigned char mic_num; 
     unsigned char data  = 0xFF;
-    unsigned char format;
-    unsigned char polarity;
+    unsigned char format;  
+    unsigned char lin_ch = 0;
     
     unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_SET_AUDIO_CFG  };
-        
+          
     //APP_TRACE_INFO(("Setup_Audio [%s]:[%d SR]:[%d CH]: %s\r\n",(pAudioCfg->type == 0) ? "REC " : "PLAY", pAudioCfg->sr, pAudioCfg->channels,((pAudioCfg->type == 0) && (pAudioCfg->lin_ch_mask == 0)) ? "LIN Disabled" : "LIN Enabled"));
     if( pAudioCfg->type == 0 ) {
-        APP_TRACE_INFO(("\r\nSetup_Audio [REC ]:[%d SR]:[%d CH]:[%d-Bit]", pAudioCfg->sample_rate, pAudioCfg->channel_num, pAudioCfg->bit_length));
+        if ( pAudioCfg->lin_ch_mask != 0 ) { 
+            lin_ch = 2;// 2 channel LINE IN
+            pAudioCfg->channel_num += lin_ch; 
+            //APP_TRACE_INFO(("LIN 2CH added up to %d CH\r\n",pAudioCfg->channel_num)); 
+        }
+        APP_TRACE_INFO(("\r\nSetup_Audio [REC ]:[%d SR]:[%d CH]:[%d-Bit]:[LIN %d]", pAudioCfg->sample_rate, pAudioCfg->channel_num, pAudioCfg->bit_length, lin_ch));
     } else if( pAudioCfg->type == 1 ){
         APP_TRACE_INFO(("\r\nSetup_Audio [PLAY]:[%d SR]:[%d CH]:[%d-Bit]", pAudioCfg->sample_rate, pAudioCfg->channel_num, pAudioCfg->bit_length ));
     } else {
@@ -246,20 +248,20 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         mic_num = Global_Mic_Mask[0]; //save mic num to ruler0
     } 
 #endif   
-    if ( (pAudioCfg->type == 0) && (pAudioCfg->lin_ch_mask != 0) ) {         
-        pAudioCfg->channel_num += 2; //add 2 channel for LINE IN
-        APP_TRACE_INFO(("Lin 2 channels added...%d\r\n",pAudioCfg->channel_num)); 
-    }
 
-#ifdef BOARD_TYPE_UIF    
+
+#ifdef BOARD_TYPE_UIF  
     if ( pAudioCfg->type == 0 ) {
         
         pAudioCfg->gpio_rec_num  = Get_Mask_Num( pAudioCfg->gpio_rec_bit_mask ); //gpio num
         pAudioCfg->gpio_rec_start_index = pAudioCfg->channel_num;  //gpio start index
-        pAudioCfg->channel_num += pAudioCfg->gpio_rec_num; //add gpio num to channel 
+        pAudioCfg->channel_num += pAudioCfg->gpio_rec_num; //add gpio num to channel         
+        if(  pAudioCfg->channel_num > 8 ) {
+            APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO+SPI Rec channel num(=%d) > 8 NOT allowed for UIF\r\n", pAudioCfg->channel_num));
+            return AUD_CFG_MIC_NUM_MAX_ERR ;
+        }  
         
-        pAudioCfg->spi_rec_num   = Get_Mask_Num( pAudioCfg->spi_rec_bit_mask );  //spi num    
-        
+        pAudioCfg->spi_rec_num   = Get_Mask_Num( pAudioCfg->spi_rec_bit_mask );  //spi num           
         Global_SPI_Rec_En = 0; //clear flag as No SPI rec
         if( pAudioCfg->spi_rec_num  != 0 ){
             if( pAudioCfg->channel_num != 0 ) {
@@ -268,11 +270,7 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
             }
             pAudioCfg->channel_num = pAudioCfg->spi_rec_num;  //use spi num for rec channel  
             Global_SPI_Rec_En = 1; //set flag for SPI rec            
-        }      
-        if(  pAudioCfg->channel_num > 8 ) {
-            APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO+SPI Rec channel num(=%d) > 8 NOT allowed for AB03\r\n", pAudioCfg->channel_num));
-            return AUD_CFG_MIC_NUM_MAX_ERR ;
-        }  
+        } 
         
     }
 #endif
@@ -285,7 +283,35 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         APP_TRACE_INFO(("WARN:(Setup_Audio Rec)pAudioCfg->channel_num  =  0\r\n" ));        
         //return AUD_CFG_PLAY_CH_ZERO_ERR; UI not support
     }
-    
+                 
+
+    //ssc_cki =  0: falling egde send for sending, 1: rising edge lock for receiving
+    if ( pAudioCfg->type == 0 ) { //rec
+        pAudioCfg->ssc_cki  =   pAudioCfg->bclk_polarity == 0 ? 1 : 0 ;
+    } else { //play
+        pAudioCfg->ssc_cki  =   pAudioCfg->bclk_polarity == 0 ? 0 : 1 ;
+    }
+    switch(  pAudioCfg->format ) {
+        case 1 :  //PDM
+            flag_bypass_fm36 = 0;       //Not bypass FM36 for PDM mode
+            pAudioCfg->ssc_start = 4;  //falling edge trigger for low left
+            pAudioCfg->channel_num = 8; //make sure 8 slots enabled when used FM36 to record PDM     
+        break;         
+        case 2 : //I2S or I2S-TDM
+            flag_bypass_fm36 = 1;      //bypass FM36
+            pAudioCfg->ssc_start = 4;  //falling edge trigger for low left   
+            if( pAudioCfg->ssc_delay != 1 ) {  //one clock delay is needed in I2S 
+                return CODEC_FORMAT_NOT_SUPPORT_ERR;
+            }              
+        break;           
+        case 3 : //PCM or PCM-TDM
+            flag_bypass_fm36 = 1;      //bypass FM36   
+            pAudioCfg->ssc_start = 5;  //rising edge trigger for high left          
+        break;         
+        default:
+            return CODEC_FORMAT_NOT_SUPPORT_ERR;
+        break;
+    }    
     //Dump_Data(buf, sizeof(buf)); 
     UART2_Mixer(3); 
     USART_SendBuf( AUDIO_UART, buf, sizeof(buf)) ; 
@@ -298,46 +324,18 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
     if( data != NO_ERR ) {
         APP_TRACE_INFO(("\r\nSetup_Audio ERROR: %d\r\n ",data)); 
         return data; 
-    }
-    
-    flag_bypass_fm36 = 1;  //bypass FM36
-    if( pAudioCfg->format == 1 && pAudioCfg->channel_num == 2 ){ //I2S
-        format = 0 ;//I2S
-    } else if( pAudioCfg->format == 2 ){ //PDM       
-        format = 1; //I2S-TDM
-        pAudioCfg->channel_num = 8; //make sure 8 slots enabled when used FM36 to record PDM
-        flag_bypass_fm36 = 0; //not bypass FM36 for PDM mode
-    } else if( pAudioCfg->format == 3 ) { //PCM/TDM
-        format = 2; //PCM/TDM
-    } else {
-        return CODEC_FORMAT_NOT_SUPPORT_ERR;
-    }
-      
-//       pAudioCfg->type == 0 && pAudioCfg->ssc_start==4 && pAudioCfg->ssc_cki == 1
-//       pAudioCfg->type == 1 && pAudioCfg->ssc_start==4 && pAudioCfg->ssc_cki == 0    
-//       pAudioCfg->type == 0 && pAudioCfg->ssc_start==5 && pAudioCfg->ssc_cki == 0
-//       pAudioCfg->type == 1 && pAudioCfg->ssc_start==5 && pAudioCfg->ssc_cki == 1
+    }                      
         
-    if( (pAudioCfg->type + pAudioCfg->ssc_cki) != 1 ) {
-        return CODEC_FORMAT_NOT_SUPPORT_ERR;
-    }
-    if( pAudioCfg->ssc_start==4 ) {    
-        polarity = 0;
-    } else if( pAudioCfg->ssc_start==5 ){
-        polarity = 1;    
-    } else {
-        return CODEC_FORMAT_NOT_SUPPORT_ERR;
-    }    
-  
-    codec_set[pAudioCfg->type].flag       = 1;  //cfg received
-    codec_set[pAudioCfg->type].sr         = pAudioCfg->sample_rate;
-    codec_set[pAudioCfg->type].sample_len = pAudioCfg->bit_length;
-    codec_set[pAudioCfg->type].format     = format;
-    codec_set[pAudioCfg->type].slot_num   = pAudioCfg->channel_num;
-    codec_set[pAudioCfg->type].m_s_sel    = pAudioCfg->master_slave;
-    codec_set[pAudioCfg->type].delay      = pAudioCfg->ssc_delay;
-    codec_set[pAudioCfg->type].bclk_polarity = polarity;
-    return err ; 
+    codec_set[pAudioCfg->type].flag          = 1;  //cfg received
+    codec_set[pAudioCfg->type].sr            = pAudioCfg->sample_rate;
+    codec_set[pAudioCfg->type].sample_len    = pAudioCfg->bit_length;
+    codec_set[pAudioCfg->type].format        = pAudioCfg->format;
+    codec_set[pAudioCfg->type].slot_num      = pAudioCfg->channel_num;
+    codec_set[pAudioCfg->type].m_s_sel       = pAudioCfg->master_slave;
+    codec_set[pAudioCfg->type].delay         = pAudioCfg->ssc_delay;
+    codec_set[pAudioCfg->type].bclk_polarity = pAudioCfg->bclk_polarity;
+    
+    return 0 ; 
 }
 
 
@@ -366,9 +364,10 @@ unsigned char Update_Audio( void )
         if( (codec_set[0].sr !=  codec_set[1].sr) ||
             (codec_set[0].sample_len !=  codec_set[1].sample_len) ||
             (codec_set[0].format !=  codec_set[1].format)  ||
-            (codec_set[0].m_s_sel !=  codec_set[1].m_s_sel)  ) {
+            (codec_set[0].m_s_sel !=  codec_set[1].m_s_sel) ||
+            (codec_set[0].bclk_polarity !=  codec_set[1].bclk_polarity) ) {
             err = AUD_CFG_ERR;
-            APP_TRACE_INFO(("\r\nERROR: [REC] conflict [PLAY] audio settings!\r\n"));
+            APP_TRACE_INFO(("\r\nERROR: [REC] and [PLAY] audio settings conflicts!\r\n"));
         }
         if( codec_set[0].slot_num >= codec_set[1].slot_num ) {
            index = 0; 
@@ -384,25 +383,25 @@ unsigned char Update_Audio( void )
     }    
     codec_set[0].flag = 0; //reset Cfg flag
     codec_set[1].flag = 0;
+    
     if( err != NO_ERR ) {
         return err;
     }
-    
-    //codec_set[index].
+    APP_TRACE_INFO(("\r\n\r\n############## BCLK POLARITY = %d\r\n\r\n", codec_set[index].bclk_polarity));
     I2C_Mixer(I2C_MIX_FM36_CODEC);    
     err = Init_CODEC( codec_set[index] );    
-    //err = Init_CODEC( pAudioCfg->sr,  pAudioCfg->bit_length, i2s_tdm_sel, buf[4], buf[15]);
     I2C_Mixer(I2C_MIX_UIF_S);
     if( err != NO_ERR ) {
         APP_TRACE_INFO(("\r\nUpdate_Audio Init_CODEC ERROR: %d\r\n",err)); 
         return err;
     } 
+    
+    I2C_Mixer(I2C_MIX_FM36_CODEC);
 #ifdef BOARD_TYPE_AB03  
     err = Init_FM36_AB03( codec_set[index].sr, Global_Mic_Mask[0], 1, 0, 1, 0 ); //Lin from SP1_RX, slot0~1
-#elif defined BOARD_TYPE_UIF
-    I2C_Mixer(I2C_MIX_FM36_CODEC);
+#elif defined BOARD_TYPE_UIF     
     if( flag_bypass_fm36 == 0 ) {
-        err = Init_FM36_AB03( codec_set[index].sr, Global_Mic_Mask[0], 1, 0, codec_set[index].sample_len, codec_set[index].format, 0 ); //Lin from SP1_RX, slot0~1
+      err = Init_FM36_AB03( codec_set[index].sr, Global_Mic_Mask[0], 1, 0, codec_set[index].sample_len, codec_set[0].slot_num==2 ?0:1, 0 ); //Lin from SP1_RX, slot0~1
     } else{
         err = FM36_PWD_Bypass(); 
     }
@@ -412,18 +411,7 @@ unsigned char Update_Audio( void )
         APP_TRACE_INFO(("\r\nUpdate_Audio ReInit_FM36 ERROR: %d\r\n",err)); 
         return err;
     }
-        
-//    if ( pAudioCfg->lin_ch_mask != 0 ) {
-//        err = Set_AIC3204_DSP_Offset( mic_num );
-//        if( err != NO_ERR ) {
-//            APP_TRACE_INFO(("\r\nSetup_Audio Init AIC3204 ERROR: %d\r\n",err)); 
-//        }
-//    }
-//    if( buf[16] != 0) {
-//        Global_SPI_Record = 1; //set flag for SPI rec
-//    }
-    ////////////////////////////////////////////////////////////////////////////
-    
+            
     return 0 ; 
     
 }
@@ -1995,8 +1983,8 @@ unsigned char AB_POST( void )
     I2C_Mixer(I2C_MIX_FM36_CODEC);
     codec_set[0].sr = SAMPLE_RATE_DEF;
     codec_set[0].sample_len = SAMPLE_LENGTH;
-    codec_set[0].format = 0; //I2S
-    codec_set[0].slot_num = 8; //8 channels
+    codec_set[0].format = 2; //I2S-TDM
+    codec_set[0].slot_num = 2; //2 channels
     codec_set[0].m_s_sel = 0; //master
     codec_set[0].flag = 0; //reset Cfg flag
     codec_set[1].flag = 0;

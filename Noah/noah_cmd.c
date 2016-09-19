@@ -784,21 +784,20 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             temp = emb_get_attr_int(&root, 6, 0);          
             PCCmd.audio_cfg.gpio_rec_bit_mask = (CPU_INT08U)temp; 
             
-            temp = emb_get_attr_int(&root, 7, 1); //default 1, choose I2S  
+            temp = emb_get_attr_int(&root, 7, 2); //1: PDM  2:I2S/I2S-TDM 3: PCM/PCM-TDM 
             PCCmd.audio_cfg.format = (CPU_INT08U)temp;
-            temp = emb_get_attr_int(&root, 8, (PCCmd.audio_cfg.type == 0)? 1:0 ); // default 0: falling egde send for sending, 1: rising edge lock for receiving   
-            PCCmd.audio_cfg.ssc_cki = (CPU_INT08U)temp;
+            temp = emb_get_attr_int(&root, 8, 0 ); // default polarity =0
+            PCCmd.audio_cfg.bclk_polarity = (CPU_INT08U)temp;
             temp = emb_get_attr_int(&root, 9, 1);   //default 1 cycle delay          
             PCCmd.audio_cfg.ssc_delay = (CPU_INT08U)temp;
-            temp = emb_get_attr_int(&root, 10, 4);  //default 4: falling edge trigger for low left          
-            PCCmd.audio_cfg.ssc_start = (CPU_INT08U)temp;
+            //temp = emb_get_attr_int(&root, 10, 4);  //default 4: falling edge trigger for low left          
+            //PCCmd.audio_cfg.ssc_start = (CPU_INT08U)temp;
             temp = emb_get_attr_int(&root, 11, 0);  //default 0: as master      
-            PCCmd.audio_cfg.master_slave = (CPU_INT08U)temp;
+            PCCmd.audio_cfg.master_slave = (CPU_INT08U)temp; 
             
             temp = emb_get_attr_int(&root, 12, 0);     //default 0: no SPI recording         
             PCCmd.audio_cfg.spi_rec_bit_mask = (CPU_INT08U)temp;
-            
-           
+                       
             err = Setup_Audio( &PCCmd.audio_cfg );
 
         break ;
@@ -1289,7 +1288,9 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
     }
     
     //Send_Report( pkt_sn, err ); //moved to : App_TaskCMDParse()
-    
+    if( err ) {
+        APP_TRACE_INFO(("\r\nEMB_Data_Parse ERROR: %d\r\n ",err)); 
+    }
     return err;
 
 }

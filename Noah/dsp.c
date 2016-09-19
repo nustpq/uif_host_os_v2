@@ -905,7 +905,7 @@ unsigned char Init_FM36_AB03( unsigned short sr,
     } 
     
 //    if( Global_UIF_Setting[ UIF_TYPE_FM36_PATH - 1 ].attribute == ATTRI_FM36_PATH_PWD_BP ) {
-//        FM36_PWD_Bypass();
+//       FM36_PWD_Bypass();
 //        
 //    }
     
