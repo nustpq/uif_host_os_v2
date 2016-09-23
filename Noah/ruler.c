@@ -1711,6 +1711,7 @@ unsigned char Toggle_Mic(  TOGGLE_MIC *pdata )
 }
 
 
+
 /*
 *********************************************************************************************************
 *                                       Set_Volume()
@@ -1760,7 +1761,7 @@ unsigned char Set_Volume(  SET_VOLUME *pdata )
         I2C_Mixer(I2C_MIX_UIF_S); 
         return err;    
     }
-    err = CODEC_Set_Volume( pdata->spk, pdata->lout );
+    err = CODEC_Set_Volume( pdata->spk, pdata->lout, pdata->lin );
     if( OS_ERR_NONE != err ) {    
         APP_TRACE_INFO(( "FAIL [0x%X]\r\n", err )); 
         I2C_Mixer(I2C_MIX_UIF_S); 

@@ -227,9 +227,10 @@ typedef struct {
 }TOGGLE_MIC ;
 
 typedef struct {
-    unsigned int    mic;   
-    unsigned int    lout; 
-    unsigned int    spk;
+    signed int    mic;   
+    signed int    lout; 
+    signed int    spk;
+    signed int    lin; 
 }SET_VOLUME ;
 
 typedef struct {

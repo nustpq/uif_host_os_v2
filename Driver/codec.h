@@ -51,7 +51,7 @@ unsigned char Set_AIC3204_DSP_Offset( unsigned char slot_index ) ;
 unsigned char Init_CODEC_AIC3204( unsigned int sample_rate ) ;
 
 unsigned char CODEC_LOUT_Small_Gain_En( bool small_gain );
-unsigned char CODEC_Set_Volume( unsigned int vol_spk,  unsigned int vol_lin );
+unsigned char CODEC_Set_Volume( float vol_spk, float vol_lout, float vol_lin );
 unsigned char Check_SR_Support( unsigned int sample_rate );
 
 #endif
