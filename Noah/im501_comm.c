@@ -942,7 +942,7 @@ void Service_To_iM501_IRQ( void )
     
     unsigned char err;    
     To_Host_CMD   cmd;
-    SPI_REC_CFG   spi_rec_cfg;
+    SPI_PLAY_REC_CFG   spi_rec_cfg;
     
     if ( im501_irq_counter ) {
         
@@ -974,9 +974,9 @@ void Service_To_iM501_IRQ( void )
             im501_change_if_speed(2,1); //change SPI speed to high speed  
             
             spi_rec_cfg.gpio_irq  = im501_irq_gpio; 
-            spi_rec_cfg.spi_mode  = Global_UIF_Setting[UIF_TYPE_SPI - 1].speed;
-            spi_rec_cfg.spi_speed = Global_UIF_Setting[UIF_TYPE_SPI - 1].attribute;               
-            spi_rec_cfg.chip_id   = Global_UIF_Setting[UIF_TYPE_DUT_ID - 1].attribute;
+            spi_rec_cfg.spi_mode  = Global_UIF_Setting[UIF_TYPE_SPI - 1].attribute;
+            spi_rec_cfg.spi_speed = Global_UIF_Setting[UIF_TYPE_SPI - 1].speed;               
+            spi_rec_cfg.chip_id   = ATTRI_DUT_ID_IM501; //Global_UIF_Setting[UIF_TYPE_DUT_ID - 1].attribute;
             err = SPI_Rec_Start( &spi_rec_cfg ); //send start CMD to audio MCU 
              
         }  

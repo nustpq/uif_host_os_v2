@@ -1038,14 +1038,27 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         
         break;
         
-        case PC_CMD_SPI_REC:  //for FM1388 test                        
-            SPI_REC_CFG spi_rec_cfg;    
-            spi_rec_cfg.spi_mode  = Global_UIF_Setting[1].attribute;
-            spi_rec_cfg.spi_speed = Global_UIF_Setting[1].speed;
-            spi_rec_cfg.gpio_irq = 2;//useless for FM1388 //im501_irq_gpio;              
+        case PC_CMD_SPI_REC:  //for FM1388 test 
+        case PC_CMD_SPI_PLAY:
+            SPI_PLAY_REC_CFG spi_rec_cfg;  
+            temp = emb_get_attr_int(&root, 1, -1);  //rec mask
+            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
+            spi_rec_cfg.rec_ch_mask = temp & 0x03FF; 
+            temp = emb_get_attr_int(&root, 2, 0); //play mask
+            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
+            spi_rec_cfg.play_ch_mask = temp & 0x03FF; 
+            temp = emb_get_attr_int(&root, 3, 10); //play wait time_tick ms
+            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }            
+            spi_rec_cfg.time_dly = temp ;  
+            spi_rec_cfg.gpio_irq = 2;//useless for FM1388 //im501_irq_gpio;            
+            spi_rec_cfg.spi_speed = Global_UIF_Setting[UIF_TYPE_SPI - 1].speed *1000;
+            spi_rec_cfg.spi_mode  = 0;//Global_UIF_Setting[UIF_TYPE_SPI - 1].attribute;               
+            spi_rec_cfg.chip_id   = ATTRI_DUT_ID_FM1388;
+            
             err = SPI_Rec_Start( &spi_rec_cfg ); //send CMD to Audio MCU 
        
-        break;       
+        break;  
+        
             
 /*        
         case PC_CMD_SESSION :

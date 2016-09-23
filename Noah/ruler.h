@@ -191,12 +191,19 @@ typedef struct {
 }AUDIO_CFG;
 
 typedef struct {
-  unsigned int   spi_speed;
-  unsigned char  spi_mode;  
-  unsigned char  gpio_irq;
-  unsigned char  chip_id;
-  unsigned char  reserved[1];
-}SPI_REC_CFG;
+  unsigned int    spi_speed; 
+  
+  unsigned short  rec_ch_mask;
+  unsigned short  play_ch_mask;
+  
+  unsigned short  chip_id;
+  unsigned char   spi_mode;  
+  unsigned char   gpio_irq; 
+  
+  unsigned char   time_dly;  
+  unsigned char   reserved[3];
+
+}SPI_PLAY_REC_CFG;
 
 typedef struct {
     unsigned char    type;    //rec = 1,  play = 2, rec&play = 3   
@@ -384,6 +391,6 @@ extern void Read_Flash_State( FLASH_INFO  *pFlash_Info, unsigned int flash_addre
 extern void Debug_Audio( void ) ;
 extern unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg );
 
-extern unsigned char SPI_Rec_Start( SPI_REC_CFG *pSpi_rec_cfg );
+extern unsigned char SPI_Rec_Start( SPI_PLAY_REC_CFG *pSpi_rec_cfg );
 
 #endif

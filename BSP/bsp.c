@@ -38,7 +38,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:H:V2.61]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:H:V2.62]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB01
 const CPU_CHAR hw_version[]  = "[HW:V1.0]"; 
@@ -998,7 +998,7 @@ CPU_INT32U  BSP_CPU_ClkFreq (void)
         case BSP_CLK_SRC_MAIN:                                 /* Main clock                                         */
              cpu_freq = BSP_MAIN_XTAL_FREQ;
              break;
-
+        
         case BSP_CLK_SRC_PLLA:                                  /* PLL clock                                          */
              cpu_freq = BSP_PLL_GetFreq();
              break;

@@ -34,7 +34,7 @@ Freq=10000000
 MultiCoreRunAll=1
 [DebugChecksum]
 <<<<<<< HEAD
-Checksum=-2031524891
+Checksum=928415632
 =======
 Checksum=821862027
 >>>>>>> fm1388_test_spi_rec
@@ -77,11 +77,9 @@ Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\spi.c}.286.5" 0 0 1 "" 0 "" 0
 Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.385.9" 0 0 1 "" 0 "" 0
 Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.254.5" 0 0 1 "" 0 "" 0
 Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.852.13" 0 0 1 "" 0 "" 0
-Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\ruler.c}.289.5" 0 0 1 "" 0 "" 0
-Bp8=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\gpio.c}.97.5" 0 0 1 "" 0 "" 0
-Bp9=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Noah\ruler.c}.306.9" 0 0 1 "" 0 "" 0
-Bp10=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Noah\ruler.c}.306.9" 0 0 1 "" 0 "" 0
-Count=11
+Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\gpio.c}.97.5" 0 0 1 "" 0 "" 0
+Bp8=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Noah\ruler.c}.293.5" 0 0 1 "" 0 "" 0
+Count=9
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

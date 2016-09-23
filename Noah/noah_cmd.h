@@ -243,8 +243,8 @@
 #define  PC_CMD_ENTER_PSM            45
 #define  PC_CMD_GPIO_SESSION         46
 #define  PC_CMD_SPI_REC              47 //start SPI record
-
 #define  PC_CMD_IF_ONOFF             48
+#define  PC_CMD_SPI_PLAY             49 //start SPI play
 
 #define  PC_CMD_DOWNLOAD_RULER_FW    100
 #define  PC_CMD_UPDATE_RULER_FW      101
@@ -332,7 +332,7 @@ typedef union  {
     MCU_FLASH             mcu_flash;
     SET_VEC_CFG           set_vec_cfg;
     VOICE_BUF             voice_buf_data;
-    SPI_REC_CFG           spi_rec_cfg;
+    SPI_PLAY_REC_CFG       spi_rec_cfg;
     GPIO_SESSION          gpio_session;
 }PCCMDDAT, *pPCCMDDAT ;
 

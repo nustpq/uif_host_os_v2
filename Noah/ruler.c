@@ -186,8 +186,7 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
 {
     unsigned char err; 
     unsigned char mic_num; 
-    unsigned char data  = 0xFF;
-    unsigned char format;  
+    unsigned char data  = 0xFF;      
     unsigned char lin_ch = 0;
     
     unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_SET_AUDIO_CFG  };
@@ -256,8 +255,8 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         pAudioCfg->gpio_rec_num  = Get_Mask_Num( pAudioCfg->gpio_rec_bit_mask ); //gpio num
         pAudioCfg->gpio_rec_start_index = pAudioCfg->channel_num;  //gpio start index
         pAudioCfg->channel_num += pAudioCfg->gpio_rec_num; //add gpio num to channel         
-        if(  pAudioCfg->channel_num > 8 ) {
-            APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO+SPI Rec channel num(=%d) > 8 NOT allowed for UIF\r\n", pAudioCfg->channel_num));
+        if(  pAudioCfg->channel_num > 10 ) {
+            APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO+SPI Rec channel num(=%d) > 10 NOT allowed for UIF\r\n", pAudioCfg->channel_num));
             return AUD_CFG_MIC_NUM_MAX_ERR ;
         }  
         
@@ -266,7 +265,7 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         if( pAudioCfg->spi_rec_num  != 0 ){
             if( pAudioCfg->channel_num != 0 ) {
                 APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO Rec conflict with SPI Rec\r\n"));
-                return AUD_CFG_SPI_REC_CONFLICT ;
+                //return AUD_CFG_SPI_REC_CONFLICT ;
             }
             pAudioCfg->channel_num = pAudioCfg->spi_rec_num;  //use spi num for rec channel  
             Global_SPI_Rec_En = 1; //set flag for SPI rec            
@@ -600,7 +599,7 @@ unsigned char Get_Audio_Version( void )
 
 
     
-unsigned char SPI_Rec_Start( SPI_REC_CFG *pSpi_rec_cfg )
+unsigned char SPI_Rec_Start( SPI_PLAY_REC_CFG *pSpi_rec_cfg )
 {   
     unsigned char err   = 0xFF;  
     unsigned char data  = 0xFF;
@@ -617,14 +616,14 @@ unsigned char SPI_Rec_Start( SPI_REC_CFG *pSpi_rec_cfg )
     }
     pSpi_rec_cfg->gpio_irq -= 2 ;//'cause UIF_GPIO connecting to Host is differnt from Audio
     
-    APP_TRACE_INFO(("\r\nSPI_Rec_Start : Chip ID = %d, IRQ = GPIO[%d], spi.mode = %d, spi.speed = %d MHz\r\n",\
-                         pSpi_rec_cfg->chip_id, pSpi_rec_cfg->gpio_irq, pSpi_rec_cfg->spi_mode, pSpi_rec_cfg->spi_speed / 1000000 ));
+    APP_TRACE_INFO(("\r\nSPI_Rec_Start : Chip ID = %d, IRQ = GPIO[%d], spi.mode = %d, spi.speed = %d kHz\r\n",\
+                         pSpi_rec_cfg->chip_id, pSpi_rec_cfg->gpio_irq, pSpi_rec_cfg->spi_mode, pSpi_rec_cfg->spi_speed / 1000 ));
     
     Disable_SPI_Port(); //disabled host mcu SPI;
     
     UART2_Mixer(3); 
     USART_SendBuf( AUDIO_UART, buf,  sizeof(buf) ); 
-    USART_SendBuf( AUDIO_UART, (unsigned char *)pSpi_rec_cfg, sizeof(SPI_REC_CFG)) ; 
+    USART_SendBuf( AUDIO_UART, (unsigned char *)pSpi_rec_cfg, sizeof(SPI_PLAY_REC_CFG)) ; 
     err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM );  
     if( err != NO_ERR  || data != 0  ) {         
         APP_TRACE_INFO(("\r\nSPI_Rec_Start ERROR: timeout = %d, ack data = %d\r\n",err, data));  
@@ -1984,7 +1983,7 @@ unsigned char AB_POST( void )
     codec_set[0].sr = SAMPLE_RATE_DEF;
     codec_set[0].sample_len = SAMPLE_LENGTH;
     codec_set[0].format = 2; //I2S-TDM
-    codec_set[0].slot_num = 2; //2 channels
+    codec_set[0].slot_num = 8; //8 channels : BUG 如果设置为2ch，则FM36 counter不动？？？
     codec_set[0].m_s_sel = 0; //master
     codec_set[0].flag = 0; //reset Cfg flag
     codec_set[1].flag = 0;

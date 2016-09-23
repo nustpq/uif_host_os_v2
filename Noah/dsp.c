@@ -613,7 +613,7 @@ unsigned char FM36_PDM_CLK_Set( unsigned char pdm_dac_clk, unsigned char pdm_adc
             data1 = 0x3E80;
         break; 
         default ://2.048
-            APP_TRACE_INFO(("Not supported PDM CLK, reset to default 2.048MHz\r\n"));
+            APP_TRACE_INFO(("Not supported PDM ADC CLK, reset to default 2.048MHz\r\n"));
             data3 = 0x1B;          
             data1 = 0x7D00;
         break;
@@ -628,13 +628,13 @@ unsigned char FM36_PDM_CLK_Set( unsigned char pdm_dac_clk, unsigned char pdm_adc
             data2 = 0xBB80;            
         break;
         case 2 : //2.048           
-            data2 = 0x7D00;;            
+            data2 = 0x7D00;         
         break;
         case 1 : //1.024           
             data2 = 0x3E80;          
         break; 
         default ://1.024
-            APP_TRACE_INFO(("Not supported PDM CLK, reset to default 1.024MHz\r\n"));            
+            APP_TRACE_INFO(("Not supported PDM ADC CLK, reset to default 1.024MHz\r\n"));            
             data2 = 0x3E80;           
         break;
     }
