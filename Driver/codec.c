@@ -461,17 +461,13 @@ unsigned char encode(signed char value)
   }
 }
 
+
 unsigned char CODEC_Set_Volume( float vol_spk, float vol_lout, float vol_lin )
 {
-    unsigned char err;            
-    float temp = 0;
-    unsigned char flag=0;
-    unsigned char Mic_PGA=0,ADC_GAIN=0;
-    
+    unsigned char err ;
     vol_spk= (vol_spk - (int)vol_spk%5)/10;
     vol_lout=(vol_lout - (int)vol_lout%5)/10;
     vol_lin=(vol_lin - (int)vol_lin%5)/10;
-       
     if (vol_lin < -12){
         vol_lin=-12;
     }
@@ -490,7 +486,9 @@ unsigned char CODEC_Set_Volume( float vol_spk, float vol_lout, float vol_lin )
     if(vol_lout > 53){
          vol_lout=53;
     }
-        
+    float temp=0;
+    unsigned char flag=0;
+    unsigned char Mic_PGA=0,ADC_GAIN=0;
     for(unsigned char i=0;i<95+1;i++){
       for(signed char j=-24;j<40+1;j++){
           temp=i*0.5+j*0.5;
@@ -508,7 +506,7 @@ unsigned char CODEC_Set_Volume( float vol_spk, float vol_lout, float vol_lin )
     if( OS_ERR_NONE != err ) {
         err = CODEC_WR_REG_ERR;
         return err ;
-    } 
+    }
     I2CWrite_Codec_AIC3204(59,Mic_PGA); 
     I2CWrite_Codec_AIC3204(60,Mic_PGA); 
     I2CWrite_Codec_AIC3204(0,0); //switch to Page0
@@ -517,23 +515,46 @@ unsigned char CODEC_Set_Volume( float vol_spk, float vol_lout, float vol_lin )
    
     signed char DAC_GAIN=0 ,HPL_GAIN=0 ,LOL_GAIN=0;
     unsigned char flag1=0,flag2=0;
-    for(signed char k=-127;k<48+1;k++){
+    for(signed char k=0;k<48+1;k++){
       for(signed char m=-6;m<29+1;m++){
           temp=k*0.5+m;
           if(temp==vol_lout && flag1==0){
               DAC_GAIN=encode(k);
-              HPL_GAIN=encode(m);
+              LOL_GAIN=encode(m);
               flag1=1;
           }
           if(temp==vol_spk && flag2==0 ){
               DAC_GAIN=encode(k);
-              LOL_GAIN=encode(m);
+              HPL_GAIN=encode(m);            
               flag2=1;
           }
           if(flag1==1 && flag2==1)break;    
       }
-      if(flag1==1 && flag2==1)break;    
+      if(flag1==1 && flag2==1)break;
+      flag1=0;
+      flag2=0;
     }
+    if(flag1==0 || flag2==0){
+         for(signed char k=0;k>-127-1;k--){
+            for(signed char m=-6;m<29+1;m++){
+              temp=k*0.5+m;
+              if(temp==vol_lout && flag1==0){
+              DAC_GAIN=encode(k);
+              LOL_GAIN=encode(m);
+              flag1=1;
+            }
+            if(temp==vol_spk && flag2==0 ){
+              DAC_GAIN=encode(k);
+              HPL_GAIN=encode(m);            
+              flag2=1;
+            }
+            if(flag1==1 && flag2==1)break;    
+          }
+        if(flag1==1 && flag2==1)break;
+        flag1=0;
+        flag2=0;
+        }
+    }   
     flag1=0;
     flag2=0;
     I2CWrite_Codec_AIC3204(0,0); //switch to Page0
@@ -546,9 +567,7 @@ unsigned char CODEC_Set_Volume( float vol_spk, float vol_lout, float vol_lin )
     I2CWrite_Codec_AIC3204(19,LOL_GAIN);
     
     return err;
-    
 }
-
 
 unsigned char Set_AIC3204_DSP_Offset( unsigned char slot_index ) 
 {
@@ -1050,7 +1069,7 @@ unsigned char Init_CODEC( CODEC_SETS codec_set )
     unsigned char err;
     unsigned char i, if_set;
  
-    APP_TRACE_INFO(("Init CODEC\r\n"));
+    
     //if( memcmp(&codec_set_saved,&codec_set_saved,sizeof(CODEC_SETS){
     if( (codec_set_saved.sr == codec_set.sr)  &&\
         (codec_set_saved.sample_len == codec_set.sample_len) &&\
@@ -1062,8 +1081,9 @@ unsigned char Init_CODEC( CODEC_SETS codec_set )
         return 0;
     } else {
         codec_set_saved = codec_set;  
-    }
-         
+    }  
+    APP_TRACE_INFO(("Init CODEC: [SR-%d][Format-%d][Slot-%d][Polarity-%d]:[M/S-%d]\r\n", codec_set_saved.sr, codec_set_saved.format, codec_set_saved.slot_num, codec_set_saved.bclk_polarity, codec_set_saved.m_s_sel));
+
     Pin_Reset_Codec();
     //OSTimeDly(2000); //test
    

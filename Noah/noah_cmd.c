@@ -797,6 +797,9 @@ CPU_INT08U  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             
             temp = emb_get_attr_int(&root, 12, 0);     //default 0: no SPI recording         
             PCCmd.audio_cfg.spi_rec_bit_mask = (CPU_INT08U)temp;
+            
+            temp = emb_get_attr_int(&root, 13, 8);     //default 8: Bus slot number         
+            PCCmd.audio_cfg.slot_num = (CPU_INT08U)temp;
                        
             err = Setup_Audio( &PCCmd.audio_cfg );
 

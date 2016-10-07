@@ -183,13 +183,13 @@ void Check_UART_Mixer_Ready( void )
 *********************************************************************************************************
 */
 unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
-{
+{    
     unsigned char err; 
     unsigned char mic_num; 
     unsigned char data  = 0xFF;      
     unsigned char lin_ch = 0;
     
-    unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_SET_AUDIO_CFG  };
+    unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_SET_AUDIO_CFG };
           
     //APP_TRACE_INFO(("Setup_Audio [%s]:[%d SR]:[%d CH]: %s\r\n",(pAudioCfg->type == 0) ? "REC " : "PLAY", pAudioCfg->sr, pAudioCfg->channels,((pAudioCfg->type == 0) && (pAudioCfg->lin_ch_mask == 0)) ? "LIN Disabled" : "LIN Enabled"));
     if( pAudioCfg->type == 0 ) {
@@ -246,6 +246,7 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
     } else {
         mic_num = Global_Mic_Mask[0]; //save mic num to ruler0
     } 
+
 #endif   
 
 
@@ -270,9 +271,12 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
             pAudioCfg->channel_num = pAudioCfg->spi_rec_num;  //use spi num for rec channel  
             Global_SPI_Rec_En = 1; //set flag for SPI rec            
         } 
-        
     }
 #endif
+    if( (pAudioCfg->spi_rec_num != 0) && (pAudioCfg->channel_num > pAudioCfg->slot_num) )   {
+         APP_TRACE_INFO(("\r\nSetup_Audio ERROR: channel_num > slot_num\r\n"));  
+         return AUD_CFG_ERR ;               
+    }
     //check channel num    
     if( (pAudioCfg->type == 1) && (pAudioCfg->channel_num == 0) ) {
         APP_TRACE_INFO(("WARN:(Setup_Audio Play)pAudioCfg->channel_num =  0\r\n" ));        
@@ -294,7 +298,7 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         case 1 :  //PDM
             flag_bypass_fm36 = 0;       //Not bypass FM36 for PDM mode
             pAudioCfg->ssc_start = 4;  //falling edge trigger for low left
-            pAudioCfg->channel_num = 8; //make sure 8 slots enabled when used FM36 to record PDM     
+            pAudioCfg->slot_num  = 8; //make sure 8 slots enabled when used FM36 to record PDM     
         break;         
         case 2 : //I2S or I2S-TDM
             flag_bypass_fm36 = 1;      //bypass FM36
@@ -329,11 +333,11 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
     codec_set[pAudioCfg->type].sr            = pAudioCfg->sample_rate;
     codec_set[pAudioCfg->type].sample_len    = pAudioCfg->bit_length;
     codec_set[pAudioCfg->type].format        = pAudioCfg->format;
-    codec_set[pAudioCfg->type].slot_num      = pAudioCfg->channel_num;
+    codec_set[pAudioCfg->type].slot_num      = pAudioCfg->slot_num;
     codec_set[pAudioCfg->type].m_s_sel       = pAudioCfg->master_slave;
     codec_set[pAudioCfg->type].delay         = pAudioCfg->ssc_delay;
     codec_set[pAudioCfg->type].bclk_polarity = pAudioCfg->bclk_polarity;
-    
+     
     return 0 ; 
 }
 
@@ -361,18 +365,15 @@ unsigned char Update_Audio( void )
     err = 0;     
     if( (codec_set[0].flag == 1)  && (codec_set[1].flag == 1) ) {
         if( (codec_set[0].sr !=  codec_set[1].sr) ||
-            (codec_set[0].sample_len !=  codec_set[1].sample_len) ||
+            (codec_set[0].slot_num != codec_set[1].slot_num) ||
             (codec_set[0].format !=  codec_set[1].format)  ||
             (codec_set[0].m_s_sel !=  codec_set[1].m_s_sel) ||
+            (codec_set[0].sample_len !=  codec_set[1].sample_len) ||
             (codec_set[0].bclk_polarity !=  codec_set[1].bclk_polarity) ) {
             err = AUD_CFG_ERR;
             APP_TRACE_INFO(("\r\nERROR: [REC] and [PLAY] audio settings conflicts!\r\n"));
         }
-        if( codec_set[0].slot_num >= codec_set[1].slot_num ) {
-           index = 0; 
-        } else {
-           index = 1;
-        }
+        index = 0;   
     } else if( codec_set[0].flag == 1 ) {
         index = 0;
     } else if( codec_set[1].flag == 1 ) {
@@ -400,7 +401,7 @@ unsigned char Update_Audio( void )
     err = Init_FM36_AB03( codec_set[index].sr, Global_Mic_Mask[0], 1, 0, 1, 0 ); //Lin from SP1_RX, slot0~1
 #elif defined BOARD_TYPE_UIF     
     if( flag_bypass_fm36 == 0 ) {
-      err = Init_FM36_AB03( codec_set[index].sr, Global_Mic_Mask[0], 1, 0, codec_set[index].sample_len, codec_set[0].slot_num==2 ?0:1, 0 ); //Lin from SP1_RX, slot0~1
+      err = Init_FM36_AB03( codec_set[index].sr, Global_Mic_Mask[0], 1, 0, codec_set[index].sample_len, codec_set[index].slot_num==2 ? 0:1, 0 ); //Lin from SP1_RX, slot0~1
     } else{
         err = FM36_PWD_Bypass(); 
     }

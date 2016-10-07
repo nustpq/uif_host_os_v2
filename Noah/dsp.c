@@ -438,7 +438,7 @@ static unsigned char Config_SPx_Format( unsigned char bit_length, unsigned char 
               temp = 0x78D9;//16bit I2S,16bit data, MSB first,Left alignment 
         }       
         
-    } else { //TDM
+    } else { //8slot-TDM
         if( bit_length == 32 ) {          
               temp = 0x78FF;//32bit TDM, 16bit data, MSB first,Left alignment,8 slot 
         } else { //16
