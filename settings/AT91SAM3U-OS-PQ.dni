@@ -94,8 +94,7 @@ Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.544.13" 0 0 1 "" 0 "" 0
 Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.855.13" 0 0 1 "" 0 "" 0
 Bp11=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\ruler.c}.293.5" 0 0 1 "" 0 "" 0
 Bp12=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\gpio.c}.97.5" 0 0 1 "" 0 "" 0
-Bp13=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Driver\codec.c}.441.11" 0 0 1 "" 0 "" 0
-Count=14
+Count=13
 [Aliases]
 A0=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Ports\ARM-Cortex-M3\Generic\IAR\os_cpu_c.c" ""
 A1=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Source\os_core.c" ""

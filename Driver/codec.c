@@ -496,12 +496,12 @@ unsigned char CODEC_Set_Volume( float vol_spk, float vol_lout, float vol_lin )
           temp=k*0.5+m;
           if(temp==vol_lout && flag1==0){
               DAC_GAIN=encode(k);
-              HPL_GAIN=encode(m);
+              LOL_GAIN=encode(m);
               flag1=1;
           }
           if(temp==vol_spk && flag2==0 ){
               DAC_GAIN=encode(k);
-              LOL_GAIN=encode(m);
+              HPL_GAIN=encode(m);
               flag2=1;
           }
           if(flag1==1 && flag2==1)break;    
