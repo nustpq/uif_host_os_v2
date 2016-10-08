@@ -435,7 +435,7 @@ unsigned char encode(signed char value)
   }
 }
 
-unsigned char CODEC_Set_Volume( float vol_spk, float vol_lout, float vol_lin )
+unsigned char CODEC_Set_Volume_old( float vol_spk, float vol_lout, float vol_lin )
 {
     unsigned char err;            
     float temp = 0;
@@ -523,7 +523,106 @@ unsigned char CODEC_Set_Volume( float vol_spk, float vol_lout, float vol_lin )
     
 }
 
-
+unsigned char CODEC_Set_Volume( float vol_spk, float vol_lout, float vol_lin )
+{
+  
+    vol_spk= (vol_spk - (int)vol_spk%5)/10;
+    vol_lout=(vol_lout - (int)vol_lout%5)/10;
+    vol_lin=(vol_lin - (int)vol_lin%5)/10;
+    if (vol_lin < -12){
+        vol_lin=-12;
+    }
+    if(vol_lin > 67.5){
+        vol_lin=67.5;
+    }
+    if (vol_spk < -69.5){
+        vol_spk=-69.5;  
+    }
+    if(vol_spk > 53){
+         vol_spk=53;
+    }
+     if (vol_lout < -69.5){
+        vol_lout=-69.5;  
+    }
+    if(vol_lout > 53){
+         vol_lout=53;
+    }
+    float temp=0;
+    unsigned char flag=0;
+    unsigned char Mic_PGA=0,ADC_GAIN=0;
+    for(unsigned char i=0;i<95+1;i++){
+      for(signed char j=-24;j<40+1;j++){
+          temp=i*0.5+j*0.5;
+          if(temp==vol_lin){
+              Mic_PGA=encode(i);
+              ADC_GAIN=encode(j);//now not support negative
+              flag=1;
+          }
+       if(flag==1)break;   
+      }
+    if(flag==1)break; 
+    }
+    flag=0;
+    I2CWrite_Codec_AIC3204(0,1); //switch to Page1
+    I2CWrite_Codec_AIC3204(59,Mic_PGA); 
+    I2CWrite_Codec_AIC3204(60,Mic_PGA); 
+    I2CWrite_Codec_AIC3204(0,0); //switch to Page0
+    I2CWrite_Codec_AIC3204(83,ADC_GAIN); 
+    I2CWrite_Codec_AIC3204(84,ADC_GAIN); 
+   
+    signed char DAC_GAIN=0 ,HPL_GAIN=0 ,LOL_GAIN=0;
+    unsigned char flag1=0,flag2=0;
+    for(signed char k=0;k<48+1;k++){
+      for(signed char m=-6;m<29+1;m++){
+          temp=k*0.5+m;
+          if(temp==vol_lout && flag1==0){
+              DAC_GAIN=encode(k);
+              LOL_GAIN=encode(m);
+              flag1=1;
+          }
+          if(temp==vol_spk && flag2==0 ){
+              DAC_GAIN=encode(k);
+              HPL_GAIN=encode(m);            
+              flag2=1;
+          }
+          if(flag1==1 && flag2==1)break;    
+      }
+      if(flag1==1 && flag2==1)break;
+      flag1=0;
+      flag2=0;
+    }
+    if(flag1==0 || flag2==0){
+         for(signed char k=0;k>-127-1;k--){
+            for(signed char m=-6;m<29+1;m++){
+              temp=k*0.5+m;
+              if(temp==vol_lout && flag1==0){
+              DAC_GAIN=encode(k);
+              LOL_GAIN=encode(m);
+              flag1=1;
+            }
+            if(temp==vol_spk && flag2==0 ){
+              DAC_GAIN=encode(k);
+              HPL_GAIN=encode(m);            
+              flag2=1;
+            }
+            if(flag1==1 && flag2==1)break;    
+          }
+        if(flag1==1 && flag2==1)break;
+        flag1=0;
+        flag2=0;
+        }
+    }   
+    flag1=0;
+    flag2=0;
+    I2CWrite_Codec_AIC3204(0,0); //switch to Page0
+    I2CWrite_Codec_AIC3204(65,DAC_GAIN); 
+    I2CWrite_Codec_AIC3204(66,DAC_GAIN); 
+    I2CWrite_Codec_AIC3204(0,1); //switch to Page1
+    I2CWrite_Codec_AIC3204(16,HPL_GAIN); 
+    I2CWrite_Codec_AIC3204(17,HPL_GAIN);
+    I2CWrite_Codec_AIC3204(18,LOL_GAIN); 
+    I2CWrite_Codec_AIC3204(19,LOL_GAIN);
+}
 
 /*****************************************************************************/
 
