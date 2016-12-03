@@ -34,7 +34,7 @@ Freq=10000000
 MultiCoreRunAll=1
 [DebugChecksum]
 <<<<<<< HEAD
-Checksum=1424419212
+Checksum=1397660175
 =======
 Checksum=821862027
 >>>>>>> fm1388_test_spi_rec
@@ -85,16 +85,14 @@ Exclusions=
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\APP\task_cmd_parse.c}.85.13" 0 0 1 "" 0 "" 0
-Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\twid.c}.448.5" 0 0 1 "" 0 "" 0
-Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\APP\task_uart_rx.c}.103.14" 0 0 1 "" 0 "" 0
-Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\spi.c}.286.5" 0 0 1 "" 0 "" 0
-Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.385.9" 0 0 1 "" 0 "" 0
-Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\uif.c}.254.5" 0 0 1 "" 0 "" 0
-Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.855.13" 0 0 1 "" 0 "" 0
-Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\gpio.c}.97.5" 0 0 1 "" 0 "" 0
-Bp8=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Noah\ruler.c}.297.5" 0 0 1 "" 0 "" 0
-Count=9
+Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\twid.c}.448.5" 0 0 1 "" 0 "" 0
+Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\APP\task_uart_rx.c}.103.14" 0 0 1 "" 0 "" 0
+Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\spi.c}.286.5" 0 0 1 "" 0 "" 0
+Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.385.9" 0 0 1 "" 0 "" 0
+Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Noah\noah_cmd.c}.855.13" 0 0 1 "" 0 "" 0
+Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Driver\gpio.c}.97.5" 0 0 1 "" 0 "" 0
+Bp6=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Noah\ruler.c}.297.5" 0 0 1 "" 0 "" 0
+Count=7
 [Aliases]
 A0=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Ports\ARM-Cortex-M3\Generic\IAR\os_cpu_c.c" ""
 A1=_ "E:\SVN Dir\PQ\UIF Board\UIF_Host_OS_V2_nn\uCOS-II\Source\os_core.c" ""

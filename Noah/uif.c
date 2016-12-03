@@ -240,7 +240,8 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
 {  
     
     unsigned char  state, err;
-    unsigned char  buf[8] ; 
+    unsigned char  buf[8] ;
+    unsigned int   mem_addr;    
     unsigned char *pChar;
     unsigned int   i, size;
     
@@ -309,6 +310,55 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                      }
                 break;
             
+                case ATTRI_I2C_FM1388_LOAD_CODE :                      
+                    //I2C_Mixer( I2C_MIX_UIF_M );
+                    size = p_raw_write->data_len % FM1388_I2C_DATA_PACK_SIZE ; 
+                    if( size ) {                       
+                        return I2C_BUS_ERR;                      
+                    }
+                    size = p_raw_write->data_len / FM1388_I2C_DATA_PACK_SIZE - 1;
+                    mem_addr = *(unsigned int*)pChar ;
+                    pChar+= 4;
+                    for( i = 0 ; i < size ; i++ ) {                         
+                        buf[0] = 1;
+                        buf[1] =  (unsigned char)(mem_addr>>8);
+                        buf[2] =  (unsigned char)(mem_addr>>0);
+                        state =  TWID_Write( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        if ( state != SUCCESS ) {
+                            return I2C_BUS_ERR;                  
+                        }
+                        buf[0] = 2;
+                        buf[1] =  (unsigned char)(mem_addr>>24);
+                        buf[2] =  (unsigned char)(mem_addr>>16);
+                        state =  TWID_Write( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        if ( state != SUCCESS ) {
+                            return I2C_BUS_ERR;                  
+                        } 
+                        buf[0] = 3;
+                        buf[2] = *pChar++;
+                        buf[1] = *pChar++;
+                        state =  TWID_Write( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        if ( state != SUCCESS ) {
+                            return I2C_BUS_ERR;                  
+                        } 
+                        buf[0] = 4;
+                        buf[2] = *pChar++;
+                        buf[1] = *pChar++;
+                        state =  TWID_Write( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        if ( state != SUCCESS ) {
+                            return I2C_BUS_ERR;                  
+                        } 
+                        buf[0] = 0;
+                        buf[1] = 0;
+                        buf[2] = 3; //32bit write
+                        state =  TWID_Write( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        if ( state != SUCCESS ) {
+                            return I2C_BUS_ERR;                  
+                        } 
+                        mem_addr += 4 ;
+                    }   
+                break;
+                
                 case ATTRI_I2C_IM205 :  //iM205                         
                     state =  I2C_GPIO_Write_iM205 ( p_raw_write->dev_addr>>1, *pChar, *(pChar+1) );                                
                     if ( state != SUCCESS ) {
@@ -609,5 +659,6 @@ unsigned char GPIO_Session( GPIO_SESSION *p_gpio_session )
    return err;
    
 }
+   
 
 
